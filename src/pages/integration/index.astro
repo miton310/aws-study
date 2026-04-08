@@ -1,0 +1,29 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const services = [
+  { title: 'SQS / SNS', description: '疎結合・Fan-outパターン・DLQ', href: '/integration/sqs', badge: '分野2' },
+  { title: 'Kinesis', description: 'リアルタイムストリーミング・Data Streams / Firehose', href: '/integration/kinesis', badge: '分野3' },
+  { title: 'Step Functions', description: 'サーバーレスワークフロー・ステートマシン', href: '/integration/stepfunctions', badge: '分野2' },
+  { title: 'EventBridge', description: 'イベント駆動・スケジュール実行', href: '/integration/eventbridge', badge: '分野2' },
+];
+---
+
+<Layout title="統合・メッセージング">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / 統合・メッセージング</p>
+    <h1 class="text-3xl font-bold mb-2">統合・メッセージング</h1>
+    <p class="text-gray-500 mb-10">SQS・SNS・Kinesis・Step Functions・EventBridge</p>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {services.map(({ title, description, href, badge }) => (
+        <a href={href} class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-orange-500 hover:scale-105 transition-all block">
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <h2 class="font-bold text-base">{title}</h2>
+            <span class="text-xs bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full shrink-0">{badge}</span>
+          </div>
+          <p class="text-sm text-gray-500">{description}</p>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>

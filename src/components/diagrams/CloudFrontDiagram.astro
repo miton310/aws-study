@@ -1,0 +1,134 @@
+---
+---
+<div>
+  <style>
+    .cf-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
+    .dark .cf-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
+    .cf-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
+    .cf-panel{display:none;}
+    .cf-panel.active{display:block;}
+  </style>
+
+  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
+    <button class="cf-btn active" onclick="cfTab('overview')">CloudFrontとは</button>
+    <button class="cf-btn" onclick="cfTab('cache')">キャッシュの仕組み</button>
+    <button class="cf-btn" onclick="cfTab('oac')">OAC・セキュリティ</button>
+    <button class="cf-btn" onclick="cfTab('pattern')">SAA頻出パターン</button>
+  </div>
+
+  <div id="cf-overview" class="cf-panel active">
+    <svg width="100%" viewBox="0 0 680 380">
+      <defs><marker id="cf-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">Amazon CloudFront：グローバルCDNサービス</text>
+      <rect x="20"  y="60" width="80" height="44" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="60" y="86" text-anchor="middle" font-size="12" fill="#2C2C2A">東京ユーザー</text>
+      <rect x="20"  y="130" width="80" height="44" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="60" y="156" text-anchor="middle" font-size="12" fill="#2C2C2A">NYユーザー</text>
+      <rect x="20"  y="200" width="80" height="44" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="60" y="226" text-anchor="middle" font-size="12" fill="#2C2C2A">LDNユーザー</text>
+      <line x1="100" y1="82"  x2="168" y2="130" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#cf-arr)"/>
+      <line x1="100" y1="152" x2="168" y2="152" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#cf-arr)"/>
+      <line x1="100" y1="222" x2="168" y2="174" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#cf-arr)"/>
+      <rect x="170" y="100" width="160" height="104" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
+      <text x="250" y="128" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">エッジロケーション</text>
+      <text x="250" y="150" text-anchor="middle" font-size="11" fill="#085041">400+箇所・世界中</text>
+      <text x="250" y="170" text-anchor="middle" font-size="11" fill="#085041">キャッシュヒット→即返す</text>
+      <text x="250" y="190" text-anchor="middle" font-size="11" fill="#085041">ミス→オリジンへ</text>
+      <line x1="330" y1="152" x2="398" y2="152" stroke="#854F0B" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#cf-arr)"/>
+      <text x="364" y="142" text-anchor="middle" font-size="11" fill="#854F0B">ミス時のみ</text>
+      <rect x="400" y="80" width="240" height="144" rx="10" fill="#FAEEDA" stroke="#854F0B" stroke-width="1"/>
+      <text x="520" y="108" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">オリジン</text>
+      <text x="520" y="132" text-anchor="middle" font-size="12" fill="#633806">S3バケット</text>
+      <text x="520" y="154" text-anchor="middle" font-size="12" fill="#633806">ALB / EC2</text>
+      <text x="520" y="176" text-anchor="middle" font-size="12" fill="#633806">API Gateway</text>
+      <text x="520" y="198" text-anchor="middle" font-size="12" fill="#633806">カスタムオリジン</text>
+      <rect x="20" y="270" width="640" height="88" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="340" y="294" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">CloudFrontのメリット</text>
+      <text x="40" y="318" font-size="12" fill="#534AB7">・低レイテンシー（最寄りエッジから配信）　・オリジン負荷軽減　・DDoS対策（Shield統合）</text>
+      <text x="40" y="340" font-size="12" fill="#534AB7">・HTTPS対応（ACM証明書）　・WAF統合　・地域制限機能</text>
+    </svg>
+  </div>
+
+  <div id="cf-cache" class="cf-panel">
+    <svg width="100%" viewBox="0 0 680 340">
+      <defs><marker id="cf-arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">キャッシュヒット vs ミス</text>
+      <text x="160" y="56" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">キャッシュヒット（高速）</text>
+      <rect x="20"  y="66" width="80" height="44" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="60" y="92" text-anchor="middle" font-size="12" fill="#2C2C2A">ユーザー</text>
+      <line x1="100" y1="88" x2="138" y2="88" stroke="#1D9E75" stroke-width="2" marker-end="url(#cf-arr2)"/>
+      <rect x="140" y="66" width="120" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="200" y="84" text-anchor="middle" font-size="12" fill="#085041">エッジ</text><text x="200" y="100" text-anchor="middle" font-size="11" fill="#085041">キャッシュあり✅</text>
+      <line x1="200" y1="110" x2="200" y2="130" stroke="#1D9E75" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#cf-arr2)"/>
+      <rect x="140" y="132" width="120" height="36" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="200" y="154" text-anchor="middle" font-size="12" fill="#085041">即座に返す</text>
+      <text x="340" y="56" text-anchor="middle" font-size="13" font-weight="500" fill="#A32D2D">キャッシュミス（初回）</text>
+      <rect x="360" y="66" width="80" height="44" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="400" y="92" text-anchor="middle" font-size="12" fill="#2C2C2A">ユーザー</text>
+      <line x1="440" y1="88" x2="478" y2="88" stroke="#E24B4A" stroke-width="2" marker-end="url(#cf-arr2)"/>
+      <rect x="480" y="66" width="120" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="540" y="84" text-anchor="middle" font-size="12" fill="#085041">エッジ</text><text x="540" y="100" text-anchor="middle" font-size="11" fill="#A32D2D">キャッシュなし✕</text>
+      <line x1="600" y1="88" x2="638" y2="88" stroke="#E24B4A" stroke-width="1.5" marker-end="url(#cf-arr2)"/>
+      <rect x="620" y="66" width="50" height="44" rx="6" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/><text x="645" y="92" text-anchor="middle" font-size="11" fill="#633806">オリジン</text>
+      <rect x="20" y="200" width="640" height="120" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="224" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">キャッシュ制御</text>
+      <text x="40" y="248" font-size="12" fill="#633806">TTL（Time To Live）：キャッシュの有効期限（デフォルト24時間）</text>
+      <text x="40" y="270" font-size="12" fill="#633806">Invalidation：手動でキャッシュを削除（コンテンツ更新時に使用）</text>
+      <text x="40" y="292" font-size="12" fill="#633806">Cache-Control ヘッダー：オリジンからTTLを細かく制御できる</text>
+      <text x="40" y="312" font-size="12" fill="#633806">SAA頻出：「コンテンツを即時更新したい」→ Invalidationを実行</text>
+    </svg>
+  </div>
+
+  <div id="cf-oac" class="cf-panel">
+    <svg width="100%" viewBox="0 0 680 340">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">OAC（オリジンアクセス制御）：S3への直接アクセスを防ぐ</text>
+      <rect x="40"  y="50" width="270" height="100" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+      <text x="175" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#791F1F">OACなし（問題あり）</text>
+      <text x="175" y="102" text-anchor="middle" font-size="12" fill="#A32D2D">S3のURLに直接アクセス可能</text>
+      <text x="175" y="124" text-anchor="middle" font-size="12" fill="#A32D2D">CloudFrontをバイパスされる</text>
+      <rect x="370" y="50" width="270" height="100" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="505" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">OACあり（推奨）</text>
+      <text x="505" y="102" text-anchor="middle" font-size="12" fill="#085041">CloudFront経由のみS3にアクセス可</text>
+      <text x="505" y="124" text-anchor="middle" font-size="12" fill="#085041">S3への直接アクセスを遮断</text>
+      <rect x="40" y="170" width="600" height="56" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="340" y="194" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">設定方法</text>
+      <text x="340" y="214" text-anchor="middle" font-size="12" fill="#534AB7">OACを作成 → CloudFrontに設定 → S3バケットポリシーでCloudFrontのみ許可</text>
+      <rect x="40" y="246" width="600" height="76" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="270" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出ポイント</text>
+      <text x="60" y="294" font-size="12" fill="#633806">「S3をCloudFront経由のみに制限」→ OAC（旧OAI）を設定</text>
+      <text x="60" y="314" font-size="12" fill="#633806">「CloudFrontのHTTPS証明書」→ ACMはus-east-1（バージニア）で作成必須</text>
+    </svg>
+  </div>
+
+  <div id="cf-pattern" class="cf-panel">
+    <svg width="100%" viewBox="0 0 680 340">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">SAA頻出パターン</text>
+      <rect x="40" y="44" width="600" height="276" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="60" y="74"  font-size="12" fill="#633806">「静的Webサイトを世界中に高速配信」</text>
+      <text x="500" y="74"  font-size="12" font-weight="500" fill="#412402">→ S3 + CloudFront</text>
+      <line x1="40" y1="86" x2="640" y2="86" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="108" font-size="12" fill="#633806">「S3に直接アクセスされないようにしたい」</text>
+      <text x="500" y="108" font-size="12" font-weight="500" fill="#412402">→ OAC設定</text>
+      <line x1="40" y1="120" x2="640" y2="120" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="142" font-size="12" fill="#633806">「DDoS攻撃からアプリを守りたい」</text>
+      <text x="500" y="142" font-size="12" font-weight="500" fill="#412402">→ CloudFront + Shield</text>
+      <line x1="40" y1="154" x2="640" y2="154" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="176" font-size="12" fill="#633806">「SQLインジェクション・XSSを防ぎたい」</text>
+      <text x="500" y="176" font-size="12" font-weight="500" fill="#412402">→ CloudFront + WAF</text>
+      <line x1="40" y1="188" x2="640" y2="188" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="210" font-size="12" fill="#633806">「HTTPSで配信・証明書を管理したい」</text>
+      <text x="500" y="210" font-size="12" font-weight="500" fill="#412402">→ ACM（us-east-1必須）</text>
+      <line x1="40" y1="222" x2="640" y2="222" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="244" font-size="12" fill="#633806">「特定の国からのアクセスをブロック」</text>
+      <text x="500" y="244" font-size="12" font-weight="500" fill="#412402">→ CloudFront地域制限</text>
+      <line x1="40" y1="256" x2="640" y2="256" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="278" font-size="12" fill="#633806">「Global Acceleratorとの違いは？」</text>
+      <text x="500" y="278" font-size="12" font-weight="500" fill="#412402">→ CFはキャッシュあり・GAは固定IP</text>
+      <line x1="40" y1="290" x2="640" y2="290" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="308" font-size="12" fill="#633806">「コンテンツを即時更新したい」</text>
+      <text x="500" y="308" font-size="12" font-weight="500" fill="#412402">→ Invalidation実行</text>
+    </svg>
+  </div>
+</div>
+
+<script>
+  function cfTab(t: string) {
+    document.querySelectorAll('[id^="cf-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('cf-' + t)?.classList.add('active');
+    document.querySelectorAll('.cf-btn').forEach(el => el.classList.remove('active'));
+    (event?.target as HTMLElement)?.classList.add('active');
+  }
+  (window as any).cfTab = cfTab;
+</script>

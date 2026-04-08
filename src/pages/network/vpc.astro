@@ -1,0 +1,22 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import VpcDiagram from '../../components/diagrams/VpcDiagram.astro';
+import VpcAnimationDiagram from '../../components/diagrams/VpcAnimationDiagram.astro';
+---
+<Layout title="VPC">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / <a href="/network" class="hover:text-orange-500">ネットワーク</a> / VPC</p>
+    <h1 class="text-3xl font-bold mb-2">VPC（Virtual Private Cloud）</h1>
+    <p class="text-gray-500 mb-10">サブネット・SG・NACL・NAT Gateway・VPC Endpoint</p>
+
+    <section class="mb-12">
+      <h2 class="text-xl font-bold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700">通信フローアニメーション</h2>
+      <VpcAnimationDiagram />
+    </section>
+
+    <section class="mb-12">
+      <h2 class="text-xl font-bold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700">VPC構造・SG・NACL・Endpoint</h2>
+      <VpcDiagram />
+    </section>
+  </div>
+</Layout>

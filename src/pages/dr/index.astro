@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import DRDiagram from '../../components/diagrams/DRDiagram.astro';
+---
+<Layout title="DR戦略">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / DR戦略</p>
+    <h1 class="text-3xl font-bold mb-2">DR戦略（ディザスタリカバリ）</h1>
+    <p class="text-gray-500 mb-10">RTO・RPO・バックアップ・パイロットライト・ウォームスタンバイ・アクティブ-アクティブ</p>
+    <DRDiagram />
+  </div>
+</Layout>

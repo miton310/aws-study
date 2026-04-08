@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AutoScalingDiagram from '../../components/diagrams/AutoScalingDiagram.astro';
+---
+<Layout title="Auto Scaling">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / <a href="/compute" class="hover:text-orange-500">コンピューティング</a> / Auto Scaling</p>
+    <h1 class="text-3xl font-bold mb-2">EC2 Auto Scaling</h1>
+    <p class="text-gray-500 mb-10">スケーリングポリシー・最小/希望/最大・ALB連携・マルチAZ</p>
+    <AutoScalingDiagram />
+  </div>
+</Layout>

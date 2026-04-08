@@ -1,0 +1,144 @@
+---
+---
+<div>
+  <style>
+    .ddb-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
+    .dark .ddb-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
+    .ddb-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
+    .ddb-panel{display:none;}
+    .ddb-panel.active{display:block;}
+  </style>
+
+  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
+    <button class="ddb-btn active" onclick="ddbTab('overview')">DynamoDBとは</button>
+    <button class="ddb-btn" onclick="ddbTab('key')">キーとインデックス</button>
+    <button class="ddb-btn" onclick="ddbTab('feature')">重要機能</button>
+    <button class="ddb-btn" onclick="ddbTab('compare')">RDSとの使い分け</button>
+  </div>
+
+  <div id="ddb-overview" class="ddb-panel active">
+    <svg width="100%" viewBox="0 0 680 360">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">Amazon DynamoDB：フルマネージドNoSQLデータベース</text>
+      <rect x="40"  y="50" width="180" height="68" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="130" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">サーバーレス</text>
+      <text x="130" y="102" text-anchor="middle" font-size="11" fill="#534AB7">サーバー管理不要</text>
+      <rect x="250" y="50" width="180" height="68" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="340" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">ミリ秒レスポンス</text>
+      <text x="340" y="102" text-anchor="middle" font-size="11" fill="#534AB7">どんな規模でも一貫</text>
+      <rect x="460" y="50" width="180" height="68" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="550" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">自動スケール</text>
+      <text x="550" y="102" text-anchor="middle" font-size="11" fill="#534AB7">無制限のスループット</text>
+      <text x="340" y="148" text-anchor="middle" font-size="13" font-weight="500" fill="currentColor">データ構造：テーブル → アイテム → 属性</text>
+      <rect x="40" y="162" width="600" height="120" rx="10" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <text x="56" y="182" font-size="12" fill="#534AB7">テーブル: Users</text>
+      <rect x="56"  y="192" width="120" height="28" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/><text x="116" y="210" text-anchor="middle" font-size="11" fill="#3C3489">userId（PK）</text>
+      <rect x="186" y="192" width="120" height="28" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/><text x="246" y="210" text-anchor="middle" font-size="11" fill="#3C3489">name</text>
+      <rect x="316" y="192" width="120" height="28" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/><text x="376" y="210" text-anchor="middle" font-size="11" fill="#3C3489">age</text>
+      <rect x="446" y="192" width="180" height="28" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/><text x="536" y="210" text-anchor="middle" font-size="11" fill="#3C3489">任意の属性（柔軟）</text>
+      <rect x="56"  y="220" width="120" height="28" rx="0" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="116" y="238" text-anchor="middle" font-size="11" fill="#2C2C2A">user-001</text>
+      <rect x="186" y="220" width="120" height="28" rx="0" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="246" y="238" text-anchor="middle" font-size="11" fill="#2C2C2A">Miton</text>
+      <rect x="316" y="220" width="120" height="28" rx="0" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="376" y="238" text-anchor="middle" font-size="11" fill="#2C2C2A">30</text>
+      <rect x="446" y="220" width="180" height="28" rx="0" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="536" y="238" text-anchor="middle" font-size="11" fill="#2C2C2A">city: Hiroshima</text>
+      <rect x="56"  y="248" width="120" height="28" rx="0" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="116" y="266" text-anchor="middle" font-size="11" fill="#2C2C2A">user-002</text>
+      <rect x="186" y="248" width="120" height="28" rx="0" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="246" y="266" text-anchor="middle" font-size="11" fill="#2C2C2A">Taro</text>
+      <rect x="316" y="248" width="120" height="28" rx="0" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="376" y="266" text-anchor="middle" font-size="11" fill="#2C2C2A">25</text>
+      <rect x="446" y="248" width="180" height="28" rx="0" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="536" y="266" text-anchor="middle" font-size="11" fill="#2C2C2A">（属性なしもOK）</text>
+      <rect x="40" y="300" width="600" height="44" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="326" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">NoSQLの特徴：スキーマレス・各アイテムで属性が違っても良い</text>
+    </svg>
+  </div>
+
+  <div id="ddb-key" class="ddb-panel">
+    <svg width="100%" viewBox="0 0 680 360">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">キーとインデックス：データへのアクセス方法</text>
+      <rect x="40"  y="50" width="270" height="80" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="175" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">シンプルキー（PKのみ）</text>
+      <text x="175" y="102" text-anchor="middle" font-size="12" fill="#534AB7">userId だけで一意に識別</text>
+      <rect x="370" y="50" width="270" height="80" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="505" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">複合キー（PK + ソートキー）</text>
+      <text x="505" y="102" text-anchor="middle" font-size="12" fill="#534AB7">userId + timestamp で一意に識別</text>
+      <rect x="40"  y="160" width="270" height="100" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="175" y="188" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">GSI（グローバルセカンダリインデックス）</text>
+      <text x="175" y="212" text-anchor="middle" font-size="12" fill="#085041">別のPKでクエリ可能</text>
+      <text x="175" y="232" text-anchor="middle" font-size="12" fill="#085041">例：emailでユーザーを検索</text>
+      <text x="175" y="252" text-anchor="middle" font-size="12" fill="#085041">後から追加可能</text>
+      <rect x="370" y="160" width="270" height="100" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="505" y="188" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">LSI（ローカルセカンダリインデックス）</text>
+      <text x="505" y="212" text-anchor="middle" font-size="12" fill="#993C1D">同じPKで別ソートキーでクエリ</text>
+      <text x="505" y="232" text-anchor="middle" font-size="12" fill="#993C1D">テーブル作成時のみ設定可能</text>
+      <text x="505" y="252" text-anchor="middle" font-size="12" fill="#993C1D">後から追加不可</text>
+      <rect x="40" y="278" width="600" height="60" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="302" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出</text>
+      <text x="340" y="326" text-anchor="middle" font-size="12" fill="#633806">PK以外の属性で検索したい → GSIを作成（後から追加可能）</text>
+    </svg>
+  </div>
+
+  <div id="ddb-feature" class="ddb-panel">
+    <svg width="100%" viewBox="0 0 680 340">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">DynamoDBの重要機能</text>
+      <rect x="40"  y="50" width="180" height="80" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="130" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">DAX</text>
+      <text x="130" y="102" text-anchor="middle" font-size="12" fill="#085041">インメモリキャッシュ</text>
+      <text x="130" y="120" text-anchor="middle" font-size="11" fill="#085041">マイクロ秒レスポンス</text>
+      <rect x="250" y="50" width="180" height="80" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="340" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">DynamoDB Streams</text>
+      <text x="340" y="102" text-anchor="middle" font-size="12" fill="#085041">データ変更をイベント化</text>
+      <text x="340" y="120" text-anchor="middle" font-size="11" fill="#085041">Lambdaと連携可能</text>
+      <rect x="460" y="50" width="180" height="80" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="550" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">グローバルテーブル</text>
+      <text x="550" y="102" text-anchor="middle" font-size="12" fill="#085041">複数リージョンに自動複製</text>
+      <text x="550" y="120" text-anchor="middle" font-size="11" fill="#085041">低レイテンシーアクセス</text>
+      <rect x="40"  y="150" width="180" height="80" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="130" y="178" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">TTL</text>
+      <text x="130" y="202" text-anchor="middle" font-size="12" fill="#534AB7">有効期限で自動削除</text>
+      <text x="130" y="220" text-anchor="middle" font-size="11" fill="#534AB7">セッション管理向き</text>
+      <rect x="250" y="150" width="180" height="80" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="340" y="178" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">オンデマンドモード</text>
+      <text x="340" y="202" text-anchor="middle" font-size="12" fill="#534AB7">使った分だけ課金</text>
+      <text x="340" y="220" text-anchor="middle" font-size="11" fill="#534AB7">トラフィック予測不要</text>
+      <rect x="460" y="150" width="180" height="80" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="550" y="178" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">プロビジョンドモード</text>
+      <text x="550" y="202" text-anchor="middle" font-size="12" fill="#534AB7">RCU/WCUを事前設定</text>
+      <text x="550" y="220" text-anchor="middle" font-size="11" fill="#534AB7">Auto Scalingと組合せ</text>
+      <rect x="40" y="250" width="600" height="68" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="274" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出ポイント</text>
+      <text x="60" y="298" font-size="12" fill="#633806">「DynamoDBをさらに高速化」→ DAX（マイクロ秒・ElastiCacheとの違いに注意）</text>
+      <text x="60" y="316" font-size="12" fill="#633806">「データ変更をトリガーにLambdaを実行」→ DynamoDB Streams</text>
+    </svg>
+  </div>
+
+  <div id="ddb-compare" class="ddb-panel">
+    <svg width="100%" viewBox="0 0 680 340">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">RDS vs DynamoDB：どちらを選ぶか</text>
+      <rect x="40"  y="50" width="180" height="36" rx="4" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="130" y="72" text-anchor="middle" font-size="12" font-weight="500" fill="#2C2C2A">比較項目</text>
+      <rect x="230" y="50" width="190" height="36" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/><text x="325" y="72" text-anchor="middle" font-size="12" font-weight="500" fill="#0C447C">RDS / Aurora</text>
+      <rect x="430" y="50" width="210" height="36" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/><text x="535" y="72" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">DynamoDB</text>
+      <rect x="40"  y="86" width="180" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="130" y="108" text-anchor="middle" font-size="12" fill="#5F5E5A">DBの種類</text>
+      <rect x="230" y="86" width="190" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="325" y="108" text-anchor="middle" font-size="12" fill="#0C447C">リレーショナル（SQL）</text>
+      <rect x="430" y="86" width="210" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="535" y="108" text-anchor="middle" font-size="12" fill="#3C3489">NoSQL（Key-Value）</text>
+      <rect x="40"  y="122" width="180" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="130" y="144" text-anchor="middle" font-size="12" fill="#5F5E5A">スキーマ</text>
+      <rect x="230" y="122" width="190" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="325" y="144" text-anchor="middle" font-size="12" fill="#0C447C">固定スキーマ必須</text>
+      <rect x="430" y="122" width="210" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="535" y="144" text-anchor="middle" font-size="12" fill="#3C3489">スキーマレス・柔軟</text>
+      <rect x="40"  y="158" width="180" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="130" y="180" text-anchor="middle" font-size="12" fill="#5F5E5A">JOIN・複雑クエリ</text>
+      <rect x="230" y="158" width="190" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="325" y="180" text-anchor="middle" font-size="12" fill="#0C447C">✅ 得意</text>
+      <rect x="430" y="158" width="210" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="535" y="180" text-anchor="middle" font-size="12" fill="#A32D2D">✕ 苦手</text>
+      <rect x="40"  y="194" width="180" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="130" y="216" text-anchor="middle" font-size="12" fill="#5F5E5A">スケール</text>
+      <rect x="230" y="194" width="190" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="325" y="216" text-anchor="middle" font-size="12" fill="#0C447C">垂直スケール中心</text>
+      <rect x="430" y="194" width="210" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="535" y="216" text-anchor="middle" font-size="12" fill="#3C3489">水平スケール・無制限</text>
+      <rect x="40" y="250" width="600" height="68" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="274" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出の使い分け</text>
+      <text x="60" y="298" font-size="12" fill="#633806">「JOIN・トランザクション・複雑なクエリ」→ RDS / Aurora</text>
+      <text x="60" y="316" font-size="12" fill="#633806">「大規模・高速・サーバーレス・スキーマ柔軟」→ DynamoDB</text>
+    </svg>
+  </div>
+</div>
+
+<script>
+  function ddbTab(t: string) {
+    document.querySelectorAll('[id^="ddb-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('ddb-' + t)?.classList.add('active');
+    document.querySelectorAll('.ddb-btn').forEach(el => el.classList.remove('active'));
+    (event?.target as HTMLElement)?.classList.add('active');
+  }
+  (window as any).ddbTab = ddbTab;
+</script>

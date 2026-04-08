@@ -1,11 +1,137 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const categories = [
+  {
+    title: 'ネットワーク',
+    description: 'VPC・ELB・Route53・CloudFront・Transit Gateway',
+    href: '/network',
+    icon: '🌐',
+    color: 'bg-blue-50 border-blue-200',
+    badge: '分野1・3',
+  },
+  {
+    title: 'セキュリティ',
+    description: 'IAM・KMS・WAF・Shield・GuardDuty・Cognito',
+    href: '/security',
+    icon: '🔒',
+    color: 'bg-red-50 border-red-200',
+    badge: '分野1（30%）',
+  },
+  {
+    title: 'コンピューティング',
+    description: 'EC2・Lambda・Fargate・ECS・Auto Scaling',
+    href: '/compute',
+    icon: '⚡',
+    color: 'bg-yellow-50 border-yellow-200',
+    badge: '分野2・3',
+  },
+  {
+    title: 'データベース',
+    description: 'RDS・Aurora・DynamoDB・ElastiCache',
+    href: '/database',
+    icon: '🗄️',
+    color: 'bg-green-50 border-green-200',
+    badge: '分野3（24%）',
+  },
+  {
+    title: 'ストレージ',
+    description: 'S3・EBS・EFS・Snow Family',
+    href: '/storage',
+    icon: '💾',
+    color: 'bg-purple-50 border-purple-200',
+    badge: '分野3・4',
+  },
+  {
+    title: '統合・メッセージング',
+    description: 'SQS・SNS・Kinesis・Step Functions・EventBridge',
+    href: '/integration',
+    icon: '🔗',
+    color: 'bg-orange-50 border-orange-200',
+    badge: '分野2（26%）',
+  },
+  {
+    title: '監視・管理',
+    description: 'CloudWatch・CloudFormation・Systems Manager',
+    href: '/management',
+    icon: '📊',
+    color: 'bg-teal-50 border-teal-200',
+    badge: '分野6',
+  },
+  {
+    title: 'DR戦略',
+    description: 'バックアップ・パイロットライト・ウォームスタンバイ・アクティブ-アクティブ',
+    href: '/dr',
+    icon: '🛡️',
+    color: 'bg-pink-50 border-pink-200',
+    badge: '分野2',
+  },
+];
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="トップ">
+
+  <!-- Hero -->
+  <section class="max-w-7xl mx-auto px-4 pt-16 pb-12 text-center">
+    <div class="inline-flex items-center gap-2 bg-orange-100 text-orange-600 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
+      <span>📚</span>
+      <span>図解でわかる AWS 試験対策</span>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+      AWSを<span class="text-orange-500">図解</span>で学ぶ
+    </h1>
+    <p class="text-gray-600 text-lg max-w-2xl mx-auto mb-8">
+      複雑なAWSサービスの関係を図解で直感的に理解。問題演習で知識を定着させて試験に臨もう。
+    </p>
+    <div class="flex flex-wrap gap-4 justify-center">
+      <a href="/network" class="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-lg transition-colors">
+        図解を見る →
+      </a>
+      <a href="/quiz" class="border border-gray-300 hover:border-orange-500 font-medium px-6 py-3 rounded-lg transition-colors">
+        問題演習へ
+      </a>
+    </div>
+  </section>
+
+  <!-- Exam Info -->
+  <section class="max-w-7xl mx-auto px-4 mb-16">
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="border rounded-xl p-6 flex items-center gap-4">
+        <div class="bg-orange-500 text-white font-bold text-sm px-3 py-1.5 rounded-lg shrink-0">
+          SAA-C03
+        </div>
+        <div>
+          <p class="font-medium">Solutions Architect Associate</p>
+          <p class="text-sm text-gray-500">合格スコア 720/1000 65問</p>
+        </div>
+      </div>
+      <div class="border rounded-xl p-6 flex items-center gap-4">
+        <div class="bg-red-500 text-white font-bold text-sm px-3 py-1.5 rounded-lg shrink-0">
+          SAP-C02
+        </div>
+        <div>
+          <p class="font-medium">Solutions Architect Professional</p>
+          <p class="text-sm text-gray-500">合格スコア 750/1000 75問</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="max-w-7xl mx-auto px-4 pb-20">
+    <h2 class="text-2xl font-bold mb-8">カテゴリから学ぶ</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {categories.map(({ title, description, href, icon, color, badge }) => (
+        <a href={href} class={`${color} border rounded-xl p-5 hover:scale-105 transition-transform duration-200 block`}>
+          <div class="text-3xl mb-3">{icon}</div>
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <h3 class="font-bold text-base">{title}</h3>
+            <span class="text-xs bg-white px-2 py-0.5 rounded-full shrink-0">{badge}</span>
+          </div>
+          <p class="text-sm text-gray-600 leading-relaxed">{description}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+
 </Layout>

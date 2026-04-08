@@ -1,0 +1,129 @@
+---
+---
+<div>
+  <style>
+    .as-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
+    .dark .as-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
+    .as-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
+    .as-panel{display:none;}
+    .as-panel.active{display:block;}
+  </style>
+
+  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
+    <button class="as-btn active" onclick="asTab('overview')">Auto Scalingとは</button>
+    <button class="as-btn" onclick="asTab('policy')">スケーリングポリシー</button>
+    <button class="as-btn" onclick="asTab('elb')">ELBとの連携</button>
+    <button class="as-btn" onclick="asTab('pattern')">頻出パターン</button>
+  </div>
+
+  <div id="as-overview" class="as-panel active">
+    <svg width="100%" viewBox="0 0 680 380">
+      <defs><marker id="as-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">EC2 Auto Scaling：負荷に応じてEC2台数を自動調整</text>
+      <text x="120" y="52" text-anchor="middle" font-size="12" fill="#085041">通常時</text>
+      <rect x="40" y="62" width="160" height="100" rx="10" fill="none" stroke="#1D9E75" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <rect x="60"  y="80" width="120" height="36" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="120" y="102" text-anchor="middle" font-size="12" fill="#085041">EC2 × 2台</text>
+      <text x="120" y="152" text-anchor="middle" font-size="11" fill="#085041">希望台数: 2</text>
+      <text x="340" y="52" text-anchor="middle" font-size="12" fill="#993C1D">スパイク時（スケールアウト）</text>
+      <rect x="220" y="62" width="240" height="100" rx="10" fill="none" stroke="#993C1D" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <rect x="234" y="80" width="100" height="36" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="284" y="102" text-anchor="middle" font-size="12" fill="#085041">EC2 × 4台</text>
+      <line x1="200" y1="100" x2="220" y2="100" stroke="#993C1D" stroke-width="2" marker-end="url(#as-arr)"/>
+      <text x="340" y="152" text-anchor="middle" font-size="11" fill="#993C1D">自動で台数増加</text>
+      <text x="570" y="52" text-anchor="middle" font-size="12" fill="#185FA5">閑散時（スケールイン）</text>
+      <rect x="490" y="62" width="160" height="100" rx="10" fill="none" stroke="#185FA5" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <rect x="510" y="80" width="120" height="36" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="570" y="102" text-anchor="middle" font-size="12" fill="#085041">EC2 × 1台</text>
+      <line x1="460" y1="100" x2="490" y2="100" stroke="#185FA5" stroke-width="2" marker-end="url(#as-arr)"/>
+      <text x="570" y="152" text-anchor="middle" font-size="11" fill="#185FA5">自動で台数削減</text>
+      <text x="340" y="192" text-anchor="middle" font-size="13" font-weight="500" fill="currentColor">Auto Scalingグループの3つの設定値</text>
+      <rect x="40"  y="208" width="180" height="68" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/><text x="130" y="234" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">最小台数</text><text x="130" y="258" text-anchor="middle" font-size="12" fill="#185FA5">絶対に下回らない台数</text>
+      <rect x="250" y="208" width="180" height="68" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/><text x="340" y="234" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">希望台数</text><text x="340" y="258" text-anchor="middle" font-size="12" fill="#534AB7">通常時の目標台数</text>
+      <rect x="460" y="208" width="180" height="68" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/><text x="550" y="234" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">最大台数</text><text x="550" y="258" text-anchor="middle" font-size="12" fill="#993C1D">絶対に超えない台数</text>
+      <rect x="40" y="296" width="600" height="68" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="320" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">ALB + Auto Scaling + マルチAZ = SAA最頻出の高可用性構成</text>
+      <text x="340" y="344" text-anchor="middle" font-size="12" fill="#633806">例: 最小1・希望2・最大10 → 負荷に応じて1〜10台の間で自動調整</text>
+    </svg>
+  </div>
+
+  <div id="as-policy" class="as-panel">
+    <svg width="100%" viewBox="0 0 680 360">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">スケーリングポリシーの種類</text>
+      <rect x="40"  y="50" width="270" height="100" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="175" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">ターゲット追跡スケーリング</text>
+      <text x="175" y="102" text-anchor="middle" font-size="12" fill="#085041">「CPU使用率を50%に保つ」</text>
+      <text x="175" y="124" text-anchor="middle" font-size="11" fill="#085041">自動で台数を調整・最もシンプル・推奨</text>
+      <rect x="370" y="50" width="270" height="100" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="505" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">ステップスケーリング</text>
+      <text x="505" y="102" text-anchor="middle" font-size="12" fill="#534AB7">「CPU70%超→2台追加、90%超→5台追加」</text>
+      <text x="505" y="124" text-anchor="middle" font-size="11" fill="#534AB7">段階的に細かく制御</text>
+      <rect x="40"  y="168" width="270" height="100" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="175" y="196" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">シンプルスケーリング</text>
+      <text x="175" y="220" text-anchor="middle" font-size="12" fill="#993C1D">アラーム発火で固定台数を追加/削除</text>
+      <text x="175" y="242" text-anchor="middle" font-size="11" fill="#993C1D">クールダウン期間後に再評価</text>
+      <rect x="370" y="168" width="270" height="100" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="505" y="196" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">スケジュールスケーリング</text>
+      <text x="505" y="220" text-anchor="middle" font-size="12" fill="#185FA5">「毎朝9時に5台、夜22時に2台」</text>
+      <text x="505" y="242" text-anchor="middle" font-size="11" fill="#185FA5">予測できる負荷パターン向け</text>
+      <rect x="40" y="286" width="600" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="310" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出の使い分け</text>
+      <text x="60" y="334" font-size="12" fill="#633806">「シンプルに特定メトリクスを維持」→ ターゲット追跡　「夜間は台数を減らす」→ スケジュール</text>
+    </svg>
+  </div>
+
+  <div id="as-elb" class="as-panel">
+    <svg width="100%" viewBox="0 0 680 360">
+      <defs><marker id="as-arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">ELB + Auto Scaling：高可用性の鉄板構成</text>
+      <rect x="40"  y="60" width="80" height="44" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="80" y="86" text-anchor="middle" font-size="12" fill="#2C2C2A">ユーザー</text>
+      <line x1="120" y1="82" x2="158" y2="82" stroke="#888780" stroke-width="1.5" marker-end="url(#as-arr2)"/>
+      <rect x="160" y="48" width="120" height="68" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="220" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">ALB</text>
+      <text x="220" y="102" text-anchor="middle" font-size="11" fill="#185FA5">トラフィック分散</text>
+      <line x1="280" y1="72" x2="318" y2="60" stroke="#185FA5" stroke-width="1.5" marker-end="url(#as-arr2)"/>
+      <line x1="280" y1="82" x2="318" y2="82" stroke="#185FA5" stroke-width="1.5" marker-end="url(#as-arr2)"/>
+      <line x1="280" y1="92" x2="318" y2="104" stroke="#185FA5" stroke-width="1.5" marker-end="url(#as-arr2)"/>
+      <rect x="300" y="80" width="340" height="180" rx="12" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-dasharray="6 3"/>
+      <text x="316" y="100" font-size="11" fill="#534AB7">Auto Scalingグループ（最小2・最大6）</text>
+      <rect x="320" y="110" width="100" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="370" y="136" text-anchor="middle" font-size="12" fill="#085041">EC2-1</text>
+      <rect x="440" y="110" width="100" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="490" y="136" text-anchor="middle" font-size="12" fill="#085041">EC2-2</text>
+      <rect x="560" y="110" width="70" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="595" y="136" text-anchor="middle" font-size="12" fill="#085041">EC2-3</text>
+      <rect x="440" y="178" width="100" height="44" rx="6" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/><text x="490" y="196" text-anchor="middle" font-size="12" fill="#633806">EC2-4</text><text x="490" y="212" text-anchor="middle" font-size="11" fill="#854F0B">自動追加</text>
+      <rect x="560" y="178" width="70" height="44" rx="6" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/><text x="595" y="196" text-anchor="middle" font-size="12" fill="#633806">EC2-5</text><text x="595" y="212" text-anchor="middle" font-size="11" fill="#854F0B">自動追加</text>
+      <rect x="40" y="178" width="120" height="44" rx="6" fill="#EAF3DE" stroke="#3B6D11" stroke-width="0.5"/>
+      <text x="100" y="196" text-anchor="middle" font-size="12" font-weight="500" fill="#27500A">CloudWatch</text>
+      <text x="100" y="212" text-anchor="middle" font-size="11" fill="#3B6D11">CPU監視→アラーム</text>
+      <line x1="160" y1="200" x2="298" y2="200" stroke="#3B6D11" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#as-arr2)"/>
+      <rect x="40" y="286" width="600" height="44" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="312" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">ALB + Auto Scaling + マルチAZ = SAA で最頻出の高可用性構成</text>
+    </svg>
+  </div>
+
+  <div id="as-pattern" class="as-panel">
+    <svg width="100%" viewBox="0 0 680 320">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">SAA頻出パターン</text>
+      <rect x="40" y="44" width="600" height="256" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="60" y="74"  font-size="12" fill="#633806">「負荷に応じてEC2台数を自動調整したい」</text><text x="500" y="74"  font-size="12" font-weight="500" fill="#412402">→ Auto Scaling + ターゲット追跡</text>
+      <line x1="40" y1="86" x2="640" y2="86" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="108" font-size="12" fill="#633806">「EC2が1台落ちても自動で復旧させたい」</text><text x="500" y="108" font-size="12" font-weight="500" fill="#412402">→ Auto Scaling（最小台数=1）</text>
+      <line x1="40" y1="120" x2="640" y2="120" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="142" font-size="12" fill="#633806">「夜間のトラフィックが少ない時間帯にコスト削減」</text><text x="500" y="142" font-size="12" font-weight="500" fill="#412402">→ スケジュールスケーリング</text>
+      <line x1="40" y1="154" x2="640" y2="154" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="176" font-size="12" fill="#633806">「スケールアウト後すぐスケールインが起きてしまう」</text><text x="500" y="176" font-size="12" font-weight="500" fill="#412402">→ クールダウン期間を延長</text>
+      <line x1="40" y1="188" x2="640" y2="188" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="210" font-size="12" fill="#633806">「本番はオンデマンド・バッチはスポットで混在」</text><text x="500" y="210" font-size="12" font-weight="500" fill="#412402">→ 混合インスタンスポリシー</text>
+      <line x1="40" y1="222" x2="640" y2="222" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="244" font-size="12" fill="#633806">「ALB + Auto Scaling + マルチAZ」</text><text x="500" y="244" font-size="12" font-weight="500" fill="#412402">→ 高可用性の鉄板構成</text>
+      <line x1="40" y1="256" x2="640" y2="256" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="282" font-size="12" fill="#633806">「ウォームアップが必要なアプリで誤スケールを防ぐ」</text><text x="500" y="282" font-size="12" font-weight="500" fill="#412402">→ ウォームアップ期間を設定</text>
+    </svg>
+  </div>
+</div>
+
+<script>
+  function asTab(t: string) {
+    document.querySelectorAll('[id^="as-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('as-' + t)?.classList.add('active');
+    document.querySelectorAll('.as-btn').forEach(el => el.classList.remove('active'));
+    (event?.target as HTMLElement)?.classList.add('active');
+  }
+  (window as any).asTab = asTab;
+</script>

@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import LambdaDiagram from '../../components/diagrams/LambdaDiagram.astro';
+---
+<Layout title="Lambda">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / <a href="/compute" class="hover:text-orange-500">コンピューティング</a> / Lambda</p>
+    <h1 class="text-3xl font-bold mb-2">AWS Lambda</h1>
+    <p class="text-gray-500 mb-10">サーバーレス・イベント駆動・最大15分・自動スケール</p>
+    <LambdaDiagram />
+  </div>
+</Layout>

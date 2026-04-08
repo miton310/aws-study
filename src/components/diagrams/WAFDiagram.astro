@@ -1,0 +1,138 @@
+---
+---
+<div>
+  <style>
+    .waf-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
+    .dark .waf-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
+    .waf-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
+    .waf-panel{display:none;}
+    .waf-panel.active{display:block;}
+  </style>
+
+  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
+    <button class="waf-btn active" onclick="wafTab('overview')">全体像</button>
+    <button class="waf-btn" onclick="wafTab('waf')">WAF</button>
+    <button class="waf-btn" onclick="wafTab('shield')">Shield</button>
+    <button class="waf-btn" onclick="wafTab('detect')">GuardDuty / Inspector / Macie</button>
+  </div>
+
+  <div id="waf-overview" class="waf-panel active">
+    <svg width="100%" viewBox="0 0 680 380">
+      <defs><marker id="waf-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">AWSセキュリティサービスの役割分担</text>
+      <rect x="40"  y="50" width="180" height="56" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+      <text x="130" y="74" text-anchor="middle" font-size="13" font-weight="500" fill="#791F1F">DDoS攻撃</text>
+      <text x="130" y="94" text-anchor="middle" font-size="11" fill="#A32D2D">大量リクエストで落とす</text>
+      <rect x="40"  y="124" width="180" height="56" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="130" y="148" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">SQLi / XSS</text>
+      <text x="130" y="168" text-anchor="middle" font-size="11" fill="#993C1D">アプリ層の攻撃</text>
+      <rect x="40"  y="198" width="180" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="130" y="222" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">不審なAPIコール</text>
+      <text x="130" y="242" text-anchor="middle" font-size="11" fill="#854F0B">アカウント侵害の兆候</text>
+      <rect x="40"  y="272" width="180" height="56" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+      <text x="130" y="296" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">脆弱性スキャン</text>
+      <text x="130" y="316" text-anchor="middle" font-size="11" fill="#5F5E5A">EC2・コンテナの診断</text>
+      <line x1="220" y1="78"  x2="298" y2="78"  stroke="#E24B4A" stroke-width="1.5" marker-end="url(#waf-arr)"/>
+      <line x1="220" y1="152" x2="298" y2="152" stroke="#993C1D" stroke-width="1.5" marker-end="url(#waf-arr)"/>
+      <line x1="220" y1="226" x2="298" y2="226" stroke="#854F0B" stroke-width="1.5" marker-end="url(#waf-arr)"/>
+      <line x1="220" y1="300" x2="298" y2="300" stroke="#888780" stroke-width="1.5" marker-end="url(#waf-arr)"/>
+      <rect x="300" y="50"  width="200" height="56" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="400" y="74" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">AWS Shield</text>
+      <text x="400" y="94" text-anchor="middle" font-size="11" fill="#534AB7">Standard（無料）/ Advanced</text>
+      <rect x="300" y="124" width="200" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="400" y="148" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">AWS WAF</text>
+      <text x="400" y="168" text-anchor="middle" font-size="11" fill="#185FA5">L7フィルタリングルール</text>
+      <rect x="300" y="198" width="200" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="400" y="222" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">Amazon GuardDuty</text>
+      <text x="400" y="242" text-anchor="middle" font-size="11" fill="#085041">脅威検出・ML活用</text>
+      <rect x="300" y="272" width="200" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="400" y="296" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">Amazon Inspector</text>
+      <text x="400" y="316" text-anchor="middle" font-size="11" fill="#085041">脆弱性自動スキャン</text>
+      <rect x="510" y="50"  width="130" height="56" rx="6" fill="#EAF3DE" stroke="#3B6D11" stroke-width="0.5"/><text x="575" y="74" text-anchor="middle" font-size="11" fill="#27500A">CloudFront/ALB</text><text x="575" y="94" text-anchor="middle" font-size="11" fill="#3B6D11">Route53</text>
+      <rect x="510" y="124" width="130" height="56" rx="6" fill="#EAF3DE" stroke="#3B6D11" stroke-width="0.5"/><text x="575" y="148" text-anchor="middle" font-size="11" fill="#27500A">CloudFront/ALB</text><text x="575" y="168" text-anchor="middle" font-size="11" fill="#3B6D11">API Gateway</text>
+      <rect x="510" y="198" width="130" height="56" rx="6" fill="#EAF3DE" stroke="#3B6D11" stroke-width="0.5"/><text x="575" y="222" text-anchor="middle" font-size="11" fill="#27500A">CloudTrail</text><text x="575" y="242" text-anchor="middle" font-size="11" fill="#3B6D11">VPC Flow Logs</text>
+      <rect x="510" y="272" width="130" height="56" rx="6" fill="#EAF3DE" stroke="#3B6D11" stroke-width="0.5"/><text x="575" y="296" text-anchor="middle" font-size="11" fill="#27500A">EC2 / ECS</text><text x="575" y="316" text-anchor="middle" font-size="11" fill="#3B6D11">Lambda</text>
+      <line x1="500" y1="78"  x2="510" y2="78"  stroke="#3B6D11" stroke-width="1" stroke-dasharray="3 2"/>
+      <line x1="500" y1="152" x2="510" y2="152" stroke="#3B6D11" stroke-width="1" stroke-dasharray="3 2"/>
+      <line x1="500" y1="226" x2="510" y2="226" stroke="#3B6D11" stroke-width="1" stroke-dasharray="3 2"/>
+      <line x1="500" y1="300" x2="510" y2="300" stroke="#3B6D11" stroke-width="1" stroke-dasharray="3 2"/>
+    </svg>
+  </div>
+
+  <div id="waf-waf" class="waf-panel">
+    <svg width="100%" viewBox="0 0 680 340">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">AWS WAF：Webアプリケーションファイアウォール</text>
+      <rect x="40" y="50" width="600" height="80" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="340" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">WAFルールで防げる攻撃</text>
+      <text x="60" y="104" font-size="12" fill="#185FA5">・SQLインジェクション（DBへの不正クエリ）　・XSS（クロスサイトスクリプティング）</text>
+      <text x="60" y="122" font-size="12" fill="#185FA5">・特定IPアドレスのブロック　・レートリミット（リクエスト数制限）</text>
+      <text x="340" y="162" text-anchor="middle" font-size="13" font-weight="500" fill="currentColor">WAFをアタッチできるサービス</text>
+      <rect x="40"  y="176" width="130" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="105" y="202" text-anchor="middle" font-size="12" fill="#085041">CloudFront</text>
+      <rect x="190" y="176" width="130" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="255" y="202" text-anchor="middle" font-size="12" fill="#085041">ALB</text>
+      <rect x="340" y="176" width="130" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="405" y="202" text-anchor="middle" font-size="12" fill="#085041">API Gateway</text>
+      <rect x="490" y="176" width="150" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="565" y="202" text-anchor="middle" font-size="12" fill="#085041">AppSync</text>
+      <rect x="40" y="240" width="600" height="80" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="264" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">WAF vs NACL vs SG の使い分け</text>
+      <text x="60" y="290" font-size="12" fill="#633806">WAF：L7（HTTPの中身）を見てブロック。SQLi・XSSなどアプリ層の攻撃に対応</text>
+      <text x="60" y="310" font-size="12" fill="#633806">NACL：L4（IPアドレス・ポート）でブロック　SG：インスタンス単位・拒否ルールは書けない</text>
+    </svg>
+  </div>
+
+  <div id="waf-shield" class="waf-panel">
+    <svg width="100%" viewBox="0 0 680 340">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">AWS Shield：DDoS攻撃からの保護</text>
+      <rect x="40"  y="50" width="270" height="150" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+      <text x="175" y="80" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">Shield Standard</text>
+      <text x="175" y="106" text-anchor="middle" font-size="12" fill="#5F5E5A">無料・自動適用</text>
+      <text x="175" y="128" text-anchor="middle" font-size="12" fill="#5F5E5A">L3/L4の一般的なDDoS攻撃を防御</text>
+      <text x="175" y="150" text-anchor="middle" font-size="12" fill="#5F5E5A">全AWSユーザーに適用済み</text>
+      <rect x="370" y="50" width="270" height="150" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="505" y="80" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">Shield Advanced</text>
+      <text x="505" y="106" text-anchor="middle" font-size="12" fill="#534AB7">有料（月$3,000〜）</text>
+      <text x="505" y="128" text-anchor="middle" font-size="12" fill="#534AB7">L7まで保護</text>
+      <text x="505" y="150" text-anchor="middle" font-size="12" fill="#534AB7">DDoSコスト保護・24/7対応チーム</text>
+      <rect x="40" y="220" width="600" height="100" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="244" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出ポイント</text>
+      <text x="60" y="270" font-size="12" fill="#633806">「DDoS対策」→ Shield（Standard は全員無料・Advanced は有料で強化）</text>
+      <text x="60" y="292" font-size="12" fill="#633806">「WAF + Shield Advanced」→ 最強の組み合わせ（L3〜L7まで防御）</text>
+      <text x="60" y="314" font-size="12" fill="#633806">「CloudFront + WAF + Shield」→ 試験で最も出る鉄板セキュリティ構成</text>
+    </svg>
+  </div>
+
+  <div id="waf-detect" class="waf-panel">
+    <svg width="100%" viewBox="0 0 680 340">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">GuardDuty / Inspector / Macie：検出・診断系サービス</text>
+      <rect x="40"  y="50" width="180" height="120" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="130" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">GuardDuty</text>
+      <text x="130" y="102" text-anchor="middle" font-size="12" fill="#085041">脅威検出</text>
+      <text x="130" y="124" text-anchor="middle" font-size="12" fill="#085041">CloudTrail/VPC Flow</text>
+      <text x="130" y="144" text-anchor="middle" font-size="12" fill="#085041">をMLで分析</text>
+      <rect x="250" y="50" width="180" height="120" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="340" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">Inspector</text>
+      <text x="340" y="102" text-anchor="middle" font-size="12" fill="#085041">脆弱性スキャン</text>
+      <text x="340" y="124" text-anchor="middle" font-size="12" fill="#085041">EC2・ECR・Lambda</text>
+      <text x="340" y="144" text-anchor="middle" font-size="12" fill="#085041">のCVEを自動検出</text>
+      <rect x="460" y="50" width="180" height="120" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="550" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">Macie</text>
+      <text x="550" y="102" text-anchor="middle" font-size="12" fill="#085041">S3の機密データ検出</text>
+      <text x="550" y="124" text-anchor="middle" font-size="12" fill="#085041">個人情報・クレカ番号</text>
+      <text x="550" y="144" text-anchor="middle" font-size="12" fill="#085041">などを自動検出</text>
+      <rect x="40" y="190" width="600" height="128" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="216" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出：シナリオ → 正解</text>
+      <text x="60" y="242" font-size="12" fill="#633806">「AWSアカウントへの不審なアクセスを検知したい」→ GuardDuty</text>
+      <text x="60" y="264" font-size="12" fill="#633806">「EC2の既知の脆弱性（CVE）を自動検出したい」→ Inspector</text>
+      <text x="60" y="286" font-size="12" fill="#633806">「S3に個人情報が含まれていないか確認したい」→ Macie</text>
+      <text x="60" y="308" font-size="12" fill="#633806">「誰がいつ何の操作をしたか記録したい」→ CloudTrail</text>
+    </svg>
+  </div>
+</div>
+
+<script>
+  function wafTab(t: string) {
+    document.querySelectorAll('[id^="waf-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('waf-' + t)?.classList.add('active');
+    document.querySelectorAll('.waf-btn').forEach(el => el.classList.remove('active'));
+    (event?.target as HTMLElement)?.classList.add('active');
+  }
+  (window as any).wafTab = wafTab;
+</script>

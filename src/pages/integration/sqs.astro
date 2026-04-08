@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SQSSNSDiagram from '../../components/diagrams/SQSSNSDiagram.astro';
+---
+<Layout title="SQS / SNS">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / <a href="/integration" class="hover:text-orange-500">統合・メッセージング</a> / SQS・SNS</p>
+    <h1 class="text-3xl font-bold mb-2">SQS / SNS</h1>
+    <p class="text-gray-500 mb-10">疎結合・非同期処理・Fan-outパターン</p>
+    <SQSSNSDiagram />
+  </div>
+</Layout>

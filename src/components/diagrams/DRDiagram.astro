@@ -1,0 +1,107 @@
+---
+---
+<div>
+  <style>
+    .dr-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
+    .dark .dr-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
+    .dr-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
+    .dr-panel{display:none;}
+    .dr-panel.active{display:block;}
+  </style>
+
+  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
+    <button class="dr-btn active" onclick="drTab('rto')">RTO・RPOとは</button>
+    <button class="dr-btn" onclick="drTab('strategy')">4つのDR戦略</button>
+    <button class="dr-btn" onclick="drTab('pattern')">頻出パターン</button>
+  </div>
+
+  <div id="dr-rto" class="dr-panel active">
+    <svg width="100%" viewBox="0 0 680 380">
+      <defs><marker id="dr-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">RTO・RPO：DRの2大指標</text>
+      <line x1="40" y1="160" x2="640" y2="160" stroke="#D3D1C7" stroke-width="2" marker-end="url(#dr-arr)"/>
+      <line x1="200" y1="140" x2="200" y2="180" stroke="#E24B4A" stroke-width="2"/>
+      <text x="200" y="128" text-anchor="middle" font-size="12" fill="#A32D2D">最後のバックアップ</text>
+      <line x1="340" y1="140" x2="340" y2="180" stroke="#E24B4A" stroke-width="2"/>
+      <text x="340" y="128" text-anchor="middle" font-size="12" fill="#A32D2D">障害発生</text>
+      <line x1="540" y1="140" x2="540" y2="180" stroke="#1D9E75" stroke-width="2"/>
+      <text x="540" y="128" text-anchor="middle" font-size="12" fill="#085041">復旧完了</text>
+      <line x1="200" y1="200" x2="338" y2="200" stroke="#993C1D" stroke-width="2" marker-end="url(#dr-arr)"/>
+      <text x="270" y="220" text-anchor="middle" font-size="12" fill="#993C1D">RPO（許容できるデータ損失時間）</text>
+      <line x1="342" y1="200" x2="538" y2="200" stroke="#534AB7" stroke-width="2" marker-end="url(#dr-arr)"/>
+      <text x="440" y="220" text-anchor="middle" font-size="12" fill="#534AB7">RTO（目標復旧時間）</text>
+      <rect x="40"  y="248" width="270" height="100" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="175" y="276" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">RPO（Recovery Point Objective）</text>
+      <text x="175" y="300" text-anchor="middle" font-size="12" fill="#993C1D">どこまでのデータ損失を許容するか</text>
+      <text x="175" y="322" text-anchor="middle" font-size="12" fill="#993C1D">小さいほど良い（高コスト）</text>
+      <rect x="370" y="248" width="270" height="100" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="505" y="276" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">RTO（Recovery Time Objective）</text>
+      <text x="505" y="300" text-anchor="middle" font-size="12" fill="#534AB7">障害から何時間以内に復旧するか</text>
+      <text x="505" y="322" text-anchor="middle" font-size="12" fill="#534AB7">小さいほど良い（高コスト）</text>
+    </svg>
+  </div>
+
+  <div id="dr-strategy" class="dr-panel">
+    <svg width="100%" viewBox="0 0 680 400">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">4つのDR戦略：コストと復旧速度のトレードオフ</text>
+      <rect x="40"  y="50" width="270" height="80" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+      <text x="175" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">バックアップ＆リストア</text>
+      <text x="175" y="102" text-anchor="middle" font-size="12" fill="#5F5E5A">定期的にS3などにバックアップ</text>
+      <text x="175" y="122" text-anchor="middle" font-size="12" fill="#5F5E5A">コスト最低 / RTO・RPO 最大（数時間〜）</text>
+      <rect x="370" y="50" width="270" height="80" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="505" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">パイロットライト</text>
+      <text x="505" y="102" text-anchor="middle" font-size="12" fill="#185FA5">コアシステムのみ最小構成で起動中</text>
+      <text x="505" y="122" text-anchor="middle" font-size="12" fill="#185FA5">障害時にスケールアップ（数十分〜）</text>
+      <rect x="40"  y="150" width="270" height="80" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="175" y="178" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">ウォームスタンバイ</text>
+      <text x="175" y="202" text-anchor="middle" font-size="12" fill="#085041">縮小版システムを常時稼働</text>
+      <text x="175" y="222" text-anchor="middle" font-size="12" fill="#085041">障害時にフルスケールへ（数分〜）</text>
+      <rect x="370" y="150" width="270" height="80" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="505" y="178" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">アクティブ-アクティブ</text>
+      <text x="505" y="202" text-anchor="middle" font-size="12" fill="#534AB7">2拠点で同時に本番稼働</text>
+      <text x="505" y="222" text-anchor="middle" font-size="12" fill="#534AB7">コスト最高 / RTO・RPOほぼゼロ</text>
+      <rect x="40"  y="258" width="130" height="44" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="105" y="284" text-anchor="middle" font-size="12" fill="#444441">バックアップ</text>
+      <rect x="190" y="258" width="130" height="44" rx="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/><text x="255" y="284" text-anchor="middle" font-size="12" fill="#0C447C">パイロット</text>
+      <rect x="340" y="258" width="130" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="405" y="284" text-anchor="middle" font-size="12" fill="#085041">ウォーム</text>
+      <rect x="490" y="258" width="150" height="44" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/><text x="565" y="284" text-anchor="middle" font-size="12" fill="#3C3489">アクティブ×2</text>
+      <text x="40"  y="332" text-anchor="start" font-size="12" fill="#5F5E5A">コスト低 →</text>
+      <text x="640" y="332" text-anchor="end" font-size="12" fill="#5F5E5A">← コスト高</text>
+      <text x="40"  y="354" text-anchor="start" font-size="12" fill="#A32D2D">RTO/RPO大 →</text>
+      <text x="640" y="354" text-anchor="end" font-size="12" fill="#085041">← RTO/RPO小</text>
+      <rect x="40" y="370" width="600" height="24" rx="6" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="386" text-anchor="middle" font-size="11" font-weight="500" fill="#633806">SAA頻出：「RTO・RPOを最小化」→ アクティブ-アクティブ（マルチリージョン）</text>
+    </svg>
+  </div>
+
+  <div id="dr-pattern" class="dr-panel">
+    <svg width="100%" viewBox="0 0 680 340">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">SAA頻出パターン</text>
+      <rect x="40" y="44" width="600" height="276" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="60" y="74"  font-size="12" fill="#633806">「コスト最小・RTO数時間でもOK」</text><text x="500" y="74"  font-size="12" font-weight="500" fill="#412402">→ バックアップ＆リストア</text>
+      <line x1="40" y1="86" x2="640" y2="86" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="108" font-size="12" fill="#633806">「コア機能だけ最小コストで待機」</text><text x="500" y="108" font-size="12" font-weight="500" fill="#412402">→ パイロットライト</text>
+      <line x1="40" y1="120" x2="640" y2="120" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="142" font-size="12" fill="#633806">「縮小版を常時稼働・数分で本番スケール」</text><text x="500" y="142" font-size="12" font-weight="500" fill="#412402">→ ウォームスタンバイ</text>
+      <line x1="40" y1="154" x2="640" y2="154" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="176" font-size="12" fill="#633806">「ダウンタイムゼロ・データ損失ゼロ」</text><text x="500" y="176" font-size="12" font-weight="500" fill="#412402">→ アクティブ-アクティブ</text>
+      <line x1="40" y1="188" x2="640" y2="188" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="210" font-size="12" fill="#633806">「RDSのフェイルオーバーを自動化したい」</text><text x="500" y="210" font-size="12" font-weight="500" fill="#412402">→ RDSマルチAZ</text>
+      <line x1="40" y1="222" x2="640" y2="222" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="244" font-size="12" fill="#633806">「Auroraでグローバルに複製・低RTO」</text><text x="500" y="244" font-size="12" font-weight="500" fill="#412402">→ Aurora Global Database</text>
+      <line x1="40" y1="256" x2="640" y2="256" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="278" font-size="12" fill="#633806">「EC2を別リージョンで素早く復旧したい」</text><text x="500" y="278" font-size="12" font-weight="500" fill="#412402">→ AMIを別リージョンにコピー</text>
+      <line x1="40" y1="290" x2="640" y2="290" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="312" font-size="12" fill="#633806">「S3データを別リージョンに複製・DR対策」</text><text x="500" y="312" font-size="12" font-weight="500" fill="#412402">→ S3クロスリージョンレプリケーション</text>
+    </svg>
+  </div>
+</div>
+
+<script>
+  function drTab(t: string) {
+    document.querySelectorAll('[id^="dr-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('dr-' + t)?.classList.add('active');
+    document.querySelectorAll('.dr-btn').forEach(el => el.classList.remove('active'));
+    (event?.target as HTMLElement)?.classList.add('active');
+  }
+  (window as any).drTab = drTab;
+</script>

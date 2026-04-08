@@ -1,0 +1,127 @@
+---
+---
+<div>
+  <style>
+    .fg-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
+    .dark .fg-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
+    .fg-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
+    .fg-panel{display:none;}
+    .fg-panel.active{display:block;}
+  </style>
+
+  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
+    <button class="fg-btn active" onclick="fgTab('overview')">コンテナ基礎</button>
+    <button class="fg-btn" onclick="fgTab('compare')">EC2モード vs Fargate</button>
+    <button class="fg-btn" onclick="fgTab('arch')">ECSアーキテクチャ</button>
+    <button class="fg-btn" onclick="fgTab('pattern')">頻出パターン</button>
+  </div>
+
+  <div id="fg-overview" class="fg-panel active">
+    <svg width="100%" viewBox="0 0 680 360">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">コンテナとFargateの位置づけ</text>
+      <text x="160" y="52" text-anchor="middle" font-size="12" fill="#185FA5">EC2（仮想マシン）</text>
+      <rect x="40" y="62" width="240" height="160" rx="10" fill="none" stroke="#378ADD" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <rect x="56"  y="76" width="208" height="28" rx="4" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="160" y="94" text-anchor="middle" font-size="11" fill="#5F5E5A">ゲストOS（Linux等）</text>
+      <rect x="56"  y="114" width="90" height="52" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/><text x="101" y="136" text-anchor="middle" font-size="12" fill="#0C447C">アプリA</text><text x="101" y="156" text-anchor="middle" font-size="11" fill="#185FA5">+ランタイム</text>
+      <rect x="156" y="114" width="108" height="52" rx="4" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/><text x="210" y="136" text-anchor="middle" font-size="12" fill="#0C447C">アプリB</text><text x="210" y="156" text-anchor="middle" font-size="11" fill="#185FA5">+ランタイム</text>
+      <rect x="56"  y="176" width="208" height="28" rx="4" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="160" y="194" text-anchor="middle" font-size="11" fill="#5F5E5A">ハイパーバイザー / ホストOS</text>
+      <text x="510" y="52" text-anchor="middle" font-size="12" fill="#085041">コンテナ（Docker）</text>
+      <rect x="400" y="62" width="240" height="160" rx="10" fill="none" stroke="#1D9E75" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <rect x="416" y="76" width="90" height="52" rx="4" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="461" y="98" text-anchor="middle" font-size="12" fill="#085041">コンテナA</text><text x="461" y="118" text-anchor="middle" font-size="11" fill="#085041">アプリ+依存</text>
+      <rect x="516" y="76" width="108" height="52" rx="4" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="570" y="98" text-anchor="middle" font-size="12" fill="#085041">コンテナB</text><text x="570" y="118" text-anchor="middle" font-size="11" fill="#085041">アプリ+依存</text>
+      <rect x="416" y="138" width="208" height="28" rx="4" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="520" y="156" text-anchor="middle" font-size="11" fill="#5F5E5A">コンテナランタイム（Docker）</text>
+      <rect x="416" y="176" width="208" height="28" rx="4" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="520" y="194" text-anchor="middle" font-size="11" fill="#5F5E5A">ホストOS（共有）</text>
+      <rect x="40" y="244" width="600" height="88" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="340" y="270" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">AWS Fargateの役割</text>
+      <text x="340" y="296" text-anchor="middle" font-size="12" fill="#534AB7">コンテナを動かすサーバー（EC2）の管理をAWSが全部やってくれる</text>
+      <text x="340" y="318" text-anchor="middle" font-size="12" fill="#534AB7">「どのEC2で動かすか」を気にせずコンテナのコードだけ書けばいい</text>
+    </svg>
+  </div>
+
+  <div id="fg-compare" class="fg-panel">
+    <svg width="100%" viewBox="0 0 680 380">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">ECS起動タイプ：EC2モード vs Fargateモード</text>
+      <text x="160" y="52" text-anchor="middle" font-size="12" fill="#185FA5">EC2モード</text>
+      <rect x="40" y="62" width="270" height="220" rx="12" fill="none" stroke="#378ADD" stroke-width="1.5" stroke-dasharray="6 3"/>
+      <text x="56" y="82" font-size="11" fill="#185FA5">自分でEC2を管理する</text>
+      <rect x="60"  y="92" width="230" height="36" rx="6" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/><text x="175" y="114" text-anchor="middle" font-size="12" fill="#0C447C">ECS クラスター</text>
+      <rect x="60"  y="140" width="100" height="60" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="110" y="162" text-anchor="middle" font-size="12" fill="#444441">EC2</text><text x="110" y="182" text-anchor="middle" font-size="11" fill="#5F5E5A">自分で管理</text>
+      <rect x="180" y="140" width="110" height="60" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="235" y="162" text-anchor="middle" font-size="12" fill="#444441">EC2</text><text x="235" y="182" text-anchor="middle" font-size="11" fill="#5F5E5A">OSパッチ必要</text>
+      <rect x="60"  y="216" width="100" height="36" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="110" y="238" text-anchor="middle" font-size="12" fill="#085041">タスクA</text>
+      <rect x="180" y="216" width="110" height="36" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="235" y="238" text-anchor="middle" font-size="12" fill="#085041">タスクB</text>
+      <rect x="60"  y="264" width="230" height="14" rx="4" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/><text x="175" y="275" text-anchor="middle" font-size="10" fill="#791F1F">EC2の管理・スケール設定が必要</text>
+      <text x="520" y="52" text-anchor="middle" font-size="12" fill="#085041">Fargateモード</text>
+      <rect x="370" y="62" width="270" height="220" rx="12" fill="none" stroke="#1D9E75" stroke-width="1.5" stroke-dasharray="6 3"/>
+      <text x="386" y="82" font-size="11" fill="#085041">サーバー管理ゼロ</text>
+      <rect x="390" y="92" width="230" height="36" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/><text x="505" y="114" text-anchor="middle" font-size="12" fill="#3C3489">ECS クラスター（Fargate）</text>
+      <rect x="390" y="140" width="230" height="60" rx="6" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/><text x="505" y="164" text-anchor="middle" font-size="12" fill="#633806">AWSがサーバーを管理</text><text x="505" y="186" text-anchor="middle" font-size="11" fill="#854F0B">EC2の存在を意識しない</text>
+      <rect x="390" y="216" width="100" height="36" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="440" y="238" text-anchor="middle" font-size="12" fill="#085041">タスクA</text>
+      <rect x="500" y="216" width="100" height="36" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="550" y="238" text-anchor="middle" font-size="12" fill="#085041">タスクB</text>
+      <rect x="390" y="264" width="230" height="14" rx="4" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="505" y="275" text-anchor="middle" font-size="10" fill="#085041">コンテナのCPU/メモリだけ指定すればOK</text>
+      <rect x="40" y="302" width="600" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="326" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出：「サーバー管理不要・コンテナだけ動かしたい」→ Fargate</text>
+      <text x="340" y="348" text-anchor="middle" font-size="12" fill="#633806">「コスト最適化・細かいEC2設定が必要」→ EC2モード</text>
+    </svg>
+  </div>
+
+  <div id="fg-arch" class="fg-panel">
+    <svg width="100%" viewBox="0 0 680 360">
+      <defs><marker id="fg-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">ECS + Fargate の構成要素</text>
+      <rect x="20"  y="60" width="110" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="75" y="84" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">ECR</text>
+      <text x="75" y="104" text-anchor="middle" font-size="11" fill="#185FA5">イメージ保管</text>
+      <line x1="130" y1="88" x2="168" y2="88" stroke="#185FA5" stroke-width="1.5" marker-end="url(#fg-arr)"/>
+      <rect x="170" y="44" width="360" height="220" rx="12" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-dasharray="6 3"/>
+      <text x="186" y="64" font-size="11" fill="#534AB7">ECS クラスター（Fargate）</text>
+      <rect x="190" y="76" width="320" height="172" rx="10" fill="none" stroke="#1D9E75" stroke-width="1" stroke-dasharray="4 3"/>
+      <text x="206" y="96" font-size="11" fill="#085041">ECS サービス（タスク数を維持）</text>
+      <rect x="208" y="108" width="130" height="56" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="273" y="134" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">タスク</text>
+      <text x="273" y="154" text-anchor="middle" font-size="11" fill="#085041">コンテナの実行単位</text>
+      <rect x="358" y="108" width="130" height="56" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="423" y="134" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">タスク</text>
+      <text x="423" y="154" text-anchor="middle" font-size="11" fill="#085041">コンテナの実行単位</text>
+      <rect x="208" y="178" width="280" height="56" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="348" y="202" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">タスク定義</text>
+      <text x="348" y="222" text-anchor="middle" font-size="11" fill="#534AB7">イメージ・CPU・メモリ・IAMロールを定義</text>
+      <rect x="550" y="60" width="110" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="605" y="84" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">ALB</text>
+      <text x="605" y="104" text-anchor="middle" font-size="11" fill="#854F0B">トラフィック分散</text>
+      <line x1="530" y1="88" x2="550" y2="88" stroke="#854F0B" stroke-width="1.5" marker-end="url(#fg-arr)"/>
+      <rect x="40" y="286" width="600" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="310" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">重要な概念</text>
+      <text x="60" y="334" font-size="12" fill="#633806">タスク定義：どのイメージ・何CPU・何メモリを記述　サービス：「タスクを常に3つ維持」のように台数を管理</text>
+    </svg>
+  </div>
+
+  <div id="fg-pattern" class="fg-panel">
+    <svg width="100%" viewBox="0 0 680 300">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">サーバーレスコンピューティングの使い分け</text>
+      <rect x="40" y="44" width="600" height="236" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="60" y="74"  font-size="12" fill="#633806">「15分以内の軽い処理・イベント駆動」</text><text x="500" y="74"  font-size="12" font-weight="500" fill="#412402">→ Lambda</text>
+      <line x1="40" y1="86" x2="640" y2="86" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="108" font-size="12" fill="#633806">「コンテナ化されたアプリ・サーバー管理不要」</text><text x="500" y="108" font-size="12" font-weight="500" fill="#412402">→ ECS + Fargate</text>
+      <line x1="40" y1="120" x2="640" y2="120" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="142" font-size="12" fill="#633806">「コンテナ・EC2コスト最適化・細かい制御」</text><text x="500" y="142" font-size="12" font-weight="500" fill="#412402">→ ECS + EC2モード</text>
+      <line x1="40" y1="154" x2="640" y2="154" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="176" font-size="12" fill="#633806">「Kubernetesでコンテナ管理・サーバー管理不要」</text><text x="500" y="176" font-size="12" font-weight="500" fill="#412402">→ EKS + Fargate</text>
+      <line x1="40" y1="188" x2="640" y2="188" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="210" font-size="12" fill="#633806">「コンテナイメージの保管・管理」</text><text x="500" y="210" font-size="12" font-weight="500" fill="#412402">→ Amazon ECR</text>
+      <line x1="40" y1="222" x2="640" y2="222" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="244" font-size="12" fill="#633806">「Lambdaの15分制限を超える処理」</text><text x="500" y="244" font-size="12" font-weight="500" fill="#412402">→ Fargate（制限なし）</text>
+      <line x1="40" y1="256" x2="640" y2="256" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="278" font-size="12" fill="#633806">「大規模並列バッチ処理」</text><text x="500" y="278" font-size="12" font-weight="500" fill="#412402">→ AWS Batch（Fargate or EC2）</text>
+    </svg>
+  </div>
+</div>
+
+<script>
+  function fgTab(t: string) {
+    document.querySelectorAll('[id^="fg-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('fg-' + t)?.classList.add('active');
+    document.querySelectorAll('.fg-btn').forEach(el => el.classList.remove('active'));
+    (event?.target as HTMLElement)?.classList.add('active');
+  }
+  (window as any).fgTab = fgTab;
+</script>

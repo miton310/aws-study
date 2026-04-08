@@ -1,0 +1,28 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const services = [
+  { title: 'CloudWatch', description: 'メトリクス・アラーム・ログ・Logs Insights', href: '/management/cloudwatch', badge: '全分野' },
+  { title: 'CloudFormation', description: 'IaC・スタック・ドリフト検出', href: '/management/cloudformation', badge: '分野2' },
+  { title: 'Systems Manager', description: 'Session Manager・Parameter Store・Patch Manager', href: '/management/ssm', badge: '分野2' },
+];
+---
+
+<Layout title="監視・管理">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / 監視・管理</p>
+    <h1 class="text-3xl font-bold mb-2">監視・管理</h1>
+    <p class="text-gray-500 mb-10">CloudWatch・CloudFormation・Systems Manager</p>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {services.map(({ title, description, href, badge }) => (
+        <a href={href} class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-orange-500 hover:scale-105 transition-all block">
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <h2 class="font-bold text-base">{title}</h2>
+            <span class="text-xs bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full shrink-0">{badge}</span>
+          </div>
+          <p class="text-sm text-gray-500">{description}</p>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,200 @@
+---
+// VPC 図解コンポーネント
+---
+
+<div class="diagram-wrapper">
+  <style>
+    .ctrl-btn {
+      cursor: pointer;
+      font-size: 12px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+      color: #111827;
+      font-family: inherit;
+    }
+    .dark .ctrl-btn {
+      border-color: #374151;
+      background: #1f2937;
+      color: #f9fafb;
+    }
+    .ctrl-btn.active {
+      background: #534AB7;
+      color: #fff;
+      border-color: #534AB7;
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+  </style>
+
+  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
+    <button class="ctrl-btn active" onclick="vpcSetTab('overview')">VPC全体構造</button>
+    <button class="ctrl-btn" onclick="vpcSetTab('sg')">SG vs NACL</button>
+    <button class="ctrl-btn" onclick="vpcSetTab('endpoint')">VPC Endpoint</button>
+    <button class="ctrl-btn" onclick="vpcSetTab('nat')">NAT Gateway</button>
+  </div>
+
+  <div id="vpc-tab-overview" class="tab-panel active">
+    <svg width="100%" viewBox="0 0 680 400">
+      <defs>
+        <marker id="vpc-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <!-- Internet -->
+      <rect x="270" y="20" width="140" height="36" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+      <text x="340" y="42" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">インターネット</text>
+
+      <!-- IGW -->
+      <rect x="255" y="76" width="170" height="36" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="340" y="98" text-anchor="middle" font-size="13" fill="#085041">Internet Gateway</text>
+      <line x1="340" y1="56" x2="340" y2="76" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#vpc-arrow)"/>
+
+      <!-- VPC border -->
+      <rect x="30" y="130" width="620" height="250" rx="14" fill="none" stroke="#1D9E75" stroke-width="1.5" stroke-dasharray="8 4"/>
+      <text x="46" y="152" font-size="12" fill="#085041">VPC (10.0.0.0/16)</text>
+
+      <!-- Public Subnet -->
+      <rect x="50" y="162" width="260" height="100" rx="10" fill="#E6F1FB" stroke="#185FA5" stroke-width="1"/>
+      <text x="66" y="182" font-size="12" fill="#185FA5">パブリックサブネット</text>
+      <rect x="70" y="194" width="100" height="44" rx="6" fill="#B5D4F4" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="120" y="214" text-anchor="middle" font-size="13" font-weight="500" fill="#042C53">EC2</text>
+      <text x="120" y="230" text-anchor="middle" font-size="11" fill="#0C447C">パブリックIP</text>
+
+      <!-- Private Subnet -->
+      <rect x="370" y="162" width="260" height="100" rx="10" fill="#FAEEDA" stroke="#854F0B" stroke-width="1"/>
+      <text x="386" y="182" font-size="12" fill="#854F0B">プライベートサブネット</text>
+      <rect x="390" y="194" width="100" height="44" rx="6" fill="#FAC775" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="440" y="214" text-anchor="middle" font-size="13" font-weight="500" fill="#412402">EC2</text>
+      <text x="440" y="230" text-anchor="middle" font-size="11" fill="#633806">プライベートIP</text>
+
+      <!-- NAT GW -->
+      <rect x="200" y="194" width="100" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="250" y="214" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">NAT GW</text>
+      <text x="250" y="230" text-anchor="middle" font-size="11" fill="#085041">→インターネット</text>
+
+      <!-- Route Table note -->
+      <rect x="50" y="290" width="570" height="72" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="340" y="316" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">ルートテーブル</text>
+      <text x="340" y="338" text-anchor="middle" font-size="12" fill="#534AB7">パブリック: 0.0.0.0/0 → IGW</text>
+      <text x="340" y="356" text-anchor="middle" font-size="12" fill="#534AB7">プライベート: 0.0.0.0/0 → NAT GW</text>
+
+      <!-- IGW to public arrow -->
+      <line x1="340" y1="112" x2="180" y2="162" stroke="#185FA5" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#vpc-arrow)"/>
+    </svg>
+  </div>
+
+  <div id="vpc-tab-sg" class="tab-panel">
+    <svg width="100%" viewBox="0 0 680 380">
+      <!-- SG vs NACL comparison -->
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">セキュリティグループ vs ネットワークACL</text>
+
+      <!-- SG -->
+      <rect x="40" y="50" width="270" height="280" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
+      <text x="175" y="80" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">セキュリティグループ（SG）</text>
+
+      <rect x="60" y="96" width="230" height="32" rx="6" fill="#9FE1CB" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="175" y="116" text-anchor="middle" font-size="12" fill="#04342C">インスタンスレベルで適用</text>
+      <rect x="60" y="136" width="230" height="32" rx="6" fill="#9FE1CB" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="175" y="156" text-anchor="middle" font-size="12" fill="#04342C">ステートフル（戻り通信自動許可）</text>
+      <rect x="60" y="176" width="230" height="32" rx="6" fill="#9FE1CB" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="175" y="196" text-anchor="middle" font-size="12" fill="#04342C">許可ルールのみ（拒否は書けない）</text>
+      <rect x="60" y="216" width="230" height="32" rx="6" fill="#9FE1CB" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="175" y="236" text-anchor="middle" font-size="12" fill="#04342C">デフォルト: インバウンド全拒否</text>
+      <rect x="60" y="256" width="230" height="32" rx="6" fill="#9FE1CB" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="175" y="276" text-anchor="middle" font-size="12" fill="#04342C">デフォルト: アウトバウンド全許可</text>
+
+      <!-- NACL -->
+      <rect x="370" y="50" width="270" height="280" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
+      <text x="505" y="80" text-anchor="middle" font-size="14" font-weight="500" fill="#3C3489">ネットワークACL（NACL）</text>
+
+      <rect x="390" y="96" width="230" height="32" rx="6" fill="#CECBF6" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="505" y="116" text-anchor="middle" font-size="12" fill="#26215C">サブネットレベルで適用</text>
+      <rect x="390" y="136" width="230" height="32" rx="6" fill="#CECBF6" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="505" y="156" text-anchor="middle" font-size="12" fill="#26215C">ステートレス（戻り通信も設定必要）</text>
+      <rect x="390" y="176" width="230" height="32" rx="6" fill="#CECBF6" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="505" y="196" text-anchor="middle" font-size="12" fill="#26215C">許可・拒否の両方書ける</text>
+      <rect x="390" y="216" width="230" height="32" rx="6" fill="#CECBF6" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="505" y="236" text-anchor="middle" font-size="12" fill="#26215C">番号順に評価（小さい番号が優先）</text>
+      <rect x="390" y="256" width="230" height="32" rx="6" fill="#CECBF6" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="505" y="276" text-anchor="middle" font-size="12" fill="#26215C">デフォルト: 全通信許可</text>
+
+      <rect x="40" y="344" width="600" height="32" rx="6" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="364" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">SAA頻出：NACLはステートレスなのでアウトバウンドも明示的に許可が必要</text>
+    </svg>
+  </div>
+
+  <div id="vpc-tab-endpoint" class="tab-panel">
+    <svg width="100%" viewBox="0 0 680 360">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">VPC Endpoint：インターネットを経由せずAWSサービスへ</text>
+
+      <!-- Gateway type -->
+      <rect x="40" y="50" width="270" height="140" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
+      <text x="175" y="78" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">Gateway型</text>
+      <text x="175" y="102" text-anchor="middle" font-size="12" fill="#085041">対象: S3・DynamoDB</text>
+      <text x="175" y="124" text-anchor="middle" font-size="12" fill="#085041">ルートテーブルに追加</text>
+      <text x="175" y="146" text-anchor="middle" font-size="12" fill="#085041">無料</text>
+      <text x="175" y="168" text-anchor="middle" font-size="12" fill="#085041">同一リージョンのみ</text>
+
+      <!-- Interface type -->
+      <rect x="370" y="50" width="270" height="140" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
+      <text x="505" y="78" text-anchor="middle" font-size="14" font-weight="500" fill="#3C3489">Interface型（PrivateLink）</text>
+      <text x="505" y="102" text-anchor="middle" font-size="12" fill="#3C3489">対象: ほぼ全AWSサービス</text>
+      <text x="505" y="124" text-anchor="middle" font-size="12" fill="#3C3489">ENI（プライベートIP）を作成</text>
+      <text x="505" y="146" text-anchor="middle" font-size="12" fill="#3C3489">有料（時間+データ転送）</text>
+      <text x="505" y="168" text-anchor="middle" font-size="12" fill="#3C3489">クロスリージョン対応</text>
+
+      <rect x="40" y="210" width="600" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="234" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">メリット</text>
+      <text x="340" y="254" text-anchor="middle" font-size="12" fill="#633806">インターネットGW・NAT GW不要→セキュア・低コスト</text>
+
+      <rect x="40" y="284" width="600" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="340" y="308" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">SAA頻出</text>
+      <text x="340" y="328" text-anchor="middle" font-size="12" fill="#0C447C">「プライベートサブネットからS3にセキュアにアクセス」→ Gateway型VPC Endpoint</text>
+    </svg>
+  </div>
+
+  <div id="vpc-tab-nat" class="tab-panel">
+    <svg width="100%" viewBox="0 0 680 360">
+      <defs>
+        <marker id="vpc-arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">NAT Gateway：プライベートサブネット→インターネット</text>
+
+      <rect x="270" y="44" width="140" height="36" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+      <text x="340" y="66" text-anchor="middle" font-size="13" fill="#2C2C2A">インターネット</text>
+
+      <rect x="255" y="100" width="170" height="36" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="340" y="122" text-anchor="middle" font-size="13" fill="#085041">Internet Gateway</text>
+      <line x1="340" y1="80" x2="340" y2="100" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#vpc-arrow2)"/>
+
+      <rect x="220" y="156" width="240" height="44" rx="8" fill="#9FE1CB" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="340" y="176" text-anchor="middle" font-size="13" font-weight="500" fill="#04342C">NAT Gateway</text>
+      <text x="340" y="192" text-anchor="middle" font-size="11" fill="#085041">パブリックサブネットに配置</text>
+      <line x1="340" y1="136" x2="340" y2="156" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#vpc-arrow2)"/>
+
+      <rect x="200" y="226" width="280" height="44" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="246" text-anchor="middle" font-size="13" font-weight="500" fill="#412402">プライベートEC2</text>
+      <text x="340" y="262" text-anchor="middle" font-size="11" fill="#633806">インターネットには出られるが入れない</text>
+      <line x1="340" y1="200" x2="340" y2="226" stroke="#854F0B" stroke-width="1.5" marker-end="url(#vpc-arrow2)"/>
+
+      <rect x="40" y="290" width="600" height="44" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="340" y="310" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">Egress-Only IGW</text>
+      <text x="340" y="328" text-anchor="middle" font-size="12" fill="#534AB7">IPv6専用のNAT GW的な機能・アウトバウンドのみ許可</text>
+    </svg>
+  </div>
+</div>
+
+<script>
+  function vpcSetTab(t: string) {
+    document.querySelectorAll('[id^="vpc-tab-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('vpc-tab-' + t)?.classList.add('active');
+    document.querySelectorAll('.ctrl-btn').forEach(el => el.classList.remove('active'));
+    event?.target && (event.target as HTMLElement).classList.add('active');
+  }
+  (window as any).vpcSetTab = vpcSetTab;
+</script>

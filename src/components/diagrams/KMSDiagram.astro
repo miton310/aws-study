@@ -1,0 +1,106 @@
+---
+---
+<div>
+  <style>
+    .kms-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
+    .dark .kms-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
+    .kms-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
+    .kms-panel{display:none;}
+    .kms-panel.active{display:block;}
+  </style>
+
+  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
+    <button class="kms-btn active" onclick="kmsTab('overview')">KMSとは</button>
+    <button class="kms-btn" onclick="kmsTab('sse')">S3の暗号化3種</button>
+    <button class="kms-btn" onclick="kmsTab('pattern')">頻出パターン</button>
+  </div>
+
+  <div id="kms-overview" class="kms-panel active">
+    <svg width="100%" viewBox="0 0 680 360">
+      <defs><marker id="kms-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">AWS KMS：暗号化キーの一元管理</text>
+      <rect x="220" y="50" width="240" height="56" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="340" y="74" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">AWS KMS</text>
+      <text x="340" y="94" text-anchor="middle" font-size="11" fill="#534AB7">CMK（カスタマーマスターキー）を管理</text>
+      <rect x="40"  y="140" width="180" height="80" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="130" y="168" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">AWS管理キー</text>
+      <text x="130" y="192" text-anchor="middle" font-size="12" fill="#185FA5">AWSが自動作成・管理</text>
+      <text x="130" y="212" text-anchor="middle" font-size="11" fill="#185FA5">無料・ローテーション自動</text>
+      <rect x="250" y="140" width="180" height="80" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="340" y="168" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">カスタマー管理キー</text>
+      <text x="340" y="192" text-anchor="middle" font-size="12" fill="#993C1D">自分で作成・管理</text>
+      <text x="340" y="212" text-anchor="middle" font-size="11" fill="#993C1D">ポリシー設定・有料</text>
+      <rect x="460" y="140" width="180" height="80" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+      <text x="550" y="168" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">外部キー（BYOK）</text>
+      <text x="550" y="192" text-anchor="middle" font-size="12" fill="#5F5E5A">自前のキーをインポート</text>
+      <text x="550" y="212" text-anchor="middle" font-size="11" fill="#5F5E5A">コンプライアンス対応</text>
+      <rect x="40"  y="250" width="100" height="44" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="90"  y="276" text-anchor="middle" font-size="12" fill="#2C2C2A">平文データ</text>
+      <line x1="140" y1="272" x2="178" y2="272" stroke="#888780" stroke-width="1.5" marker-end="url(#kms-arr)"/>
+      <rect x="180" y="250" width="120" height="44" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/><text x="240" y="276" text-anchor="middle" font-size="12" fill="#3C3489">KMSで暗号化</text>
+      <line x1="300" y1="272" x2="338" y2="272" stroke="#534AB7" stroke-width="1.5" marker-end="url(#kms-arr)"/>
+      <rect x="340" y="250" width="120" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="400" y="276" text-anchor="middle" font-size="12" fill="#085041">暗号化データ</text>
+      <line x1="460" y1="272" x2="498" y2="272" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#kms-arr)"/>
+      <rect x="500" y="250" width="140" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="570" y="268" text-anchor="middle" font-size="12" fill="#085041">S3 / RDS / EBS</text><text x="570" y="284" text-anchor="middle" font-size="11" fill="#085041">安全に保存</text>
+      <rect x="40" y="314" width="600" height="32" rx="6" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="334" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">EBS・RDSの暗号化は作成時のみ設定可能（後から変更不可）</text>
+    </svg>
+  </div>
+
+  <div id="kms-sse" class="kms-panel">
+    <svg width="100%" viewBox="0 0 680 360">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">S3の暗号化の種類（SAA最頻出）</text>
+      <rect x="40"  y="50" width="180" height="100" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="130" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">SSE-S3</text>
+      <text x="130" y="102" text-anchor="middle" font-size="12" fill="#085041">AWSがキーを管理</text>
+      <text x="130" y="124" text-anchor="middle" font-size="12" fill="#085041">デフォルト暗号化</text>
+      <text x="130" y="142" text-anchor="middle" font-size="11" fill="#085041">設定が最も簡単</text>
+      <rect x="250" y="50" width="180" height="100" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="340" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">SSE-KMS</text>
+      <text x="340" y="102" text-anchor="middle" font-size="12" fill="#534AB7">KMSでキーを管理</text>
+      <text x="340" y="124" text-anchor="middle" font-size="12" fill="#534AB7">アクセスログ・監査</text>
+      <text x="340" y="142" text-anchor="middle" font-size="11" fill="#534AB7">コンプライアンス対応</text>
+      <rect x="460" y="50" width="180" height="100" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="550" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">SSE-C</text>
+      <text x="550" y="102" text-anchor="middle" font-size="12" fill="#993C1D">お客様がキーを提供</text>
+      <text x="550" y="124" text-anchor="middle" font-size="12" fill="#993C1D">AWSはキーを保存しない</text>
+      <text x="550" y="142" text-anchor="middle" font-size="11" fill="#993C1D">HTTPS必須</text>
+      <rect x="145" y="170" width="390" height="68" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="196" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">クライアントサイド暗号化</text>
+      <text x="340" y="220" text-anchor="middle" font-size="12" fill="#633806">S3に送る前にクライアント側で暗号化</text>
+      <rect x="40" y="258" width="600" height="80" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="282" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出の使い分け</text>
+      <text x="60" y="306" font-size="12" fill="#633806">「とにかく簡単に暗号化」→ SSE-S3（デフォルト）</text>
+      <text x="60" y="326" font-size="12" fill="#633806">「誰がいつキーを使ったか監査ログが必要」→ SSE-KMS</text>
+    </svg>
+  </div>
+
+  <div id="kms-pattern" class="kms-panel">
+    <svg width="100%" viewBox="0 0 680 320">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">SAA頻出パターン</text>
+      <rect x="40" y="44" width="600" height="256" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="60" y="74"  font-size="12" fill="#633806">「S3データを暗号化・キーのアクセスログも必要」</text><text x="500" y="74"  font-size="12" font-weight="500" fill="#412402">→ SSE-KMS</text>
+      <line x1="40" y1="86" x2="640" y2="86" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="108" font-size="12" fill="#633806">「暗号化されていないRDSを暗号化したい」</text><text x="500" y="108" font-size="12" font-weight="500" fill="#412402">→ スナップショット→暗号化コピー→復元</text>
+      <line x1="40" y1="120" x2="640" y2="120" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="142" font-size="12" fill="#633806">「専用ハードウェアでキー管理・FIPS 140-2 Level 3」</text><text x="500" y="142" font-size="12" font-weight="500" fill="#412402">→ CloudHSM</text>
+      <line x1="40" y1="154" x2="640" y2="154" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="176" font-size="12" fill="#633806">「DB接続情報・APIキーを安全に保管・自動ローテーション」</text><text x="500" y="176" font-size="12" font-weight="500" fill="#412402">→ Secrets Manager</text>
+      <line x1="40" y1="188" x2="640" y2="188" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="210" font-size="12" fill="#633806">「設定値を安全に保管・無料で使いたい」</text><text x="500" y="210" font-size="12" font-weight="500" fill="#412402">→ Parameter Store</text>
+      <line x1="40" y1="222" x2="640" y2="222" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="244" font-size="12" fill="#633806">「自動ローテーション必要」</text><text x="500" y="244" font-size="12" font-weight="500" fill="#412402">→ Secrets Manager</text>
+      <line x1="40" y1="256" x2="640" y2="256" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
+      <text x="60" y="282" font-size="12" fill="#633806">「自動ローテーション不要・無料・シンプル」</text><text x="500" y="282" font-size="12" font-weight="500" fill="#412402">→ SSM Parameter Store</text>
+    </svg>
+  </div>
+</div>
+
+<script>
+  function kmsTab(t: string) {
+    document.querySelectorAll('[id^="kms-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('kms-' + t)?.classList.add('active');
+    document.querySelectorAll('.kms-btn').forEach(el => el.classList.remove('active'));
+    (event?.target as HTMLElement)?.classList.add('active');
+  }
+  (window as any).kmsTab = kmsTab;
+</script>

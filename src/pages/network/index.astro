@@ -1,0 +1,32 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const services = [
+  { title: 'VPC', description: 'サブネット・SG・NACL・NAT Gateway', href: '/network/vpc', badge: '分野1・3' },
+  { title: 'ELB', description: 'ALB・NLB・GWLB の使い分け', href: '/network/elb', badge: '分野2・3' },
+  { title: 'Route 53', description: 'DNS・ルーティングポリシー6種', href: '/network/route53', badge: '分野2・3' },
+  { title: 'CloudFront', description: 'CDN・OAC・WAF・Shield', href: '/network/cloudfront', badge: '分野3' },
+  { title: 'Transit Gateway', description: '複数VPC・オンプレ接続のハブ', href: '/network/tgw', badge: '分野1' },
+  { title: 'Direct Connect / VPN', description: 'オンプレ→AWS専用線・VPN接続', href: '/network/dx', badge: '分野1' },
+  { title: 'Global Accelerator', description: '固定IP・グローバル通信高速化', href: '/network/ga', badge: '分野3' },
+];
+---
+
+<Layout title="ネットワーク">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / ネットワーク</p>
+    <h1 class="text-3xl font-bold mb-2">ネットワーク</h1>
+    <p class="text-gray-500 mb-10">VPC・ELB・Route53・CloudFront・Transit Gateway</p>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {services.map(({ title, description, href, badge }) => (
+        <a href={href} class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-orange-500 hover:scale-105 transition-all block">
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <h2 class="font-bold text-base">{title}</h2>
+            <span class="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full shrink-0">{badge}</span>
+          </div>
+          <p class="text-sm text-gray-500">{description}</p>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>

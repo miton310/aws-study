@@ -1,0 +1,125 @@
+---
+---
+<div>
+  <style>
+    .diag-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
+    .dark .diag-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
+    .diag-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
+    .diag-panel{display:none;}
+    .diag-panel.active{display:block;}
+  </style>
+
+  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
+    <button class="diag-btn active" onclick="elbTab('overview')">ELB概要</button>
+    <button class="diag-btn" onclick="elbTab('alb')">ALB</button>
+    <button class="diag-btn" onclick="elbTab('nlb')">NLB</button>
+    <button class="diag-btn" onclick="elbTab('compare')">使い分け</button>
+  </div>
+
+  <div id="elb-overview" class="diag-panel active">
+    <svg width="100%" viewBox="0 0 680 360">
+      <defs><marker id="elb-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">ELB：トラフィックを複数のターゲットに自動分散</text>
+      <rect x="270" y="44" width="140" height="44" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+      <text x="340" y="70" text-anchor="middle" font-size="13" fill="#2C2C2A">ユーザー</text>
+      <line x1="340" y1="88" x2="340" y2="116" stroke="#888780" stroke-width="1.5" marker-end="url(#elb-arr)"/>
+      <rect x="210" y="118" width="260" height="44" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="340" y="138" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">ELB（ロードバランサー）</text>
+      <text x="340" y="154" text-anchor="middle" font-size="11" fill="#534AB7">ヘルスチェックで異常インスタンスを自動除外</text>
+      <line x1="260" y1="162" x2="160" y2="210" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-arr)"/>
+      <line x1="340" y1="162" x2="340" y2="210" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-arr)"/>
+      <line x1="420" y1="162" x2="520" y2="210" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-arr)"/>
+      <rect x="90"  y="212" width="120" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="150" y="238" text-anchor="middle" font-size="13" fill="#085041">EC2-1</text>
+      <rect x="280" y="212" width="120" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="340" y="238" text-anchor="middle" font-size="13" fill="#085041">EC2-2</text>
+      <rect x="470" y="212" width="120" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="530" y="238" text-anchor="middle" font-size="13" fill="#085041">EC2-3</text>
+      <rect x="40" y="280" width="600" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="302" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">ELBの3種類</text>
+      <text x="340" y="324" text-anchor="middle" font-size="12" fill="#633806">ALB（L7・HTTP）/ NLB（L4・TCP/UDP・固定IP）/ GWLB（L3-4・FW統合）</text>
+    </svg>
+  </div>
+
+  <div id="elb-alb" class="diag-panel">
+    <svg width="100%" viewBox="0 0 680 360">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">ALB：L7でパスやホストヘッダーによるルーティング</text>
+      <rect x="40" y="50" width="600" height="56" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="340" y="74" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">ALB（Application Load Balancer）</text>
+      <text x="340" y="94" text-anchor="middle" font-size="12" fill="#534AB7">リスナー → ルール → ターゲットグループ → ヘルスチェック</text>
+      <rect x="40"  y="132" width="180" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="130" y="156" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">/api/* → APIサーバー</text>
+      <text x="130" y="176" text-anchor="middle" font-size="11" fill="#085041">EC2 / Lambda / ECS</text>
+      <rect x="250" y="132" width="180" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="340" y="156" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">/web/* → Webサーバー</text>
+      <text x="340" y="176" text-anchor="middle" font-size="11" fill="#085041">EC2 / ECS</text>
+      <rect x="460" y="132" width="180" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="550" y="156" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">デフォルト → 固定レスポンス</text>
+      <text x="550" y="176" text-anchor="middle" font-size="11" fill="#085041">404など</text>
+      <rect x="40" y="216" width="600" height="120" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="240" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">ALBの特徴</text>
+      <text x="60"  y="264" font-size="12" fill="#633806">・パスベース / ホストベース / ヘッダー / クエリ文字列でルーティング</text>
+      <text x="60"  y="284" font-size="12" fill="#633806">・Lambda をターゲットにできる（NLBはできない）</text>
+      <text x="60"  y="304" font-size="12" fill="#633806">・WebSocket対応 / スティッキーセッション / SSL終端</text>
+      <text x="60"  y="324" font-size="12" fill="#633806">・ACMで証明書管理（HTTPS対応）</text>
+    </svg>
+  </div>
+
+  <div id="elb-nlb" class="diag-panel">
+    <svg width="100%" viewBox="0 0 680 320">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">NLB：L4・固定IP・超低レイテンシー</text>
+      <rect x="40" y="50" width="600" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="340" y="74" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">NLB（Network Load Balancer）</text>
+      <text x="340" y="94" text-anchor="middle" font-size="12" fill="#085041">TCP/UDP/TLSをL4で処理・AZごとに静的IP（EIPも可）</text>
+      <rect x="40"  y="132" width="270" height="80" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="175" y="158" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">向いている用途</text>
+      <text x="175" y="180" text-anchor="middle" font-size="12" fill="#534AB7">ゲーム・金融・IoT・VoIP</text>
+      <text x="175" y="200" text-anchor="middle" font-size="12" fill="#534AB7">固定IPが必要なケース</text>
+      <rect x="370" y="132" width="270" height="80" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+      <text x="505" y="158" text-anchor="middle" font-size="13" font-weight="500" fill="#791F1F">向いていない用途</text>
+      <text x="505" y="180" text-anchor="middle" font-size="12" fill="#A32D2D">パスルーティングが必要</text>
+      <text x="505" y="200" text-anchor="middle" font-size="12" fill="#A32D2D">Lambdaをターゲットにしたい</text>
+      <rect x="40" y="232" width="600" height="44" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="252" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出：「固定IPが必要」→ NLB　「パスで振り分け・Lambda」→ ALB</text>
+    </svg>
+  </div>
+
+  <div id="elb-compare" class="diag-panel">
+    <svg width="100%" viewBox="0 0 680 340">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">ALB vs NLB vs GWLB 比較</text>
+      <rect x="40"  y="44" width="120" height="36" rx="4" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/><text x="100" y="66" text-anchor="middle" font-size="12" font-weight="500" fill="#2C2C2A">比較項目</text>
+      <rect x="170" y="44" width="140" height="36" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/><text x="240" y="66" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">ALB</text>
+      <rect x="320" y="44" width="140" height="36" rx="4" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="390" y="66" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">NLB</text>
+      <rect x="470" y="44" width="170" height="36" rx="4" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/><text x="555" y="66" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">GWLB</text>
+      <rect x="40"  y="80" width="120" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="100" y="102" text-anchor="middle" font-size="12" fill="#5F5E5A">レイヤー</text>
+      <rect x="170" y="80" width="140" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="240" y="102" text-anchor="middle" font-size="12" fill="#3C3489">L7</text>
+      <rect x="320" y="80" width="140" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="390" y="102" text-anchor="middle" font-size="12" fill="#085041">L4</text>
+      <rect x="470" y="80" width="170" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="555" y="102" text-anchor="middle" font-size="12" fill="#633806">L3-4</text>
+      <rect x="40"  y="116" width="120" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="100" y="138" text-anchor="middle" font-size="12" fill="#5F5E5A">プロトコル</text>
+      <rect x="170" y="116" width="140" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="240" y="138" text-anchor="middle" font-size="12" fill="#3C3489">HTTP/HTTPS</text>
+      <rect x="320" y="116" width="140" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="390" y="138" text-anchor="middle" font-size="12" fill="#085041">TCP/UDP/TLS</text>
+      <rect x="470" y="116" width="170" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="555" y="138" text-anchor="middle" font-size="12" fill="#633806">全プロトコル</text>
+      <rect x="40"  y="152" width="120" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="100" y="174" text-anchor="middle" font-size="12" fill="#5F5E5A">固定IP</text>
+      <rect x="170" y="152" width="140" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="240" y="174" text-anchor="middle" font-size="12" fill="#A32D2D">✕</text>
+      <rect x="320" y="152" width="140" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="390" y="174" text-anchor="middle" font-size="12" fill="#085041">✅</text>
+      <rect x="470" y="152" width="170" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="555" y="174" text-anchor="middle" font-size="12" fill="#A32D2D">✕</text>
+      <rect x="40"  y="188" width="120" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="100" y="210" text-anchor="middle" font-size="12" fill="#5F5E5A">Lambda対応</text>
+      <rect x="170" y="188" width="140" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="240" y="210" text-anchor="middle" font-size="12" fill="#085041">✅</text>
+      <rect x="320" y="188" width="140" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="390" y="210" text-anchor="middle" font-size="12" fill="#A32D2D">✕</text>
+      <rect x="470" y="188" width="170" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="555" y="210" text-anchor="middle" font-size="12" fill="#A32D2D">✕</text>
+      <rect x="40"  y="224" width="120" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="100" y="246" text-anchor="middle" font-size="12" fill="#5F5E5A">主な用途</text>
+      <rect x="170" y="224" width="140" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="240" y="246" text-anchor="middle" font-size="12" fill="#3C3489">WebAPI・マイクロサービス</text>
+      <rect x="320" y="224" width="140" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="390" y="246" text-anchor="middle" font-size="12" fill="#085041">ゲーム・金融・IoT</text>
+      <rect x="470" y="224" width="170" height="36" fill="#F9F8F4" stroke="#D3D1C7" stroke-width="0.5"/><text x="555" y="246" text-anchor="middle" font-size="12" fill="#633806">FW・IDS/IPS統合</text>
+      <rect x="40" y="278" width="600" height="44" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="304" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">SAA頻出：問題文に「パスルーティング」「Lambda」→ ALB / 「固定IP」「超低レイテンシー」→ NLB</text>
+    </svg>
+  </div>
+</div>
+
+<script>
+  function elbTab(t: string) {
+    document.querySelectorAll('[id^="elb-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('elb-' + t)?.classList.add('active');
+    document.querySelectorAll('.diag-btn').forEach(el => el.classList.remove('active'));
+    (event?.target as HTMLElement)?.classList.add('active');
+  }
+  (window as any).elbTab = elbTab;
+</script>

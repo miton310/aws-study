@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import DynamoDBDiagram from '../../components/diagrams/DynamoDBDiagram.astro';
+---
+<Layout title="DynamoDB">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / <a href="/database" class="hover:text-orange-500">データベース</a> / DynamoDB</p>
+    <h1 class="text-3xl font-bold mb-2">Amazon DynamoDB</h1>
+    <p class="text-gray-500 mb-10">NoSQL・DAX・Streams・GSI・LSI・グローバルテーブル</p>
+    <DynamoDBDiagram />
+  </div>
+</Layout>

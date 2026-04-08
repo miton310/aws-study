@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CloudFrontDiagram from '../../components/diagrams/CloudFrontDiagram.astro';
+---
+<Layout title="CloudFront">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / <a href="/network" class="hover:text-orange-500">ネットワーク</a> / CloudFront</p>
+    <h1 class="text-3xl font-bold mb-2">Amazon CloudFront</h1>
+    <p class="text-gray-500 mb-10">CDN・OAC・WAF・Shield統合</p>
+    <CloudFrontDiagram />
+  </div>
+</Layout>

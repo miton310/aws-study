@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import KMSDiagram from '../../components/diagrams/KMSDiagram.astro';
+---
+<Layout title="KMS">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / <a href="/security" class="hover:text-orange-500">セキュリティ</a> / KMS</p>
+    <h1 class="text-3xl font-bold mb-2">AWS KMS</h1>
+    <p class="text-gray-500 mb-10">暗号化キー管理・S3暗号化3種・Secrets Manager vs Parameter Store</p>
+    <KMSDiagram />
+  </div>
+</Layout>

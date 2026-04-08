@@ -1,23 +1,74 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
-	</head>
-	<body>
-		<slot />
-	</body>
-</html>
+---
+import '../styles/global.css';
 
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
+interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = 'AWS SAA・SAP試験対策 図解学習サイト' } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title} | AWS図解学習</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <header class="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm">
+      <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
+        <a href="/" class="font-bold text-lg flex items-center gap-2">
+          <span class="text-orange-500">AWS</span>
+          <span>図解学習</span>
+        </a>
+        <nav class="hidden md:flex items-center gap-6 text-sm">
+          <a href="/network" class="hover:text-orange-500 transition-colors">ネットワーク</a>
+          <a href="/security" class="hover:text-orange-500 transition-colors">セキュリティ</a>
+          <a href="/compute" class="hover:text-orange-500 transition-colors">コンピューティング</a>
+          <a href="/database" class="hover:text-orange-500 transition-colors">データベース</a>
+          <a href="/storage" class="hover:text-orange-500 transition-colors">ストレージ</a>
+          <a href="/integration" class="hover:text-orange-500 transition-colors">統合・メッセージング</a>
+          <a href="/management" class="hover:text-orange-500 transition-colors">監視・管理</a>
+          <a href="/dr" class="hover:text-orange-500 transition-colors">DR戦略</a>
+          <!-- <a href="/quiz" class="hover:text-orange-500 transition-colors">問題演習</a>  -->
+        </nav>
+        <button
+          id="theme-toggle"
+          class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          aria-label="テーマ切替"
+        >
+          <svg id="icon-sun" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+          </svg>
+          <svg id="icon-moon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="border-t border-gray-200 dark:border-gray-800 mt-20 py-8 text-center text-sm text-gray-500">
+      <p>AWS図解学習 — SAA / SAP 試験対策</p>
+    </footer>
+		<script is:inline>
+			const html = document.documentElement;
+			if (localStorage.theme === 'dark' || (!localStorage.theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+				html.classList.add('dark');
+			} else {
+				html.classList.remove('dark');
+			}
+
+			document.addEventListener('DOMContentLoaded', () => {
+				const toggle = document.getElementById('theme-toggle');
+				toggle?.addEventListener('click', () => {
+					html.classList.toggle('dark');
+					localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+				});
+			});
+		</script>
+  </body>
+</html>

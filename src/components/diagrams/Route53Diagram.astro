@@ -1,0 +1,106 @@
+---
+---
+<div>
+  <style>
+    .r53-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
+    .dark .r53-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
+    .r53-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
+    .r53-panel{display:none;}
+    .r53-panel.active{display:block;}
+  </style>
+
+  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
+    <button class="r53-btn active" onclick="r53Tab('overview')">Route53とは</button>
+    <button class="r53-btn" onclick="r53Tab('routing')">ルーティングポリシー</button>
+    <button class="r53-btn" onclick="r53Tab('failover')">フェイルオーバー</button>
+  </div>
+
+  <div id="r53-overview" class="r53-panel active">
+    <svg width="100%" viewBox="0 0 680 360">
+      <defs><marker id="r53-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">Amazon Route 53：DNS + ヘルスチェック + ドメイン登録</text>
+      <rect x="40" y="50" width="600" height="56" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="340" y="74" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">Amazon Route 53</text>
+      <text x="340" y="94" text-anchor="middle" font-size="12" fill="#534AB7">DNS解決 / ヘルスチェック / ドメイン登録 / トラフィックルーティング</text>
+      <rect x="40"  y="130" width="170" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="125" y="154" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">DNS解決</text>
+      <text x="125" y="174" text-anchor="middle" font-size="11" fill="#085041">ドメイン→IPアドレス変換</text>
+      <rect x="255" y="130" width="170" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="340" y="154" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">ヘルスチェック</text>
+      <text x="340" y="174" text-anchor="middle" font-size="11" fill="#085041">エンドポイントの死活監視</text>
+      <rect x="470" y="130" width="170" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="555" y="154" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">ドメイン登録</text>
+      <text x="555" y="174" text-anchor="middle" font-size="11" fill="#085041">Route53でドメイン購入可</text>
+      <rect x="40" y="210" width="600" height="120" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="234" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出ポイント</text>
+      <text x="60" y="258" font-size="12" fill="#633806">・SLA 100%（唯一100%を保証するAWSサービス）</text>
+      <text x="60" y="278" font-size="12" fill="#633806">・エッジロケーション経由でDNSクエリを処理（低レイテンシー）</text>
+      <text x="60" y="298" font-size="12" fill="#633806">・パブリックホストゾーン（インターネット向け）/ プライベートホストゾーン（VPC内向け）</text>
+      <text x="60" y="318" font-size="12" fill="#633806">・Alias レコード：AWSリソース（ALB・CloudFront等）を直接指定できる</text>
+    </svg>
+  </div>
+
+  <div id="r53-routing" class="r53-panel">
+    <svg width="100%" viewBox="0 0 680 400">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">ルーティングポリシー6種類</text>
+      <rect x="40"  y="44" width="290" height="68" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="185" y="68" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">シンプル</text>
+      <text x="185" y="90" text-anchor="middle" font-size="11" fill="#085041">1つのリソースに単純に転送・ヘルスチェックなし</text>
+      <rect x="350" y="44" width="290" height="68" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="495" y="68" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">フェイルオーバー</text>
+      <text x="495" y="90" text-anchor="middle" font-size="11" fill="#085041">プライマリ障害時にセカンダリへ自動切替</text>
+      <rect x="40"  y="128" width="290" height="68" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="185" y="152" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">加重（Weighted）</text>
+      <text x="185" y="172" text-anchor="middle" font-size="11" fill="#534AB7">重みの比率でトラフィックを分散（A/Bテスト）</text>
+      <rect x="350" y="128" width="290" height="68" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="495" y="152" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">レイテンシー</text>
+      <text x="495" y="172" text-anchor="middle" font-size="11" fill="#534AB7">最も応答が速いリージョンへ転送</text>
+      <rect x="40"  y="212" width="290" height="68" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="185" y="236" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">地理的（Geolocation）</text>
+      <text x="185" y="256" text-anchor="middle" font-size="11" fill="#633806">ユーザーの地域に基づいて転送先を決定</text>
+      <rect x="350" y="212" width="290" height="68" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="495" y="236" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">複数値回答</text>
+      <text x="495" y="256" text-anchor="middle" font-size="11" fill="#633806">複数のIPをランダムに返す・簡易LB的な使い方</text>
+      <rect x="40" y="300" width="600" height="80" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+      <text x="340" y="324" text-anchor="middle" font-size="13" font-weight="500" fill="#791F1F">SAA頻出の使い分け</text>
+      <text x="60" y="348" font-size="12" fill="#A32D2D">「障害時に自動切替」→ フェイルオーバー　「A/Bテスト・カナリアリリース」→ 加重</text>
+      <text x="60" y="368" font-size="12" fill="#A32D2D">「最も速いリージョンへ」→ レイテンシー　「国別に違うコンテンツ」→ 地理的</text>
+    </svg>
+  </div>
+
+  <div id="r53-failover" class="r53-panel">
+    <svg width="100%" viewBox="0 0 680 360">
+      <defs><marker id="r53-arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">フェイルオーバールーティング：障害時の自動切替</text>
+      <rect x="270" y="44" width="140" height="44" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+      <text x="340" y="70" text-anchor="middle" font-size="13" fill="#2C2C2A">ユーザー</text>
+      <line x1="340" y1="88" x2="340" y2="116" stroke="#888780" stroke-width="1.5" marker-end="url(#r53-arr2)"/>
+      <rect x="210" y="118" width="260" height="44" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="340" y="144" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">Route 53</text>
+      <line x1="260" y1="162" x2="160" y2="200" stroke="#1D9E75" stroke-width="2" marker-end="url(#r53-arr2)"/>
+      <line x1="420" y1="162" x2="520" y2="200" stroke="#E24B4A" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#r53-arr2)"/>
+      <rect x="60"  y="202" width="180" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="150" y="226" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">プライマリ</text>
+      <text x="150" y="246" text-anchor="middle" font-size="11" fill="#085041">東京リージョン（通常時）</text>
+      <rect x="440" y="202" width="180" height="56" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+      <text x="530" y="226" text-anchor="middle" font-size="13" font-weight="500" fill="#791F1F">セカンダリ</text>
+      <text x="530" y="246" text-anchor="middle" font-size="11" fill="#A32D2D">大阪リージョン（障害時）</text>
+      <rect x="60" y="278" width="180" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="150" y="304" text-anchor="middle" font-size="12" fill="#085041">ヘルスチェック ✅</text>
+      <rect x="440" y="278" width="180" height="44" rx="6" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+      <text x="530" y="304" text-anchor="middle" font-size="12" fill="#A32D2D">ヘルスチェック ✕ → 切替</text>
+      <rect x="40" y="336" width="600" height="20" rx="6" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="350" text-anchor="middle" font-size="11" font-weight="500" fill="#633806">プライマリが復旧すると自動的にプライマリへ戻る</text>
+    </svg>
+  </div>
+</div>
+
+<script>
+  function r53Tab(t: string) {
+    document.querySelectorAll('[id^="r53-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('r53-' + t)?.classList.add('active');
+    document.querySelectorAll('.r53-btn').forEach(el => el.classList.remove('active'));
+    (event?.target as HTMLElement)?.classList.add('active');
+  }
+  (window as any).r53Tab = r53Tab;
+</script>

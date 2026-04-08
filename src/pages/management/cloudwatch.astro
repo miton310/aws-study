@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CloudWatchDiagram from '../../components/diagrams/CloudWatchDiagram.astro';
+---
+<Layout title="CloudWatch">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / <a href="/management" class="hover:text-orange-500">監視・管理</a> / CloudWatch</p>
+    <h1 class="text-3xl font-bold mb-2">Amazon CloudWatch</h1>
+    <p class="text-gray-500 mb-10">メトリクス・アラーム・ログ・Logs Insights</p>
+    <CloudWatchDiagram />
+  </div>
+</Layout>

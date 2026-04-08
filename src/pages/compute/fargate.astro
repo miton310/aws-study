@@ -1,0 +1,12 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import FargateDiagram from '../../components/diagrams/FargateDiagram.astro';
+---
+<Layout title="Fargate / ECS">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / <a href="/compute" class="hover:text-orange-500">コンピューティング</a> / Fargate</p>
+    <h1 class="text-3xl font-bold mb-2">AWS Fargate / ECS</h1>
+    <p class="text-gray-500 mb-10">コンテナ・サーバーレス起動タイプ・EC2モード vs Fargate</p>
+    <FargateDiagram />
+  </div>
+</Layout>
