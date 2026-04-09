@@ -137,6 +137,12 @@
   <text id="step-txt" x="340" y="468" text-anchor="middle" font-size="12" fill="#534AB7"></text>
 </svg>
 
+  <div>
+    インターネット → EC2 はリクエストがIGW→パブリックEC2→プライベートEC2と降りていく流れです。<br>
+    プライベートEC2 → NAT はプライベートEC2がNAT Gatewayを経由してインターネットに出ていく流れで、プライベートIPが外に出ない点がポイントです。<br>
+    マルチAZフェイルオーバー はAZ1が落ちたときにRDS Standbyが昇格してAZ2で通信が継続される流れです。
+  </div>
+
 <script>
 const STEPS = {
   inbound: [

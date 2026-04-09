@@ -1,0 +1,180 @@
+---
+---
+<style>
+@keyframes elb-flow {
+  0%   { stroke-dashoffset: 40; opacity: 0.2; }
+  50%  { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0.2; }
+}
+@keyframes elb-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+@keyframes elb-blink-ok {
+  0%, 100% { fill: #1D9E75; }
+  50%       { fill: #9FE1CB; }
+}
+@keyframes elb-blink-ng {
+  0%, 100% { fill: #E24B4A; }
+  50%       { fill: #F7C1C1; }
+}
+.elb-flow-line {
+  stroke-dasharray: 8 6;
+  stroke-dashoffset: 40;
+  animation: elb-flow 1.4s linear infinite;
+}
+.elb-flow-line.d1 { animation-delay: 0.2s; }
+.elb-flow-line.d2 { animation-delay: 0.5s; }
+.elb-flow-line.d3 { animation-delay: 0.8s; }
+.elb-box-pulse { animation: elb-pulse 1.6s ease-in-out infinite; }
+.elb-status-ok { animation: elb-blink-ok 2s ease-in-out infinite; }
+.elb-status-ng { animation: elb-blink-ng 0.8s ease-in-out infinite; }
+.elb-ctrl-btn {
+  cursor: pointer;
+  font-size: 13px;
+  padding: 4px 14px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #111827;
+  font-family: inherit;
+}
+.dark .elb-ctrl-btn {
+  border-color: #374151;
+  background: #1f2937;
+  color: #f9fafb;
+}
+.elb-ctrl-btn.active {
+  background: #534AB7;
+  color: #fff;
+  border-color: #534AB7;
+}
+</style>
+
+<div style="display:flex;gap:8px;margin:0 0 8px 0;flex-wrap:wrap;align-items:center;">
+  <span style="font-size:13px;color:#6b7280;">シナリオ：</span>
+  <button class="elb-ctrl-btn active" id="elb-btn-normal" onclick="elbSetMode('normal')">通常分散</button>
+  <button class="elb-ctrl-btn" id="elb-btn-fail" onclick="elbSetMode('fail')">EC2-2 障害</button>
+  <button class="elb-ctrl-btn" id="elb-btn-spike" onclick="elbSetMode('spike')">スパイク流入</button>
+</div>
+
+<svg width="100%" viewBox="0 0 680 380">
+  <defs>
+    <marker id="elb-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- User -->
+  <rect x="20" y="158" width="90" height="44" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text x="65" y="176" text-anchor="middle" font-size="13" font-weight="500" fill="#2C2C2A" dominant-baseline="central">ユーザー</text>
+  <text x="65" y="192" text-anchor="middle" font-size="11" fill="#5F5E5A" dominant-baseline="central">リクエスト</text>
+
+  <!-- Static arrow user->ELB -->
+  <line x1="110" y1="180" x2="188" y2="180" stroke="#D3D1C7" stroke-width="1"/>
+
+  <!-- Animated flow user->ELB -->
+  <line id="elb-flow-in" x1="110" y1="180" x2="188" y2="180"
+        stroke="#534AB7" stroke-width="3" fill="none"
+        class="elb-flow-line" marker-end="url(#elb-arr)"/>
+
+  <!-- ELB -->
+  <g class="elb-box-pulse">
+    <rect x="190" y="148" width="120" height="64" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+    <text x="250" y="170" text-anchor="middle" font-size="14" font-weight="500" fill="#3C3489" dominant-baseline="central">ELB</text>
+    <text x="250" y="188" text-anchor="middle" font-size="11" fill="#534AB7" dominant-baseline="central">負荷分散</text>
+    <text x="250" y="204" text-anchor="middle" font-size="11" fill="#534AB7" dominant-baseline="central">ヘルスチェック</text>
+  </g>
+
+  <!-- Static lines ELB -> EC2s -->
+  <line x1="310" y1="162" x2="388" y2="100" stroke="#D3D1C7" stroke-width="1"/>
+  <line x1="310" y1="180" x2="388" y2="180" stroke="#D3D1C7" stroke-width="1"/>
+  <line x1="310" y1="198" x2="388" y2="260" stroke="#D3D1C7" stroke-width="1"/>
+
+  <!-- Animated flows ELB -> EC2 -->
+  <line id="elb-flow-a" x1="310" y1="162" x2="383" y2="103"
+        stroke="#1D9E75" stroke-width="3" fill="none"
+        class="elb-flow-line d1" marker-end="url(#elb-arr)"/>
+  <line id="elb-flow-b" x1="310" y1="180" x2="383" y2="180"
+        stroke="#1D9E75" stroke-width="3" fill="none"
+        class="elb-flow-line d2" marker-end="url(#elb-arr)"/>
+  <line id="elb-flow-c" x1="310" y1="198" x2="383" y2="257"
+        stroke="#1D9E75" stroke-width="3" fill="none"
+        class="elb-flow-line d3" marker-end="url(#elb-arr)"/>
+
+  <!-- EC2-1 -->
+  <rect x="390" y="72" width="110" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="445" y="92" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">EC2-1</text>
+  <text x="445" y="110" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">正常稼働</text>
+  <circle id="elb-dot-1" cx="508" cy="100" r="7" class="elb-status-ok"/>
+
+  <!-- EC2-2 -->
+  <rect id="elb-ec2-2-rect" x="390" y="152" width="110" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="445" y="172" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">EC2-2</text>
+  <text id="elb-lbl-2" x="445" y="190" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">正常稼働</text>
+  <circle id="elb-dot-2" cx="508" cy="180" r="7" class="elb-status-ok"/>
+
+  <!-- EC2-3 -->
+  <rect x="390" y="232" width="110" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="445" y="252" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">EC2-3</text>
+  <text x="445" y="270" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">正常稼働</text>
+  <circle id="elb-dot-3" cx="508" cy="260" r="7" class="elb-status-ok"/>
+
+  <!-- Status label -->
+  <text id="elb-status" x="340" y="340" text-anchor="middle" font-size="12" fill="#534AB7">通常：3台に均等分散中</text>
+
+  <!-- Legend -->
+  <line x1="40" y1="358" x2="80" y2="358" stroke="#534AB7" stroke-width="2.5" stroke-dasharray="8 6"/>
+  <text x="88" y="362" font-size="11" fill="#5F5E5A" dominant-baseline="central">リクエストの流れ</text>
+  <circle cx="220" cy="358" r="6" fill="#1D9E75"/>
+  <text x="232" y="362" font-size="11" fill="#5F5E5A" dominant-baseline="central">正常</text>
+  <circle cx="290" cy="358" r="6" fill="#E24B4A"/>
+  <text x="302" y="362" font-size="11" fill="#5F5E5A" dominant-baseline="central">障害</text>
+</svg>
+
+<script>
+  function elbSetMode(m: string) {
+    ['normal','fail','spike'].forEach(id => {
+      const btn = document.getElementById('elb-btn-' + id);
+      if (btn) btn.classList.toggle('active', id === m);
+    });
+
+    const flowA  = document.getElementById('elb-flow-a') as SVGLineElement | null;
+    const flowB  = document.getElementById('elb-flow-b') as SVGLineElement | null;
+    const flowC  = document.getElementById('elb-flow-c') as SVGLineElement | null;
+    const flowIn = document.getElementById('elb-flow-in') as SVGLineElement | null;
+    const dot2   = document.getElementById('elb-dot-2');
+    const lbl2   = document.getElementById('elb-lbl-2');
+    const status = document.getElementById('elb-status');
+
+    // Reset
+    [flowA, flowB, flowC, flowIn].forEach(el => {
+      if (!el) return;
+      el.style.animationDuration = '1.4s';
+      el.style.strokeWidth = '3';
+      el.style.opacity = '1';
+      el.style.animationName = '';
+    });
+    if (dot2) dot2.className.baseVal = 'elb-status-ok';
+    if (lbl2) lbl2.textContent = '正常稼働';
+
+    if (m === 'normal') {
+      if (status) { status.textContent = '通常：3台に均等分散中'; status.setAttribute('fill','#534AB7'); }
+    } else if (m === 'fail') {
+      if (dot2) dot2.className.baseVal = 'elb-status-ng';
+      if (lbl2) lbl2.textContent = '障害発生';
+      if (flowB) { flowB.style.opacity = '0'; flowB.style.animationName = 'none'; }
+      if (flowA) flowA.style.animationDuration = '0.9s';
+      if (flowC) flowC.style.animationDuration = '0.9s';
+      if (status) { status.textContent = 'EC2-2 障害検知 → 2台に自動切替'; status.setAttribute('fill','#A32D2D'); }
+    } else if (m === 'spike') {
+      [flowA, flowB, flowC, flowIn].forEach(el => {
+        if (!el) return;
+        el.style.animationDuration = '0.6s';
+        el.style.strokeWidth = '5';
+      });
+      if (status) { status.textContent = 'スパイク流入：3台フル稼働で処理'; status.setAttribute('fill','#854F0B'); }
+    }
+  }
+  (window as any).elbSetMode = elbSetMode;
+</script>

@@ -1,0 +1,14 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TransitGatewayDiagram from '../../components/diagrams/TransitGatewayDiagram.astro';
+---
+<Layout title="Transit Gateway">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / <a href="/network" class="hover:text-orange-500">ネットワーク</a> / Transit Gateway</p>
+    <h1 class="text-3xl font-bold mb-2">Transit Gateway</h1>
+    <p class="text-gray-500 mb-10">複数VPC・オンプレ・マルチアカウント接続のハブ</p>
+    <section class="mb-12">
+      <TransitGatewayDiagram />
+    </section>
+  </div>
+</Layout>

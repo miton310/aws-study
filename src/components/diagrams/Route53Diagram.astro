@@ -13,6 +13,7 @@
     <button class="r53-btn active" onclick="r53Tab('overview')">Route53とは</button>
     <button class="r53-btn" onclick="r53Tab('routing')">ルーティングポリシー</button>
     <button class="r53-btn" onclick="r53Tab('failover')">フェイルオーバー</button>
+    <button class="r53-btn" onclick="r53Tab('geoprox')">位置情報 vs 地理的近接性</button>
   </div>
 
   <div id="r53-overview" class="r53-panel active">
@@ -91,6 +92,30 @@
       <text x="530" y="304" text-anchor="middle" font-size="12" fill="#A32D2D">ヘルスチェック ✕ → 切替</text>
       <rect x="40" y="336" width="600" height="20" rx="6" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
       <text x="340" y="350" text-anchor="middle" font-size="11" font-weight="500" fill="#633806">プライマリが復旧すると自動的にプライマリへ戻る</text>
+    </svg>
+  </div>
+
+  <div id="r53-geoprox" class="r53-panel">
+    <svg width="100%" viewBox="0 0 680 300">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">位置情報 vs 地理的近接性（混同しやすい！）</text>
+      <rect x="40" y="44" width="280" height="100" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="180" y="70" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">位置情報ルーティング</text>
+      <text x="180" y="94" text-anchor="middle" font-size="12" fill="#185FA5">送信元の「国・地域」で決まる</text>
+      <text x="180" y="114" text-anchor="middle" font-size="12" fill="#185FA5">例：日本からのアクセス → 東京</text>
+      <rect x="360" y="44" width="280" height="100" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="500" y="70" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">地理的近接性ルーティング</text>
+      <text x="500" y="94" text-anchor="middle" font-size="12" fill="#185FA5">リソースとの「距離」で決まる</text>
+      <text x="500" y="114" text-anchor="middle" font-size="12" fill="#185FA5">bias で範囲を拡大・縮小可能</text>
+      <rect x="40" y="164" width="600" height="112" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="188" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">試験シナリオ → ポリシーの対応表</text>
+      <text x="60" y="212" font-size="12" fill="#633806">「障害時に自動切替したい」</text>
+      <text x="460" y="212" font-size="12" font-weight="500" fill="#633806">→ フェイルオーバー</text>
+      <text x="60" y="232" font-size="12" fill="#633806">「新バージョンに少しずつ流したい」</text>
+      <text x="460" y="232" font-size="12" font-weight="500" fill="#633806">→ 加重</text>
+      <text x="60" y="252" font-size="12" fill="#633806">「最も速いリージョンへ飛ばしたい」</text>
+      <text x="460" y="252" font-size="12" font-weight="500" fill="#633806">→ レイテンシー</text>
+      <text x="60" y="272" font-size="12" fill="#633806">「国ごとに違うコンテンツを返したい」</text>
+      <text x="460" y="272" font-size="12" font-weight="500" fill="#633806">→ 地理的（Geolocation）</text>
     </svg>
   </div>
 </div>

@@ -1,0 +1,16 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+<Layout title="ストレージ">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / ストレージ</p>
+    <h1 class="text-3xl font-bold mb-2">ストレージ</h1>
+    <p class="text-gray-500 mb-10">S3・EBS・EFS・Glacier</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <a href="/storage/s3" class="block p-6 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-orange-400 transition">
+        <div class="text-2xl font-bold mb-1">S3</div>
+        <div class="text-gray-500 text-sm">オブジェクトストレージ・ライフサイクル・暗号化</div>
+      </a>
+    </div>
+  </div>
+</Layout>

@@ -1,0 +1,160 @@
+---
+---
+<style>
+  .s3lc-btn {
+    cursor:pointer; font-size:12px; padding:4px 14px;
+    border-radius:6px; border:1px solid #e5e7eb;
+    background:#f9fafb; color:#111827; font-family:inherit;
+  }
+  .dark .s3lc-btn { border-color:#374151; background:#1f2937; color:#f9fafb; }
+  .s3lc-btn.active { background:#534AB7; color:#fff; border-color:#534AB7; }
+</style>
+
+<div style="display:flex;gap:8px;margin:0 0 10px;align-items:center;">
+  <button class="s3lc-btn active" id="s3lc-btn-play" onclick="s3lcTogglePlay()">一時停止</button>
+  <button class="s3lc-btn" id="s3lc-btn-reset" onclick="s3lcReset()">最初から</button>
+  <span id="s3lc-day-label" style="font-size:13px;color:#6b7280;margin-left:8px;">経過日数: 0日</span>
+</div>
+
+<svg width="100%" viewBox="0 0 680 320">
+  <defs>
+    <marker id="s3lc-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Timeline bar bg -->
+  <rect x="40" y="60" width="600" height="8" rx="4" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+  <!-- Progress fill -->
+  <rect id="s3lc-progress" x="40" y="60" width="0" height="8" rx="4" fill="#534AB7"/>
+
+  <!-- Milestone markers -->
+  <line x1="40"  y1="55" x2="40"  y2="75" stroke="#D3D1C7" stroke-width="1"/>
+  <text x="40"  y="50" text-anchor="middle" font-size="11" fill="#5F5E5A">0日</text>
+  <line x1="196" y1="55" x2="196" y2="75" stroke="#D3D1C7" stroke-width="1"/>
+  <text x="196" y="50" text-anchor="middle" font-size="11" fill="#5F5E5A">30日</text>
+  <line x1="352" y1="55" x2="352" y2="75" stroke="#D3D1C7" stroke-width="1"/>
+  <text x="352" y="50" text-anchor="middle" font-size="11" fill="#5F5E5A">90日</text>
+  <line x1="508" y1="55" x2="508" y2="75" stroke="#D3D1C7" stroke-width="1"/>
+  <text x="508" y="50" text-anchor="middle" font-size="11" fill="#5F5E5A">365日</text>
+  <line x1="640" y1="55" x2="640" y2="75" stroke="#D3D1C7" stroke-width="1"/>
+  <text x="640" y="50" text-anchor="middle" font-size="11" fill="#5F5E5A">730日</text>
+
+  <!-- Stage boxes -->
+  <g id="s3lc-stage-standard">
+    <rect x="40"  y="100" width="150" height="70" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+    <text x="115" y="124" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C" dominant-baseline="central">Standard</text>
+    <text x="115" y="144" text-anchor="middle" font-size="11" fill="#185FA5" dominant-baseline="central">高頻度アクセス</text>
+    <text x="115" y="160" text-anchor="middle" font-size="11" fill="#185FA5" dominant-baseline="central">コスト: 高</text>
+  </g>
+  <g id="s3lc-stage-ia" opacity="0.3">
+    <rect x="222" y="100" width="150" height="70" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+    <text x="297" y="124" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C" dominant-baseline="central">Standard-IA</text>
+    <text x="297" y="144" text-anchor="middle" font-size="11" fill="#185FA5" dominant-baseline="central">低頻度アクセス</text>
+    <text x="297" y="160" text-anchor="middle" font-size="11" fill="#185FA5" dominant-baseline="central">コスト: 中</text>
+  </g>
+  <g id="s3lc-stage-glacier" opacity="0.3">
+    <rect x="404" y="100" width="150" height="70" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+    <text x="479" y="124" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13" dominant-baseline="central">Glacier</text>
+    <text x="479" y="144" text-anchor="middle" font-size="11" fill="#993C1D" dominant-baseline="central">アーカイブ</text>
+    <text x="479" y="160" text-anchor="middle" font-size="11" fill="#993C1D" dominant-baseline="central">コスト: 低</text>
+  </g>
+  <g id="s3lc-stage-delete" opacity="0.3">
+    <rect x="578" y="100" width="62" height="70" rx="8" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/>
+    <text x="609" y="130" text-anchor="middle" font-size="13" font-weight="500" fill="#444441" dominant-baseline="central">削除</text>
+    <text x="609" y="150" text-anchor="middle" font-size="11" fill="#5F5E5A" dominant-baseline="central">自動</text>
+  </g>
+
+  <!-- Arrows between stages -->
+  <line id="s3lc-arr-1" x1="190" y1="135" x2="220" y2="135" stroke="#185FA5" stroke-width="1.5" marker-end="url(#s3lc-arr)" opacity="0.3"/>
+  <line id="s3lc-arr-2" x1="372" y1="135" x2="402" y2="135" stroke="#993C1D" stroke-width="1.5" marker-end="url(#s3lc-arr)" opacity="0.3"/>
+  <line id="s3lc-arr-3" x1="554" y1="135" x2="576" y2="135" stroke="#5F5E5A" stroke-width="1.5" marker-end="url(#s3lc-arr)" opacity="0.3"/>
+
+  <!-- Object dot -->
+  <circle id="s3lc-dot" cx="115" cy="195" r="10" fill="#534AB7"/>
+  <text x="115" y="215" text-anchor="middle" font-size="11" fill="#534AB7" id="s3lc-dot-label">オブジェクト</text>
+
+  <!-- Info box -->
+  <rect x="40" y="240" width="600" height="60" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text id="s3lc-info-title" x="340" y="262" text-anchor="middle" font-size="13" font-weight="500" fill="#2C2C2A" dominant-baseline="central">Standard：作成直後〜30日</text>
+  <text id="s3lc-info-desc"  x="340" y="284" text-anchor="middle" font-size="11" fill="#5F5E5A" dominant-baseline="central">頻繁にアクセスされるデータ向け。最も高い可用性・耐久性。</text>
+</svg>
+
+<script>
+  const S3LC_TOTAL = 730;
+  const S3LC_BAR   = 600;
+  const S3LC_STAGES = [
+    { day:0,   endDay:30,  cx:115, id:'s3lc-stage-standard', arr:null,         color:'#534AB7',
+      title:'Standard：作成直後〜30日',     desc:'頻繁にアクセスされるデータ向け。最も高い可用性・耐久性。' },
+    { day:30,  endDay:90,  cx:297, id:'s3lc-stage-ia',       arr:'s3lc-arr-1', color:'#185FA5',
+      title:'Standard-IA：30日〜90日',      desc:'アクセス頻度が下がったデータへ自動移行。取得時に料金が発生。' },
+    { day:90,  endDay:365, cx:479, id:'s3lc-stage-glacier',  arr:'s3lc-arr-2', color:'#993C1D',
+      title:'Glacier：90日〜365日',         desc:'ほぼアクセスしないアーカイブデータ。コストが大幅に削減される。' },
+    { day:365, endDay:730, cx:609, id:'s3lc-stage-delete',   arr:'s3lc-arr-3', color:'#5F5E5A',
+      title:'削除：365日以降',              desc:'ライフサイクルポリシーにより自動削除。ストレージコストがゼロに。' },
+  ];
+
+  let s3lcDay = 0;
+  let s3lcPlaying = true;
+  let s3lcRaf: number | null = null;
+  let s3lcLast: number | null = null;
+  const S3LC_SPEED = 60;
+
+  function s3lcDayToX(d: number){ return 40 + (d / S3LC_TOTAL) * S3LC_BAR; }
+
+  function s3lcGetStage(d: number){
+    for(let i = S3LC_STAGES.length-1; i>=0; i--){
+      if(d >= S3LC_STAGES[i].day) return S3LC_STAGES[i];
+    }
+    return S3LC_STAGES[0];
+  }
+
+  function s3lcRender(d: number){
+    const w = (d / S3LC_TOTAL) * S3LC_BAR;
+    document.getElementById('s3lc-progress')!.setAttribute('width', String(Math.min(w, S3LC_BAR)));
+    document.getElementById('s3lc-day-label')!.textContent = `経過日数: ${Math.floor(d)}日`;
+    const cx = s3lcDayToX(d);
+    document.getElementById('s3lc-dot')!.setAttribute('cx', String(Math.min(cx, 650)));
+    const stage = s3lcGetStage(d);
+    S3LC_STAGES.forEach(s => {
+      document.getElementById(s.id)!.setAttribute('opacity', s.id === stage.id ? '1' : '0.3');
+      if(s.arr) document.getElementById(s.arr)!.setAttribute('opacity', d >= s.day ? '1' : '0.3');
+    });
+    document.getElementById('s3lc-dot')!.setAttribute('fill', stage.color);
+    document.getElementById('s3lc-info-title')!.textContent = stage.title;
+    document.getElementById('s3lc-info-desc')!.textContent  = stage.desc;
+  }
+
+  function s3lcLoop(ts: number){
+    if(!s3lcLast) s3lcLast = ts;
+    const delta = (ts - s3lcLast) / 1000;
+    s3lcLast = ts;
+    s3lcDay = Math.min(s3lcDay + delta * S3LC_SPEED, S3LC_TOTAL);
+    s3lcRender(s3lcDay);
+    if(s3lcDay >= S3LC_TOTAL){ setTimeout(s3lcReset, 1500); return; }
+    if(s3lcPlaying) s3lcRaf = requestAnimationFrame(s3lcLoop);
+  }
+
+  function s3lcTogglePlay(){
+    s3lcPlaying = !s3lcPlaying;
+    const btn = document.getElementById('s3lc-btn-play')!;
+    btn.textContent = s3lcPlaying ? '一時停止' : '再生';
+    btn.classList.toggle('active', s3lcPlaying);
+    if(s3lcPlaying){ s3lcLast = null; s3lcRaf = requestAnimationFrame(s3lcLoop); }
+    else if(s3lcRaf) cancelAnimationFrame(s3lcRaf);
+  }
+
+  function s3lcReset(){
+    if(s3lcRaf) cancelAnimationFrame(s3lcRaf);
+    s3lcDay = 0; s3lcLast = null; s3lcPlaying = true;
+    document.getElementById('s3lc-btn-play')!.textContent = '一時停止';
+    document.getElementById('s3lc-btn-play')!.classList.add('active');
+    s3lcRender(0);
+    s3lcRaf = requestAnimationFrame(s3lcLoop);
+  }
+  (window as any).s3lcTogglePlay = s3lcTogglePlay;
+  (window as any).s3lcReset = s3lcReset;
+
+  s3lcRender(0);
+  s3lcRaf = requestAnimationFrame(s3lcLoop);
+</script>

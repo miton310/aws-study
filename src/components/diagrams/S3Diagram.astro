@@ -1,0 +1,106 @@
+---
+---
+<div>
+  <style>
+    .s3-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
+    .dark .s3-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
+    .s3-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
+    .s3-panel{display:none;}
+    .s3-panel.active{display:block;}
+  </style>
+
+  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
+    <button class="s3-btn active" onclick="s3Tab('overview')">S3とは</button>
+    <button class="s3-btn" onclick="s3Tab('classes')">ストレージクラス</button>
+    <button class="s3-btn" onclick="s3Tab('security')">セキュリティ</button>
+  </div>
+
+  <div id="s3-overview" class="s3-panel active">
+    <svg width="100%" viewBox="0 0 680 340">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">Amazon S3：オブジェクトストレージ</text>
+      <rect x="40" y="44" width="600" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="340" y="68" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">Amazon S3（Simple Storage Service）</text>
+      <text x="340" y="88" text-anchor="middle" font-size="11" fill="#085041">オブジェクトストレージ・容量無制限・高耐久性（イレブンナイン）</text>
+      <rect x="40"  y="120" width="185" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="132" y="144" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">構造</text>
+      <text x="132" y="162" text-anchor="middle" font-size="11" fill="#085041">バケット → オブジェクト</text>
+      <rect x="247" y="120" width="185" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="340" y="144" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">耐久性</text>
+      <text x="340" y="162" text-anchor="middle" font-size="11" fill="#085041">99.999999999%（11ナイン）</text>
+      <rect x="454" y="120" width="185" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="547" y="144" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">アクセス制御</text>
+      <text x="547" y="162" text-anchor="middle" font-size="11" fill="#085041">バケットポリシー / IAM</text>
+      <rect x="40" y="196" width="600" height="124" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="220" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出ポイント</text>
+      <text x="60" y="244" font-size="12" fill="#633806">・バケット名はグローバルで一意（全AWSアカウントで重複不可）</text>
+      <text x="60" y="264" font-size="12" fill="#633806">・静的ウェブサイトホスティング可能</text>
+      <text x="60" y="284" font-size="12" fill="#633806">・バージョニングで誤削除対策・MFA Delete で保護強化</text>
+      <text x="60" y="304" font-size="12" fill="#633806">・S3 Transfer Acceleration：CloudFront エッジ経由で高速アップロード</text>
+    </svg>
+  </div>
+
+  <div id="s3-classes" class="s3-panel">
+    <svg width="100%" viewBox="0 0 680 400">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">ストレージクラス：コストと取得速度のトレードオフ</text>
+      <rect x="40"  y="44" width="290" height="68" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="185" y="68" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">Standard</text>
+      <text x="185" y="90" text-anchor="middle" font-size="11" fill="#185FA5">高頻度アクセス・高可用性・コスト高</text>
+      <rect x="350" y="44" width="290" height="68" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="495" y="68" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">Standard-IA</text>
+      <text x="495" y="90" text-anchor="middle" font-size="11" fill="#185FA5">低頻度アクセス・取得時に課金・コスト中</text>
+      <rect x="40"  y="128" width="290" height="68" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="185" y="152" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">One Zone-IA</text>
+      <text x="185" y="172" text-anchor="middle" font-size="11" fill="#185FA5">1AZのみ・AZ障害でデータ消失リスクあり</text>
+      <rect x="350" y="128" width="290" height="68" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="495" y="152" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">Intelligent-Tiering</text>
+      <text x="495" y="172" text-anchor="middle" font-size="11" fill="#534AB7">アクセス頻度に応じて自動でクラス切替</text>
+      <rect x="40"  y="212" width="290" height="68" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="185" y="236" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">Glacier Instant</text>
+      <text x="185" y="256" text-anchor="middle" font-size="11" fill="#993C1D">アーカイブ・ミリ秒単位で取得可</text>
+      <rect x="350" y="212" width="290" height="68" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="495" y="236" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">Glacier Flexible</text>
+      <text x="495" y="256" text-anchor="middle" font-size="11" fill="#993C1D">アーカイブ・取得：数分〜数時間</text>
+      <rect x="145" y="296" width="390" height="56" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="340" y="320" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">Glacier Deep Archive</text>
+      <text x="340" y="340" text-anchor="middle" font-size="11" fill="#993C1D">最安・長期保管・取得に12時間以上</text>
+      <line x1="40" y1="372" x2="640" y2="372" stroke="#D3D1C7" stroke-width="1"/>
+      <text x="40"  y="390" font-size="11" fill="#185FA5">← 高コスト・高速取得</text>
+      <text x="640" y="390" text-anchor="end" font-size="11" fill="#993C1D">低コスト・低速取得 →</text>
+    </svg>
+  </div>
+
+  <div id="s3-security" class="s3-panel">
+    <svg width="100%" viewBox="0 0 680 320">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">S3 セキュリティ・アクセス制御</text>
+      <rect x="40"  y="44" width="290" height="80" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="185" y="70" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">バケットポリシー</text>
+      <text x="185" y="92" text-anchor="middle" font-size="11" fill="#534AB7">バケット単位でアクセス制御</text>
+      <text x="185" y="112" text-anchor="middle" font-size="11" fill="#534AB7">JSON形式・クロスアカウント可</text>
+      <rect x="350" y="44" width="290" height="80" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="495" y="70" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">IAMポリシー</text>
+      <text x="495" y="92" text-anchor="middle" font-size="11" fill="#534AB7">ユーザー・ロール単位で制御</text>
+      <text x="495" y="112" text-anchor="middle" font-size="11" fill="#534AB7">EC2からS3へのアクセスに使用</text>
+      <rect x="40"  y="144" width="290" height="80" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="185" y="170" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">バージョニング</text>
+      <text x="185" y="192" text-anchor="middle" font-size="11" fill="#085041">誤削除・上書きから保護</text>
+      <text x="185" y="212" text-anchor="middle" font-size="11" fill="#085041">MFA Delete で削除を二重保護</text>
+      <rect x="350" y="144" width="290" height="80" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="495" y="170" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">暗号化</text>
+      <text x="495" y="192" text-anchor="middle" font-size="11" fill="#085041">SSE-S3 / SSE-KMS / SSE-C</text>
+      <text x="495" y="212" text-anchor="middle" font-size="11" fill="#085041">転送中はSSL/TLS</text>
+      <rect x="40" y="244" width="600" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="268" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出：デフォルトはすべてのパブリックアクセスをブロック</text>
+      <text x="340" y="288" text-anchor="middle" font-size="11" fill="#633806">「S3を公開したい」→ ブロックパブリックアクセスをオフ + バケットポリシーで許可</text>
+    </svg>
+  </div>
+</div>
+
+<script>
+  function s3Tab(t: string) {
+    document.querySelectorAll('[id^="s3-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('s3-' + t)?.classList.add('active');
+    document.querySelectorAll('.s3-btn').forEach(el => el.classList.remove('active'));
+    (event?.target as HTMLElement)?.classList.add('active');
+  }
+  (window as any).s3Tab = s3Tab;
+</script>
