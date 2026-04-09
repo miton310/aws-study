@@ -1,16 +1,14 @@
 ---
 ---
 <style>
-.ctrl-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
-.dark .ctrl-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
-.ctrl-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
 #scenario-label{font-size:12px;color:#6b7280;margin-left:8px;}
 </style>
 
-<div style="display:flex;gap:6px;margin:0 0 8px;flex-wrap:wrap;align-items:center;">
-  <button class="ctrl-btn active" id="btn-inbound"  onclick="setMode('inbound')">インターネット → EC2</button>
-  <button class="ctrl-btn"        id="btn-nat"      onclick="setMode('nat')">プライベートEC2 → NAT</button>
-  <button class="ctrl-btn"        id="btn-failover" onclick="setMode('failover')">マルチAZ フェイルオーバー</button>
+<!-- 通信フローアニメーション -->
+<div class="tab-btn-group items-center">
+  <button class="tab-btn active" id="btn-inbound"  onclick="setMode('inbound')">インターネット → EC2</button>
+  <button class="tab-btn"        id="btn-nat"      onclick="setMode('nat')">プライベートEC2 → NAT</button>
+  <button class="tab-btn"        id="btn-failover" onclick="setMode('failover')">マルチAZ フェイルオーバー</button>
   <span id="scenario-label">インターネットからパブリックEC2への通信</span>
 </div>
 
@@ -134,8 +132,12 @@
   <text id="fail-mark-rds" x="102" y="415" text-anchor="middle" font-size="22" fill="#E24B4A" opacity="0">✕</text>
 
   <!-- Status text -->
-  <text id="step-txt" x="340" y="468" text-anchor="middle" font-size="12" fill="#534AB7"></text>
 </svg>
+<div style="display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0;">
+  <button class="tab-btn" id="btn-prev" onclick="stepPrev()">← 戻る</button>
+  <p id="step-txt" style="margin:0;font-size:14px;color:#534AB7;font-weight:500;"></p>
+  <button class="tab-btn" id="btn-next" onclick="stepNext()">次へ →</button>
+</div>
 
   <div>
     インターネット → EC2 はリクエストがIGW→パブリックEC2→プライベートEC2と降りていく流れです。<br>
@@ -143,7 +145,7 @@
     マルチAZフェイルオーバー はAZ1が落ちたときにRDS Standbyが昇格してAZ2で通信が継続される流れです。
   </div>
 
-<script>
+<script is:inline>
 const STEPS = {
   inbound: [
     {lines:['f1'], txt:'① インターネットからIGWへ', dur:500},
@@ -171,6 +173,8 @@ const LABELS = {
 };
 
 let mode = 'inbound';
+let currentIdx = -1;
+let animating = false;
 
 function getEl(id){ return document.getElementById(id); }
 
@@ -197,7 +201,7 @@ function animLine(id, dur, cb){
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     el.style.transition=`stroke-dashoffset ${dur}ms linear`;
     el.setAttribute('stroke-dashoffset','0');
-    setTimeout(()=>{ el.setAttribute('opacity','0'); el.style.transition='none'; if(cb)cb(); }, dur+100);
+    setTimeout(()=>{ if(cb)cb(); }, dur+100);
   }));
 }
 
@@ -209,22 +213,54 @@ function showFail(cb){
   setTimeout(cb, 700);
 }
 
-let currentSteps = null;
+function updateButtons(){
+  const steps = STEPS[mode];
+  getEl('btn-prev').disabled = currentIdx <= 0;
+  getEl('btn-next').disabled = currentIdx >= steps.length - 1;
+}
 
-function runSteps(steps, idx){
-  if(steps !== currentSteps) return;
-  if(idx >= steps.length){ setTimeout(()=>runSteps(steps,0), 1000); return; }
+function showStep(idx){
+  if(animating) return;
+  const steps = STEPS[mode];
+  if(idx < 0 || idx >= steps.length) return;
+  resetAll();
+  // Re-apply all previous steps' persistent effects
+  for(let i = 0; i < idx; i++){
+    const prev = steps[i];
+    if(prev.fn === 'showFail'){
+      getEl('pub-ec2-1').style.opacity='0.3';
+      getEl('rds-1').style.opacity='0.3';
+      getEl('fail-mark-ec2').setAttribute('opacity','1');
+      getEl('fail-mark-rds').setAttribute('opacity','1');
+    }
+    prev.lines.forEach(id=>{
+      const el = getEl(id);
+      el.setAttribute('opacity','1');
+      el.setAttribute('stroke-dashoffset','0');
+    });
+  }
+  currentIdx = idx;
   const s = steps[idx];
   getEl('step-txt').textContent = s.txt;
-  const next = ()=>setTimeout(()=>runSteps(steps, idx+1), 300);
+  animating = true;
+  const done = ()=>{ animating = false; updateButtons(); };
   if(s.fn === 'showFail'){
-    showFail(next);
+    showFail(done);
   } else if(s.lines.length === 0){
-    setTimeout(next, s.dur);
+    done();
   } else {
     let remaining = s.lines.length;
-    s.lines.forEach(id=>animLine(id, s.dur, ()=>{ remaining--; if(remaining===0) next(); }));
+    s.lines.forEach(id=>animLine(id, s.dur, ()=>{ remaining--; if(remaining===0) done(); }));
   }
+  updateButtons();
+}
+
+function stepNext(){
+  showStep(currentIdx + 1);
+}
+
+function stepPrev(){
+  showStep(currentIdx - 1);
 }
 
 function setMode(m){
@@ -235,11 +271,11 @@ function setMode(m){
   });
   const label = getEl('scenario-label');
   if(label) label.textContent = LABELS[m];
+  currentIdx = -1;
   resetAll();
-  currentSteps = STEPS[m];
-  setTimeout(()=>runSteps(currentSteps, 0), 400);
+  getEl('step-txt').textContent = '';
+  showStep(0);
 }
 
-currentSteps = STEPS[mode];
-runSteps(currentSteps, 0);
+showStep(0);
 </script>

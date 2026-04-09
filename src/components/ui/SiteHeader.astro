@@ -1,0 +1,77 @@
+---
+interface Props {
+  currentPath?: string;
+}
+const { currentPath = '/' } = Astro.props;
+const isHome = currentPath === '/';
+---
+<header
+  class="sticky top-0 z-50 h-[52px] flex items-center
+         border-b backdrop-blur-md"
+  style="background:rgba(247,246,242,0.85);border-color:var(--border)"
+  id="site-header"
+>
+  <div class="w-full max-w-[1200px] mx-auto px-6 flex items-center justify-between gap-4">
+    <!-- ロゴ -->
+    <a href="/" class="flex items-center gap-2 font-bold text-sm" aria-label="ホームへ">
+      <div class="w-[26px] h-[26px] rounded-md grid place-items-center flex-shrink-0 text-white" style="background:var(--brand)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      </div>
+      <span style="color:var(--text)">AWS SAA 図解</span>
+    </a>
+
+    <!-- パンくず（ホーム以外） -->
+    {!isHome && (
+      <nav class="flex items-center gap-2 text-xs hidden sm:flex" style="color:var(--text-faint)" aria-label="パンくず">
+        <a href="/" class="hover:opacity-70 transition-opacity" style="color:var(--text-faint)">ホーム</a>
+        <span>›</span>
+        <slot name="breadcrumb" />
+      </nav>
+    )}
+
+    <!-- ダークモードトグル -->
+    <button
+      id="theme-toggle"
+      class="w-[34px] h-[34px] rounded-lg grid place-items-center transition-all duration-200"
+      style="color:var(--text-muted)"
+      aria-label="ダークモード切替"
+    >
+      <svg id="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <svg id="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="hidden">
+        <circle cx="12" cy="12" r="5"/>
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<script>
+  const html   = document.documentElement;
+  const header = document.getElementById('site-header')!;
+  const btn    = document.getElementById('theme-toggle')!;
+  const moon   = document.getElementById('icon-moon')!;
+  const sun    = document.getElementById('icon-sun')!;
+
+  let dark = html.classList.contains('dark');
+
+  function applyTheme(d: boolean) {
+    html.classList.toggle('dark', d);
+    // ヘッダー背景
+    header.style.background = d
+      ? 'rgba(19,18,15,0.85)'
+      : 'rgba(247,246,242,0.85)';
+    moon.classList.toggle('hidden', d);
+    sun.classList.toggle('hidden', !d);
+  }
+
+  applyTheme(dark);
+
+  btn.addEventListener('click', () => {
+    dark = !dark;
+    applyTheme(dark);
+  });
+</script>

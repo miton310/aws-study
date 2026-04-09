@@ -1,0 +1,37 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'AWS SAA 図解学習',
+  description = 'AWS Solutions Architect Associate 試験対策。全16章を図解とアニメーションで学ぶ。',
+} = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="ja" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <title>{title}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <!-- Tailwind CDN（ビルド前プレビュー用。本番はビルドしたCSSを使用） -->
+</head>
+<body class="min-h-dvh transition-colors duration-300" style="background:var(--bg);color:var(--text)">
+  <slot />
+
+  <script is:inline>
+    // ダークモード初期化（フラッシュ防止のためインライン実行）
+    (function () {
+      const dark = matchMedia('(prefers-color-scheme:dark)').matches;
+      document.documentElement.classList.toggle('dark', dark);
+    })();
+  </script>
+</body>
+</html>

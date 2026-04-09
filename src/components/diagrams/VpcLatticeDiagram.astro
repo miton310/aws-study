@@ -1,0 +1,105 @@
+---
+---
+<div>
+  <style>
+    .lat-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
+    .dark .lat-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
+    .lat-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
+    .lat-panel{display:none;}
+    .lat-panel.active{display:block;}
+  </style>
+
+  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
+    <button class="lat-btn active" onclick="latTab('what')">VPC Latticeとは</button>
+    <button class="lat-btn" onclick="latTab('compare')">他サービスとの違い</button>
+  </div>
+
+  <div id="lat-what" class="lat-panel active">
+    <h3 class="section-title">VPC Lattice：L7でサービス間通信を一元管理</h3>
+    <svg width="100%" viewBox="0 0 680 380">
+      <defs><marker id="lat-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+
+      <!-- Lattice service network -->
+      <rect x="40" y="44" width="600" height="200" rx="14" fill="none" stroke="#534AB7" stroke-width="2" stroke-dasharray="8 4"/>
+      <text x="56" y="66" font-size="12" fill="#534AB7">VPC Lattice サービスネットワーク（L7管理レイヤー）</text>
+      <text x="56" y="84" font-size="11" fill="#534AB7">認証 / 認可 / トラフィック制御 / モニタリングを一元管理</text>
+
+      <!-- Service A -->
+      <rect x="80" y="106" width="140" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="150" y="130" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">サービスA</text>
+      <text x="150" y="150" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">VPC 1 / Account 1</text>
+
+      <!-- Service B -->
+      <rect x="270" y="106" width="140" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="340" y="130" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">サービスB</text>
+      <text x="340" y="150" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">VPC 2 / Account 2</text>
+
+      <!-- Service C -->
+      <rect x="460" y="106" width="140" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="530" y="130" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">サービスC</text>
+      <text x="530" y="150" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">ECS / Lambda</text>
+
+      <!-- Arrows -->
+      <line x1="220" y1="130" x2="268" y2="130" stroke="#534AB7" stroke-width="1.5" marker-end="url(#lat-arr)"/>
+      <line x1="268" y1="138" x2="220" y2="138" stroke="#534AB7" stroke-width="1.5" marker-end="url(#lat-arr)"/>
+      <line x1="410" y1="130" x2="458" y2="130" stroke="#534AB7" stroke-width="1.5" marker-end="url(#lat-arr)"/>
+      <line x1="458" y1="138" x2="410" y2="138" stroke="#534AB7" stroke-width="1.5" marker-end="url(#lat-arr)"/>
+
+      <!-- L7 features bar -->
+      <rect x="80" y="182" width="520" height="36" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="340" y="204" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489" dominant-baseline="central">HTTP/HTTPS・gRPC / パスルーティング / IAM認証 / CloudWatchモニタリング</text>
+
+      <!-- SAA tip -->
+      <rect x="40" y="260" width="600" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="284" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出ポイント</text>
+      <text x="340" y="304" text-anchor="middle" font-size="11" fill="#633806">「異なるVPC・アカウント間のサービスをL7で安全に接続」→ VPC Lattice</text>
+
+      <!-- Bottom note -->
+      <rect x="40" y="332" width="600" height="36" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
+      <text x="340" y="354" text-anchor="middle" font-size="11" fill="#185FA5" dominant-baseline="central">PrivateLinkとの違い：LatticeはL7（HTTP/gRPC）対応・双方向通信・IAM認証統合が特徴</text>
+    </svg>
+  </div>
+
+  <div id="lat-compare" class="lat-panel">
+    <h3 class="section-title">似ているサービスとの違い</h3>
+    <div class="overflow-x-auto rounded-lg border border-[#D3D1C7]">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-[#F1EFE8] text-[#444441] font-medium">
+            <th class="px-4 py-2 text-center">サービス</th>
+            <th class="px-4 py-2 text-center">接続方式</th>
+            <th class="px-4 py-2 text-center">用途</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="bg-[#E6F1FB]">
+            <td class="px-4 py-3 text-center text-[#0C447C]">VPCピアリング</td>
+            <td class="px-4 py-3 text-center text-[#185FA5]">L3（IPレベル）1対1</td>
+            <td class="px-4 py-3 text-center text-[#185FA5]">VPC間ネットワーク接続</td>
+          </tr>
+          <tr class="bg-[#EEEDFE]">
+            <td class="px-4 py-3 text-center text-[#3C3489]">Transit GW</td>
+            <td class="px-4 py-3 text-center text-[#534AB7]">L3・多対多ハブ</td>
+            <td class="px-4 py-3 text-center text-[#534AB7]">複数VPC・オンプレ接続</td>
+          </tr>
+          <tr class="bg-[#E1F5EE]">
+            <td class="px-4 py-3 text-center font-medium text-[#085041]">VPC Lattice</td>
+            <td class="px-4 py-3 text-center text-[#085041]">L7・サービスメッシュ</td>
+            <td class="px-4 py-3 text-center text-[#085041]">マイクロサービス間通信</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note-box font-medium mt-2">「異なるVPC・アカウント間をL7で接続・認証も統合」→ VPC Lattice 一択</div>
+  </div>
+</div>
+
+<script>
+  function latTab(t: string) {
+    document.querySelectorAll('[id^="lat-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('lat-' + t)?.classList.add('active');
+    document.querySelectorAll('.lat-btn').forEach(el => el.classList.remove('active'));
+    (event?.target as HTMLElement)?.classList.add('active');
+  }
+  (window as any).latTab = latTab;
+</script>

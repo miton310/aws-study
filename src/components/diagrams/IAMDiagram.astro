@@ -1,23 +1,17 @@
 ---
 ---
 <div>
-  <style>
-    .iam-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
-    .dark .iam-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
-    .iam-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
-    .iam-panel{display:none;}
-    .iam-panel.active{display:block;}
-  </style>
-
-  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
-    <button class="iam-btn active" onclick="iamTab('overview')">全体構造</button>
-    <button class="iam-btn" onclick="iamTab('policy')">ポリシー評価</button>
-    <button class="iam-btn" onclick="iamTab('role')">ロールの仕組み</button>
-    <button class="iam-btn" onclick="iamTab('org')">Organizations・SCP</button>
-    <button class="iam-btn" onclick="iamTab('pattern')">頻出パターン</button>
+  <div class="tab-btn-group">
+    <button class="tab-btn active" onclick="iamTab('overview')">全体構造</button>
+    <button class="tab-btn" onclick="iamTab('policy')">ポリシー評価</button>
+    <button class="tab-btn" onclick="iamTab('role')">ロールの仕組み</button>
+    <button class="tab-btn" onclick="iamTab('org')">Organizations・SCP</button>
+    <button class="tab-btn" onclick="iamTab('role_vs_key')">ロール vs アクセスキー</button>
+    <button class="tab-btn" onclick="iamTab('eval')">ポリシー評価順序</button>
+    <button class="tab-btn" onclick="iamTab('pattern')">頻出パターン</button>
   </div>
 
-  <div id="iam-overview" class="iam-panel active">
+  <div id="iam-overview" class="tab-panel active">
     <svg width="100%" viewBox="0 0 680 400">
       <defs><marker id="iam-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
       <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">IAM の全体構造</text>
@@ -55,7 +49,7 @@
     </svg>
   </div>
 
-  <div id="iam-policy" class="iam-panel">
+  <div id="iam-policy" class="tab-panel">
     <svg width="100%" viewBox="0 0 680 380">
       <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">ポリシー評価順序：明示的DENYが最優先</text>
       <rect x="190" y="48" width="300" height="52" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
@@ -82,7 +76,7 @@
     </svg>
   </div>
 
-  <div id="iam-role" class="iam-panel">
+  <div id="iam-role" class="tab-panel">
     <svg width="100%" viewBox="0 0 680 360">
       <defs><marker id="iam-arr3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
       <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">IAMロール：AssumeRoleと一時認証情報</text>
@@ -112,7 +106,7 @@
     </svg>
   </div>
 
-  <div id="iam-org" class="iam-panel">
+  <div id="iam-org" class="tab-panel">
     <svg width="100%" viewBox="0 0 680 380">
       <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">Organizations + SCP：複数アカウントのガードレール</text>
       <rect x="40" y="44" width="600" height="200" rx="14" fill="none" stroke="#993C1D" stroke-width="2" stroke-dasharray="8 4"/>
@@ -130,28 +124,133 @@
     </svg>
   </div>
 
-  <div id="iam-pattern" class="iam-panel">
-    <svg width="100%" viewBox="0 0 680 380">
-      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">SAA頻出パターン</text>
-      <rect x="40" y="44" width="600" height="316" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
-      <text x="60" y="74"  font-size="12" fill="#633806">「EC2からS3にアクセスしたい」</text><text x="500" y="74"  font-size="12" font-weight="500" fill="#412402">→ IAMロールをEC2にアタッチ</text>
-      <line x1="40" y1="86" x2="640" y2="86" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
-      <text x="60" y="108" font-size="12" fill="#633806">「全アカウントで特定リージョン禁止」</text><text x="500" y="108" font-size="12" font-weight="500" fill="#412402">→ ルートにSCPを設定</text>
-      <line x1="40" y1="120" x2="640" y2="120" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
-      <text x="60" y="142" font-size="12" fill="#633806">「開発者に権限委任・上限を設けたい」</text><text x="500" y="142" font-size="12" font-weight="500" fill="#412402">→ 権限境界（Permission Boundary）</text>
-      <line x1="40" y1="154" x2="640" y2="154" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
-      <text x="60" y="176" font-size="12" fill="#633806">「複数アカウントをSSOで一元管理」</text><text x="500" y="176" font-size="12" font-weight="500" fill="#412402">→ IAM Identity Center</text>
-      <line x1="40" y1="188" x2="640" y2="188" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
-      <text x="60" y="210" font-size="12" fill="#633806">「企業ADでAWSにSSOログイン」</text><text x="500" y="210" font-size="12" font-weight="500" fill="#412402">→ SAML + Identity Center</text>
-      <line x1="40" y1="222" x2="640" y2="222" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
-      <text x="60" y="244" font-size="12" fill="#633806">「モバイルアプリからS3に直接アクセス」</text><text x="500" y="244" font-size="12" font-weight="500" fill="#412402">→ Cognito IDプール</text>
-      <line x1="40" y1="256" x2="640" y2="256" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
-      <text x="60" y="278" font-size="12" fill="#633806">「別アカウントのリソースにアクセス」</text><text x="500" y="278" font-size="12" font-weight="500" fill="#412402">→ クロスアカウントロール</text>
-      <line x1="40" y1="290" x2="640" y2="290" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
-      <text x="60" y="312" font-size="12" fill="#633806">「ルートユーザーを守りたい」</text><text x="500" y="312" font-size="12" font-weight="500" fill="#412402">→ MFA必須・アクセスキーを作らない</text>
-      <line x1="40" y1="324" x2="640" y2="324" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
-      <text x="60" y="354" font-size="12" fill="#633806">「IAMポリシーで許可しても動かない」</text><text x="500" y="354" font-size="12" font-weight="500" fill="#412402">→ SCPか権限境界で制限されている</text>
+  <div id="iam-role_vs_key" class="tab-panel">
+    <svg width="100%" viewBox="0 0 680 440">
+      <defs><marker id="iam-r-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">アクセスキー方式 vs IAMロール方式</text>
+
+      <!-- LEFT: Access Key (Bad) -->
+      <rect x="40" y="44" width="270" height="32" rx="6" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+      <text x="175" y="64" text-anchor="middle" font-size="13" font-weight="500" fill="#791F1F">❌ アクセスキー方式（非推奨）</text>
+
+      <rect x="60" y="92" width="230" height="52" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="175" y="114" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13" dominant-baseline="central">カスタム AMI</text>
+      <text x="175" y="134" text-anchor="middle" font-size="11" fill="#993C1D" dominant-baseline="central">テキストファイルにキーを格納</text>
+
+      <line x1="175" y1="144" x2="175" y2="170" stroke="#E24B4A" stroke-width="1.5" marker-end="url(#iam-r-arr)"/>
+
+      <rect x="60" y="172" width="230" height="52" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="175" y="194" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13" dominant-baseline="central">EC2 インスタンス</text>
+      <text x="175" y="214" text-anchor="middle" font-size="11" fill="#993C1D" dominant-baseline="central">キーをファイルから読み込む</text>
+
+      <line x1="175" y1="224" x2="175" y2="250" stroke="#E24B4A" stroke-width="1.5" marker-end="url(#iam-r-arr)"/>
+
+      <rect x="60" y="252" width="230" height="52" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="175" y="274" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13" dominant-baseline="central">DynamoDB</text>
+      <text x="175" y="294" text-anchor="middle" font-size="11" fill="#993C1D" dominant-baseline="central">アクセスキーで認証</text>
+
+      <rect x="60" y="322" width="230" height="88" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+      <text x="175" y="344" text-anchor="middle" font-size="12" font-weight="500" fill="#791F1F">リスク</text>
+      <text x="175" y="364" text-anchor="middle" font-size="11" fill="#A32D2D">・AMI流出 → キー漏洩</text>
+      <text x="175" y="382" text-anchor="middle" font-size="11" fill="#A32D2D">・キーのローテーション管理が必要</text>
+      <text x="175" y="400" text-anchor="middle" font-size="11" fill="#A32D2D">・単一障害点になりやすい</text>
+
+      <!-- RIGHT: IAM Role (Good) -->
+      <rect x="370" y="44" width="270" height="32" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="505" y="64" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">✅ IAMロール方式（推奨）</text>
+
+      <rect x="390" y="92" width="230" height="52" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="505" y="114" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">IAM ロール</text>
+      <text x="505" y="134" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">DynamoDB アクセス権限を付与</text>
+
+      <line x1="505" y1="144" x2="505" y2="170" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#iam-r-arr)"/>
+      <text x="525" y="160" font-size="11" fill="#085041">アタッチ</text>
+
+      <rect x="390" y="172" width="230" height="52" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="505" y="194" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">EC2 インスタンス</text>
+      <text x="505" y="214" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">ロールがアタッチされている</text>
+
+      <line x1="505" y1="224" x2="505" y2="250" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#iam-r-arr)"/>
+
+      <rect x="390" y="252" width="230" height="52" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="505" y="274" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">DynamoDB</text>
+      <text x="505" y="294" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">一時クレデンシャルで認証</text>
+
+      <rect x="390" y="322" width="230" height="88" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="505" y="344" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">メリット</text>
+      <text x="505" y="364" text-anchor="middle" font-size="11" fill="#085041">・キーの保存が不要</text>
+      <text x="505" y="382" text-anchor="middle" font-size="11" fill="#085041">・漏洩リスクがゼロ</text>
+      <text x="505" y="400" text-anchor="middle" font-size="11" fill="#085041">・一時クレデンシャルが自動更新</text>
     </svg>
+    <div class="note-box font-bold">
+      「EC2からAWSサービスにアクセスしたい」→ 必ずIAMロール
+    </div>
+  </div>
+
+  <!-- ポリシー評価順序 -->
+  <div id="iam-eval" class="tab-panel">
+    <svg width="100%" viewBox="0 0 680 450">
+      <defs><marker id="iam-e-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">ポリシー評価順序：上から順に判定される</text>
+
+      <!-- Step 1: 明示的DENY -->
+      <rect x="190" y="48" width="300" height="52" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+      <text x="340" y="70" text-anchor="middle" font-size="13" font-weight="500" fill="#791F1F" dominant-baseline="central">1. 明示的 DENY があるか？</text>
+      <text x="340" y="90" text-anchor="middle" font-size="11" fill="#A32D2D" dominant-baseline="central">どこか1つでもDenyがあれば即アクセス拒否</text>
+      <line x1="340" y1="100" x2="340" y2="128" stroke="#888780" stroke-width="1.5" marker-end="url(#iam-e-arr)"/>
+      <text x="372" y="118" font-size="11" fill="#A32D2D">YES → 拒否</text>
+
+      <!-- Step 2: SCP -->
+      <rect x="190" y="130" width="300" height="52" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="340" y="152" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">2. SCP で許可されているか？</text>
+      <text x="340" y="172" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">Organizationsのポリシー境界</text>
+      <line x1="340" y1="182" x2="340" y2="210" stroke="#888780" stroke-width="1.5" marker-end="url(#iam-e-arr)"/>
+      <text x="372" y="200" font-size="11" fill="#A32D2D">NO → 拒否</text>
+
+      <!-- Step 3: リソースポリシー -->
+      <rect x="190" y="212" width="300" height="52" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="340" y="234" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">3. リソースポリシーで許可？</text>
+      <text x="340" y="254" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">S3バケットポリシーなど</text>
+      <line x1="340" y1="264" x2="340" y2="292" stroke="#888780" stroke-width="1.5" marker-end="url(#iam-e-arr)"/>
+      <text x="372" y="282" font-size="11" fill="#888780">NO → 次へ</text>
+
+      <!-- Step 4: アイデンティティポリシー -->
+      <rect x="190" y="294" width="300" height="52" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="340" y="316" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">4. アイデンティティポリシーで許可？</text>
+      <text x="340" y="336" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">IAMポリシー・ロールポリシー</text>
+      <line x1="340" y1="346" x2="340" y2="374" stroke="#888780" stroke-width="1.5" marker-end="url(#iam-e-arr)"/>
+
+      <!-- アクセス許可 -->
+      <rect x="240" y="376" width="200" height="44" rx="8" fill="#EAF3DE" stroke="#3B6D11" stroke-width="0.5"/>
+      <text x="340" y="402" text-anchor="middle" font-size="13" font-weight="500" fill="#27500A" dominant-baseline="central">アクセス許可</text>
+
+      <!-- 暗黙のDENY -->
+      <rect x="530" y="130" width="120" height="36" rx="6" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
+      <text x="590" y="152" text-anchor="middle" font-size="12" font-weight="500" fill="#791F1F" dominant-baseline="central">暗黙の DENY</text>
+      <line x1="490" y1="156" x2="530" y2="148" stroke="#E24B4A" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#iam-e-arr)"/>
+      <line x1="490" y1="238" x2="530" y2="148" stroke="#E24B4A" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#iam-e-arr)"/>
+      <line x1="490" y1="320" x2="530" y2="148" stroke="#E24B4A" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#iam-e-arr)"/>
+    </svg>
+    <div class="note-box">デフォルトは暗黙のDENY。明示的なAllowがない限りアクセス不可。</div>
+  </div>
+
+  <div id="iam-pattern" class="tab-panel">
+    <h3 class="section-title">SAA頻出パターン</h3>
+    <div class="note-box overflow-hidden text-lg p-0">
+      <table class="w-full">
+        <tbody class="divide-y divide-[#854F0B]/20">
+          <tr><td class="px-4 py-2 text-[#633806]">「EC2からS3にアクセスしたい」</td><td class="px-4 py-2 font-bold text-[#412402]">→ IAMロールをEC2にアタッチ</td></tr>
+          <tr><td class="px-4 py-2 text-[#633806]">「全アカウントで特定リージョン禁止」</td><td class="px-4 py-2 font-bold text-[#412402]">→ ルートにSCPを設定</td></tr>
+          <tr><td class="px-4 py-2 text-[#633806]">「開発者に権限委任・上限を設けたい」</td><td class="px-4 py-2 font-bold text-[#412402]">→ 権限境界（Permission Boundary）</td></tr>
+          <tr><td class="px-4 py-2 text-[#633806]">「複数アカウントをSSOで一元管理」</td><td class="px-4 py-2 font-bold text-[#412402]">→ IAM Identity Center</td></tr>
+          <tr><td class="px-4 py-2 text-[#633806]">「企業ADでAWSにSSOログイン」</td><td class="px-4 py-2 font-bold text-[#412402]">→ SAML + Identity Center</td></tr>
+          <tr><td class="px-4 py-2 text-[#633806]">「モバイルアプリからS3に直接アクセス」</td><td class="px-4 py-2 font-bold text-[#412402]">→ Cognito IDプール</td></tr>
+          <tr><td class="px-4 py-2 text-[#633806]">「別アカウントのリソースにアクセス」</td><td class="px-4 py-2 font-bold text-[#412402]">→ クロスアカウントロール</td></tr>
+          <tr><td class="px-4 py-2 text-[#633806]">「ルートユーザーを守りたい」</td><td class="px-4 py-2 font-bold text-[#412402]">→ MFA必須・アクセスキーを作らない</td></tr>
+          <tr><td class="px-4 py-2 text-[#633806]">「IAMポリシーで許可しても動かない」</td><td class="px-4 py-2 font-bold text-[#412402]">→ SCPか権限境界で制限されている</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -159,7 +258,7 @@
   function iamTab(t: string) {
     document.querySelectorAll('[id^="iam-"]').forEach(el => el.classList.remove('active'));
     document.getElementById('iam-' + t)?.classList.add('active');
-    document.querySelectorAll('.iam-btn').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
     (event?.target as HTMLElement)?.classList.add('active');
   }
   (window as any).iamTab = iamTab;

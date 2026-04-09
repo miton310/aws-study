@@ -5,16 +5,23 @@ interface Props {
   title: string;
   description?: string;
 }
-const { title, description = 'AWS SAA・SAP試験対策 図解学習サイト' } = Astro.props;
+const {
+  title = 'AWS SAA・SAP試験対策 図解学習サイト',
+  description = 'AWS Solutions Architect Associate 試験対策。全16章を図解とアニメーションで学ぶ。',
+} = Astro.props;
 ---
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" class="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <title>{title} | AWS図解学習</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <!-- Tailwind CDN（ビルド前プレビュー用。本番はビルドしたCSSを使用） -->
   </head>
   <body class="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
     <header class="sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm">
@@ -70,5 +77,13 @@ const { title, description = 'AWS SAA・SAP試験対策 図解学習サイト' }
 				});
 			});
 		</script>
+
+    <!-- <script is:inline>
+      // ダークモード初期化（フラッシュ防止のためインライン実行）
+      (function () {
+        const dark = matchMedia('(prefers-color-scheme:dark)').matches;
+        document.documentElement.classList.toggle('dark', dark);
+      })();
+    </script> -->
   </body>
 </html>

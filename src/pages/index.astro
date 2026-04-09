@@ -1,5 +1,50 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { chapters } from '../data/chapters.ts';
+import SaaOverviewDiagram from '../components/diagrams/SaaOverviewDiagram.astro';
+
+const domains = [
+  {
+    num: '第1分野',
+    pct: 30,
+    color: '#dc2626',
+    bg: '#fef2f2',
+    border: 'rgba(220,38,38,0.18)',
+    label: 'セキュアなアーキテクチャの設計',
+    desc: 'IAM・VPC・暗号化・責任共有モデル。最大配点なので最優先で学習すべき領域。',
+    tags: ['IAM', 'VPC', 'KMS', 'SG/NACL', 'Shield/WAF'],
+  },
+  {
+    num: '第2分野',
+    pct: 26,
+    color: '#2563eb',
+    bg: '#eff6ff',
+    border: 'rgba(37,99,235,0.18)',
+    label: '弾力性に優れたアーキテクチャの設計',
+    desc: 'DR戦略・マルチAZ・疎結合設計。ELB・SQS・SNS・Lambdaが頻出。',
+    tags: ['ELB', 'Auto Scaling', 'Route 53', 'SQS/SNS', 'Lambda'],
+  },
+  {
+    num: '第3分野',
+    pct: 24,
+    color: '#7c3aed',
+    bg: '#f5f3ff',
+    border: 'rgba(124,58,237,0.18)',
+    label: '高パフォーマンスなアーキテクチャの設計',
+    desc: 'ストレージ・DB・ネットワーク・データ処理の選択。サービス選定の判断力が試される。',
+    tags: ['EC2', 'RDS/Aurora', 'ElastiCache', 'CloudFront', 'Kinesis'],
+  },
+  {
+    num: '第4分野',
+    pct: 20,
+    color: '#059669',
+    bg: '#ecfdf5',
+    border: 'rgba(5,150,105,0.18)',
+    label: 'コストを最適化したアーキテクチャの設計',
+    desc: '購入オプション・S3ライフサイクル・サーバーレス活用でコストを最小化する設計。',
+    tags: ['Spot/Reserved', 'Savings Plans', 'S3 Lifecycle', 'Fargate'],
+  },
+];
 
 const categories = [
   {
@@ -70,49 +115,64 @@ const categories = [
 ---
 
 <Layout title="トップ">
-
-  <!-- Hero -->
-  <section class="max-w-7xl mx-auto px-4 pt-16 pb-12 text-center">
-    <div class="inline-flex items-center gap-2 bg-orange-100 text-orange-600 text-sm font-medium px-4 py-1.5 rounded-full mb-6">
-      <span>📚</span>
-      <span>図解でわかる AWS 試験対策</span>
+  <!-- ============================================================ HERO -->
+  <section class="relative overflow-hidden py-20 md:py-28">
+    <!-- 背景グラデーション -->
+    <div class="pointer-events-none absolute inset-0"
+          style="background:radial-gradient(ellipse 60% 60% at 80% 10%,rgba(230,126,0,.08) 0%,transparent 60%),radial-gradient(ellipse 40% 40% at 10% 90%,rgba(37,99,235,.06) 0%,transparent 55%)">
     </div>
-    <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-      AWSを<span class="text-orange-500">図解</span>で学ぶ
-    </h1>
-    <p class="text-gray-600 text-lg max-w-2xl mx-auto mb-8">
-      複雑なAWSサービスの関係を図解で直感的に理解。問題演習で知識を定着させて試験に臨もう。
-    </p>
-    <div class="flex flex-wrap gap-4 justify-center">
-      <a href="/network" class="bg-orange-500 hover:bg-orange-600 text-white font-medium px-6 py-3 rounded-lg transition-colors">
-        図解を見る →
-      </a>
-      <a href="/quiz" class="border border-gray-300 hover:border-orange-500 font-medium px-6 py-3 rounded-lg transition-colors">
-        問題演習へ
-      </a>
-    </div>
-  </section>
 
-  <!-- Exam Info -->
-  <section class="max-w-7xl mx-auto px-4 mb-16">
-    <div class="grid md:grid-cols-2 gap-4">
-      <div class="border rounded-xl p-6 flex items-center gap-4">
-        <div class="bg-orange-500 text-white font-bold text-sm px-3 py-1.5 rounded-lg shrink-0">
-          SAA-C03
-        </div>
-        <div>
-          <p class="font-medium">Solutions Architect Associate</p>
-          <p class="text-sm text-gray-500">合格スコア 720/1000 65問</p>
-        </div>
+    <div class="relative max-w-[1200px] mx-auto px-6">
+      <!-- アイキャッチ -->
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-widest uppercase mb-5 border"
+            style="color:var(--brand);background:var(--brand-hi);border-color:rgba(230,126,0,0.25)">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+        SAA-C03 対応 · 図解で学ぶ AWS 認定試験
       </div>
-      <div class="border rounded-xl p-6 flex items-center gap-4">
-        <div class="bg-red-500 text-white font-bold text-sm px-3 py-1.5 rounded-lg shrink-0">
-          SAP-C02
-        </div>
-        <div>
-          <p class="font-medium">Solutions Architect Professional</p>
-          <p class="text-sm text-gray-500">合格スコア 750/1000 75問</p>
-        </div>
+
+      <!-- タイトル -->
+      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.08] mb-5"
+          style="color:var(--text)">
+        AWS SAA を<br>
+        <span style="color:var(--brand)">図解</span>で攻略する
+      </h1>
+      <p class="text-base md:text-lg mb-10 max-w-[52ch] leading-relaxed" style="color:var(--text-muted)">
+        AWS Solutions Architect Associate 試験対策。全 16 章・100+ サービスをアニメーション図解で視覚的に学習。合格スコア 720 点を目指す。
+      </p>
+
+      <!-- 統計バッジ -->
+      <div class="flex flex-wrap gap-3 mb-12">
+        {[
+          { val: '16', unit: '章' },
+          { val: '100+', unit: 'サービス' },
+          { val: '720', unit: '合格スコア' },
+          { val: '4', unit: 'ドメイン' },
+        ].map(s => (
+          <div class="flex items-baseline gap-1 px-4 py-2 rounded-full text-sm border"
+                style="background:var(--surface);border-color:var(--border);color:var(--text)">
+            <span class="text-xl font-extrabold tracking-tight" style="color:var(--brand)">{s.val}</span>
+            <span class="text-xs font-medium" style="color:var(--text-muted)">{s.unit}</span>
+          </div>
+        ))}
+      </div>
+
+      <!-- CTA -->
+      <div class="flex flex-wrap gap-3">
+        <a href="#toc"
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-white transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+            style="background:var(--brand)">
+          目次を見る
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 5v14M5 12l7 7 7-7"/>
+          </svg>
+        </a>
+        <a href="/well-architected"
+            class="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold transition-all duration-200 border hover:shadow-md"
+            style="background:var(--surface);border-color:var(--border);color:var(--text)">
+          Well-Architected とは？
+        </a>
       </div>
     </div>
   </section>
@@ -131,6 +191,166 @@ const categories = [
           <p class="text-sm text-gray-600 leading-relaxed">{description}</p>
         </a>
       ))}
+    </div>
+  </section>
+    <section class="max-w-7xl mx-auto px-4 mb-16">
+    <h2 class="text-2xl font-bold mb-6">試験構成を把握する</h2>
+    <SaaOverviewDiagram />
+  </section>
+
+  <!-- ============================================================ DOMAINS -->
+  <section class="py-16 md:py-20" style="background:var(--surface-2)">
+    <div class="max-w-[1200px] mx-auto px-6">
+      <div class="mb-10">
+        <p class="text-xs font-bold tracking-widest uppercase mb-2" style="color:var(--text-faint)">試験ドメイン</p>
+        <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight" style="color:var(--text)">4つの設計領域</h2>
+        <p class="text-sm mt-2 max-w-[50ch]" style="color:var(--text-muted)">
+          SAA-C03 は 4 つのドメインで構成。配点に応じた優先度で学習を進めよう。
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {domains.map((d, i) => (
+          <div class="rounded-xl p-5 border transition-all duration-200 hover:shadow-md hover:-translate-y-0.5"
+                style={`background:${d.bg};border-color:${d.border}`}>
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <span class="text-xs font-bold tracking-widest uppercase"
+                      style={`color:${d.color}`}>{d.num} {d.pct}%</span>
+                <h3 class="text-base font-bold mt-1 leading-snug" style="color:var(--text)">{d.label}</h3>
+              </div>
+              <!-- パーセント円グラフ -->
+              <div class="relative w-12 h-12 flex-shrink-0">
+                <svg viewBox="0 0 36 36" class="w-full h-full -rotate-90">
+                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(0,0,0,0.08)" stroke-width="3"/>
+                  <circle cx="18" cy="18" r="15.9" fill="none"
+                          stroke={d.color} stroke-width="3"
+                          stroke-dasharray={`${d.pct} ${100 - d.pct}`}
+                          stroke-linecap="round"/>
+                </svg>
+                <span class="absolute inset-0 flex items-center justify-center text-xs font-bold"
+                      style={`color:${d.color}`}>{d.pct}%</span>
+              </div>
+            </div>
+            <p class="text-xs leading-relaxed mb-3" style="color:var(--text-muted)">{d.desc}</p>
+            <div class="flex flex-wrap gap-1.5">
+              {d.tags.map(tag => (
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded"
+                      style={`background:rgba(255,255,255,0.7);color:${d.color};border:1px solid ${d.border}`}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ TOC -->
+  <section id="toc" class="py-16 md:py-20" style="background:var(--surface-2)">
+    <div class="max-w-[1200px] mx-auto px-6">
+      <div class="flex items-end justify-between flex-wrap gap-4 mb-8">
+        <div>
+          <p class="text-xs font-bold tracking-widest uppercase mb-2" style="color:var(--text-faint)">目次</p>
+          <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight" style="color:var(--text)">全 16 章</h2>
+          <p class="text-sm mt-1" style="color:var(--text-muted)">参考書の構成に沿った章立て。★★ 最重要 → ★ 重要 の順に学習しよう。</p>
+        </div>
+        <!-- 凡例 -->
+        <div class="flex flex-wrap gap-3 text-xs">
+          {[
+            { label: '★★ 最重要', cls: 'bg-amber-100 text-amber-700 border border-amber-200' },
+            { label: '★ 重要',   cls: 'bg-amber-50 text-amber-600 border border-amber-100' },
+            { label: '新設',      cls: 'bg-blue-50 text-blue-600 border border-blue-200' },
+            { label: '図解あり',  cls: 'bg-teal-50 text-teal-600 border border-teal-200' },
+          ].map(b => (
+            <span class={`px-2.5 py-1 rounded-full font-semibold ${b.cls}`}>{b.label}</span>
+          ))}
+        </div>
+      </div>
+
+      <!-- チャプターグリッド -->
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {chapters.map(ch => (
+          <div class="rounded-xl border overflow-hidden transition-all duration-200 hover:shadow-md"
+                style="background:var(--surface);border-color:var(--border)">
+            <!-- ヘッダー -->
+            <div class="flex items-center gap-3 px-4 py-3 border-b"
+                  style={`background:${ch.iconBg};border-color:var(--border)`}>
+              <span class="text-xs font-bold font-mono opacity-50" style="color:var(--text)">{ch.num}</span>
+              <div class="w-8 h-8 rounded-lg grid place-items-center text-lg flex-shrink-0 bg-white shadow-sm">
+                {ch.icon}
+              </div>
+              <h3 class="text-sm font-bold flex-1 leading-snug" style="color:var(--text)">{ch.title}</h3>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full"
+                    style="background:rgba(0,0,0,0.06);color:var(--text-muted)">
+                {ch.primaryServices.length + ch.moreServices.length}
+              </span>
+            </div>
+
+            <!-- サービスリスト（主要） -->
+            <div class="p-3 flex flex-col gap-1">
+              {ch.primaryServices.map(svc => (
+                <a href={`/${svc.slug}`}
+                    class="flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all duration-150 group"
+                    style="color:var(--text-muted)"
+                    onmouseover="this.style.background='var(--surface-off)'"
+                    onmouseout="this.style.background='transparent'">
+                  <span class="font-medium group-hover:text-[var(--brand)] transition-colors" style="color:var(--text)">
+                    {svc.name}
+                  </span>
+                  <div class="flex items-center gap-1">
+                    {svc.priority === 'star2' && (
+                      <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200">★★</span>
+                    )}
+                    {svc.priority === 'star1' && (
+                      <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-50 text-amber-600 border border-amber-100">★</span>
+                    )}
+                    {svc.isNew && (
+                      <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200">新設</span>
+                    )}
+                    {svc.hasDiagram && (
+                      <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-teal-50 text-teal-600 border border-teal-200">図解</span>
+                    )}
+                  </div>
+                </a>
+              ))}
+
+              <!-- もっと見るトグル -->
+              {ch.moreServices.length > 0 && (
+                <details class="group/more">
+                  <summary class="flex items-center gap-1.5 px-3 py-2 rounded-lg cursor-pointer text-xs font-semibold list-none transition-all duration-150"
+                            style="color:var(--text-faint)"
+                            onmouseover="this.style.background='var(--surface-off)'"
+                            onmouseout="this.style.background='transparent'">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                          class="transition-transform duration-200 group-open/more:rotate-90">
+                      <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                    さらに {ch.moreServices.length} サービス
+                  </summary>
+                  <div class="mt-1 flex flex-col gap-1">
+                    {ch.moreServices.map(svc => (
+                      <a href={`/${svc.slug}`}
+                          class="flex items-center justify-between px-3 py-1.5 rounded-lg text-sm transition-all duration-150"
+                          style="color:var(--text-muted)"
+                          onmouseover="this.style.background='var(--surface-off)'"
+                          onmouseout="this.style.background='transparent'">
+                        <span style="color:var(--text)">{svc.name}</span>
+                        <div class="flex items-center gap-1">
+                          {svc.isNew && (
+                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200">新設</span>
+                          )}
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </details>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 

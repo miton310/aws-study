@@ -1,0 +1,218 @@
+---
+/**
+ * セキュリティグループとNACLの違い解説
+ * HTTP通信を許可する際の設定パターンを視覚化
+ */
+---
+
+<style>
+  .sgn-btn{cursor:pointer;font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;transition:all 0.2s;}
+  .dark .sgn-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
+  .sgn-btn:hover{background:#f3f4f6;}
+  .dark .sgn-btn:hover{background:#374151;}
+  .sgn-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
+  #sgn-result{font-size:14px;margin:12px 0;padding:12px 16px;border-radius:8px;line-height:1.7;background:#f8fafc;border:1px solid #e2e8f0;}
+  .dark #sgn-result{background:#1e293b;border-color:#334155;color:#e2e8f0;}
+  .sgn-legend{display:flex;gap:16px;margin:8px 0;font-size:12px;color:#6b7280;flex-wrap:wrap;}
+  .sgn-legend span{display:flex;align-items:center;gap:4px;}
+</style>
+
+<div style="margin-bottom:12px;">
+  <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">シナリオを選択：</div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;">
+    <button class="sgn-btn active" id="sgn-opt1" onclick="sgnSelect(1)">
+      SGインバウンド許可
+    </button>
+    <button class="sgn-btn" id="sgn-opt2" onclick="sgnSelect(2)">
+      NACLのみ設定（その他拒否）
+    </button>
+    <button class="sgn-btn" id="sgn-opt3" onclick="sgnSelect(3)">
+      SGアウトバウンド許可
+    </button>
+  </div>
+</div>
+
+<div id="sgn-result"></div>
+
+<div class="sgn-legend">
+  <span><svg width="16" height="16"><rect width="16" height="16" rx="3" fill="#059669"/></svg> 通過</span>
+  <span><svg width="16" height="16"><rect width="16" height="16" rx="3" fill="#dc2626"/></svg> ブロック</span>
+  <span><svg width="16" height="16"><rect width="16" height="16" rx="3" fill="#9ca3af"/></svg> 未到達</span>
+</div>
+
+<svg width="100%" viewBox="0 0 700 320">
+  <defs>
+    <marker id="sgn-arr-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M2 2L8 5L2 8" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round"/>
+    </marker>
+    <marker id="sgn-arr-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M2 2L8 5L2 8" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/>
+    </marker>
+    <marker id="sgn-arr-gray" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M2 2L8 5L2 8" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
+    </marker>
+  </defs>
+
+  <!-- Background labels -->
+  <text x="350" y="20" text-anchor="middle" font-size="12" fill="#9ca3af">デフォルト設定：NACL=全許可、SG=インバウンド全拒否・アウトバウンド全許可</text>
+
+  <!-- Internet -->
+  <rect x="20" y="100" width="80" height="50" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+  <text x="60" y="120" text-anchor="middle" font-size="11" font-weight="500" fill="#334155">クライアント</text>
+  <text x="60" y="136" text-anchor="middle" font-size="10" fill="#64748b">HTTP :80</text>
+
+  <!-- VPC Box -->
+  <rect x="130" y="50" width="450" height="220" rx="12" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6 3"/>
+  <text x="145" y="72" font-size="11" fill="#2563eb" font-weight="500">VPC</text>
+
+  <!-- Subnet Box -->
+  <rect x="150" y="85" width="410" height="170" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1"/>
+  <text x="165" y="105" font-size="10" fill="#3b82f6">パブリックサブネット</text>
+
+  <!-- NACL IN -->
+  <rect id="sgn-nacl-in" x="170" y="115" width="60" height="120" rx="6" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1"/>
+  <text x="200" y="135" text-anchor="middle" font-size="10" fill="#7c3aed" font-weight="500">NACL</text>
+  <text x="200" y="150" text-anchor="middle" font-size="9" fill="#7c3aed">IN</text>
+  <text id="sgn-nacl-in-status" x="200" y="175" text-anchor="middle" font-size="18" fill="#059669">✓</text>
+  <text x="200" y="220" text-anchor="middle" font-size="9" fill="#6b7280">デフォルト</text>
+  <text x="200" y="230" text-anchor="middle" font-size="9" fill="#6b7280">全許可</text>
+
+  <!-- SG IN -->
+  <rect id="sgn-sg-in" x="280" y="115" width="60" height="120" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>
+  <text x="310" y="135" text-anchor="middle" font-size="10" fill="#059669" font-weight="500">SG</text>
+  <text x="310" y="150" text-anchor="middle" font-size="9" fill="#059669">IN</text>
+  <text id="sgn-sg-in-status" x="310" y="175" text-anchor="middle" font-size="18" fill="#059669">✓</text>
+  <text x="310" y="220" text-anchor="middle" font-size="9" fill="#6b7280">デフォルト</text>
+  <text x="310" y="230" text-anchor="middle" font-size="9" fill="#6b7280">全拒否</text>
+
+  <!-- EC2 -->
+  <rect x="365" y="130" width="70" height="90" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
+  <text x="400" y="165" text-anchor="middle" font-size="11" font-weight="500" fill="#065f46">EC2</text>
+  <text x="400" y="180" text-anchor="middle" font-size="10" fill="#065f46">Web</text>
+  <text x="400" y="195" text-anchor="middle" font-size="10" fill="#065f46">サーバー</text>
+
+  <!-- SG OUT -->
+  <rect id="sgn-sg-out" x="460" y="115" width="60" height="120" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>
+  <text x="490" y="135" text-anchor="middle" font-size="10" fill="#059669" font-weight="500">SG</text>
+  <text x="490" y="150" text-anchor="middle" font-size="9" fill="#059669">OUT</text>
+  <text id="sgn-sg-out-status" x="490" y="175" text-anchor="middle" font-size="18" fill="#059669">✓</text>
+  <text x="490" y="220" text-anchor="middle" font-size="9" fill="#6b7280">デフォルト</text>
+  <text x="490" y="230" text-anchor="middle" font-size="9" fill="#6b7280">全許可</text>
+
+  <!-- NACL OUT -->
+  <rect id="sgn-nacl-out" x="540" y="115" width="60" height="120" rx="6" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1"/>
+  <text x="570" y="135" text-anchor="middle" font-size="10" fill="#7c3aed" font-weight="500">NACL</text>
+  <text x="570" y="150" text-anchor="middle" font-size="9" fill="#7c3aed">OUT</text>
+  <text id="sgn-nacl-out-status" x="570" y="175" text-anchor="middle" font-size="18" fill="#059669">✓</text>
+  <text x="570" y="220" text-anchor="middle" font-size="9" fill="#6b7280">デフォルト</text>
+  <text x="570" y="230" text-anchor="middle" font-size="9" fill="#6b7280">全許可</text>
+
+  <!-- Request Arrow (top) -->
+  <text x="350" y="92" text-anchor="middle" font-size="10" fill="#6b7280">リクエスト →</text>
+  <path id="sgn-arrow-req1" d="M100 125 L168 125" stroke="#059669" stroke-width="2" marker-end="url(#sgn-arr-green)"/>
+  <path id="sgn-arrow-req2" d="M232 125 L278 125" stroke="#059669" stroke-width="2" marker-end="url(#sgn-arr-green)"/>
+  <path id="sgn-arrow-req3" d="M342 160 L363 160" stroke="#059669" stroke-width="2" marker-end="url(#sgn-arr-green)"/>
+
+  <!-- Response Arrow (bottom) -->
+  <text x="350" y="300" text-anchor="middle" font-size="10" fill="#6b7280">← レスポンス（戻り通信）</text>
+  <path id="sgn-arrow-res1" d="M363 195 L342 195" stroke="#059669" stroke-width="2" marker-end="url(#sgn-arr-green)"/>
+  <path id="sgn-arrow-res3" d="M458 195 L520 195" stroke="#059669" stroke-width="2" marker-end="url(#sgn-arr-green)"/>
+  <path id="sgn-arrow-res4" d="M602 195 L650 195" stroke="#059669" stroke-width="2" marker-end="url(#sgn-arr-green)"/>
+
+  <!-- Stateful label for SG -->
+  <rect x="270" y="248" width="80" height="18" rx="4" fill="#d1fae5" stroke="#10b981" stroke-width="0.5"/>
+  <text x="310" y="260" text-anchor="middle" font-size="9" fill="#065f46">ステートフル</text>
+
+  <!-- Stateless label for NACL -->
+  <rect x="350" y="56" width="80" height="18" rx="4" fill="#ede9fe" stroke="#8b5cf6" stroke-width="0.5"/>
+  <text x="390" y="68" text-anchor="middle" font-size="9" fill="#6d28d9">ステートレス</text>
+</svg>
+
+<script>
+  const SGN_DATA: Record<number, {
+    naclIn: string; sgIn: string; sgOut: string; naclOut: string;
+    explanation: string;
+  }> = {
+    1: {
+      naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass',
+      explanation: `<strong>✅ 通信成功</strong><br>
+SGは<strong>ステートフル</strong>：インバウンドを許可すると、戻り通信（レスポンス）は自動的に許可される。<br>
+NACLはデフォルトで全許可なので追加設定不要。<br>
+→ <strong>SGでインバウンド許可するだけでHTTP通信が可能</strong>`
+    },
+    2: {
+      naclIn: 'pass', sgIn: 'block', sgOut: 'gray', naclOut: 'block',
+      explanation: `<strong>❌ 通信失敗</strong><br>
+NACLは<strong>ステートレス</strong>：戻り通信も明示的に許可が必要。<br>
+「80番インバウンドのみ許可、その他拒否」だと、レスポンスのアウトバウンド（エフェメラルポート1024-65535）がブロックされる。<br>
+また、SGのインバウンド許可がないとEC2に到達できない。`
+    },
+    3: {
+      naclIn: 'pass', sgIn: 'block', sgOut: 'gray', naclOut: 'gray',
+      explanation: `<strong>❌ 通信失敗</strong><br>
+<strong>アウトバウンド</strong>＝EC2から外部への通信方向。<br>
+クライアントからEC2への通信は<strong>インバウンド</strong>。<br>
+SGのインバウンドが許可されていないため、リクエストがEC2に届かない。`
+    }
+  };
+
+  function sgnSelect(opt: number) {
+    const data = SGN_DATA[opt];
+
+    // Update button styles
+    [1,2,3].forEach(i => {
+      const btn = document.getElementById(`sgn-opt${i}`)!;
+      btn.classList.toggle('active', i === opt);
+    });
+
+    // Show result
+    const result = document.getElementById('sgn-result')!;
+    result.innerHTML = data.explanation;
+
+    // Update diagram
+    sgnUpdateStatus('sgn-nacl-in-status', data.naclIn);
+    sgnUpdateStatus('sgn-sg-in-status', data.sgIn);
+    sgnUpdateStatus('sgn-sg-out-status', data.sgOut);
+    sgnUpdateStatus('sgn-nacl-out-status', data.naclOut);
+
+    // Update arrows
+    sgnUpdateArrow('sgn-arrow-req1', data.naclIn === 'pass' ? 'green' : 'red');
+    sgnUpdateArrow('sgn-arrow-req2', data.naclIn === 'pass' && data.sgIn !== 'gray' ? (data.sgIn === 'pass' ? 'green' : 'red') : 'gray');
+    sgnUpdateArrow('sgn-arrow-req3', data.sgIn === 'pass' ? 'green' : 'gray');
+
+    // Response arrows
+    sgnUpdateArrow('sgn-arrow-res1', data.sgIn === 'pass' ? 'green' : 'gray');
+    sgnUpdateArrow('sgn-arrow-res3', data.sgOut === 'pass' ? 'green' : 'gray');
+    sgnUpdateArrow('sgn-arrow-res4', data.naclOut === 'pass' ? 'green' : (data.naclOut === 'block' ? 'red' : 'gray'));
+  }
+
+  function sgnUpdateStatus(id: string, status: string) {
+    const el = document.getElementById(id)!;
+    if (status === 'pass') {
+      el.textContent = '✓';
+      el.setAttribute('fill', '#059669');
+    } else if (status === 'block') {
+      el.textContent = '✕';
+      el.setAttribute('fill', '#dc2626');
+    } else {
+      el.textContent = '–';
+      el.setAttribute('fill', '#9ca3af');
+    }
+  }
+
+  function sgnUpdateArrow(id: string, color: string) {
+    const el = document.getElementById(id)!;
+    const colorMap: Record<string, string> = {
+      green: '#059669',
+      red: '#dc2626',
+      gray: '#9ca3af'
+    };
+    el.setAttribute('stroke', colorMap[color]);
+    el.setAttribute('marker-end', `url(#sgn-arr-${color})`);
+  }
+
+  (window as any).sgnSelect = sgnSelect;
+
+  // Initialize
+  sgnSelect(1);
+</script>

@@ -1,0 +1,686 @@
+---
+// AWS Well-Architected Framework — SAA-C03 学習ページ
+import Layout from '../../layouts/Layout.astro';
+import CloudWatchDiagram from '../../components/diagrams/CloudWatchDiagram.astro';
+
+const pillars = [
+  {
+    id: 'operational',
+    num: '01',
+    icon: '⚙️',
+    color: '#2563eb',
+    colorBg: '#eff6ff',
+    colorDark: '#60a5fa',
+    colorBgDark: 'rgba(37,99,235,0.15)',
+    name: '運用上の優秀性',
+    nameEn: 'Operational Excellence',
+    tagline: '運用プロセスと手順の実行・監視・継続的改善',
+    keyPrinciples: [
+      '運用をコードとして実行（IaC）',
+      '小さく可逆的な変更を頻繁に行う',
+      '運用手順を定期的に改善する',
+      '障害を予測して設計する',
+      '運用上の失敗から学ぶ',
+    ],
+    awsServices: ['CloudFormation', 'CloudWatch', 'X-Ray', 'Systems Manager', 'CloudTrail'],
+    examTips: 'IaCによる自動化・CloudFormationでの変更管理・CloudWatchによる監視が頻出。',
+    priority: 'star1',
+  },
+  {
+    id: 'security',
+    num: '02',
+    icon: '🔐',
+    color: '#dc2626',
+    colorBg: '#fef2f2',
+    colorDark: '#f87171',
+    colorBgDark: 'rgba(220,38,38,0.15)',
+    name: 'セキュリティ',
+    nameEn: 'Security',
+    tagline: 'データ・システム・資産の保護',
+    keyPrinciples: [
+      '強力なアイデンティティ基盤の実装',
+      'トレーサビリティを有効にする',
+      'すべてのレイヤーにセキュリティを適用',
+      'セキュリティのベストプラクティスを自動化',
+      'データを転送中・保管中に保護する',
+      '人手によるデータアクセスを排除',
+      'セキュリティイベントへの備えをする',
+    ],
+    awsServices: ['IAM', 'KMS', 'CloudTrail', 'GuardDuty', 'Shield / WAF', 'Macie', 'Security Hub'],
+    examTips: '最小権限の原則・MFA・暗号化（KMS）・GuardDutyによる脅威検知が頻出。',
+    priority: 'star2',
+  },
+  {
+    id: 'reliability',
+    num: '03',
+    icon: '🔄',
+    color: '#2563eb',
+    colorBg: '#eff6ff',
+    colorDark: '#60a5fa',
+    colorBgDark: 'rgba(37,99,235,0.15)',
+    name: '信頼性',
+    nameEn: 'Reliability',
+    tagline: 'ワークロードの意図した機能を正しく一貫して実行する能力',
+    keyPrinciples: [
+      '障害から自動的に回復する',
+      'リカバリ手順をテストする',
+      '水平方向にスケールしてワークロードの可用性を高める',
+      'キャパシティを推測しない（Auto Scaling）',
+      '変更の管理と自動化',
+    ],
+    awsServices: ['ELB', 'Auto Scaling', 'Route 53', 'RDS Multi-AZ', 'S3', 'CloudWatch'],
+    examTips: 'Multi-AZ・マルチリージョン・ELB+Auto Scaling・RTO/RPO の違いが頻出。',
+    priority: 'star2',
+  },
+  {
+    id: 'performance',
+    num: '04',
+    icon: '⚡',
+    color: '#7c3aed',
+    colorBg: '#f5f3ff',
+    colorDark: '#a78bfa',
+    colorBgDark: 'rgba(124,58,237,0.15)',
+    name: 'パフォーマンス効率',
+    nameEn: 'Performance Efficiency',
+    tagline: 'ITリソースを効率的に使用してシステム要件を満たす',
+    keyPrinciples: [
+      '最新テクノロジーの民主化',
+      '数分でグローバル展開する',
+      'サーバーレスアーキテクチャを使用する',
+      '実験をより頻繁に行う',
+      'メカニカルシンパシーを考慮する',
+    ],
+    awsServices: ['CloudFront', 'ElastiCache', 'Aurora', 'Lambda', 'SQS', 'Kinesis'],
+    examTips: 'キャッシュ（ElastiCache/CloudFront）・適切なDBの選択・スケーリング戦略が頻出。',
+    priority: 'star1',
+  },
+  {
+    id: 'cost',
+    num: '05',
+    icon: '💰',
+    color: '#059669',
+    colorBg: '#ecfdf5',
+    colorDark: '#34d399',
+    colorBgDark: 'rgba(5,150,105,0.15)',
+    name: 'コスト最適化',
+    nameEn: 'Cost Optimization',
+    tagline: '最低価格でビジネス価値を提供するシステムの実行',
+    keyPrinciples: [
+      'クラウド財務管理を実装する',
+      '消費モデルを採用する（使った分だけ払う）',
+      '全体的な効率を測定する',
+      '差別化につながらない重労働への投資をやめる',
+      '費用を分析・帰属させる',
+    ],
+    awsServices: ['Cost Explorer', 'AWS Budgets', 'Savings Plans', 'Trusted Advisor', 'S3 Intelligent-Tiering'],
+    examTips: 'Reserved / Spot / On-Demand の使い分け・Savings Plans・S3ストレージクラスが頻出。',
+    priority: 'star2',
+  },
+  {
+    id: 'sustainability',
+    num: '06',
+    icon: '🌱',
+    color: '#059669',
+    colorBg: '#ecfdf5',
+    colorDark: '#34d399',
+    colorBgDark: 'rgba(5,150,105,0.15)',
+    name: '持続可能性',
+    nameEn: 'Sustainability',
+    tagline: 'クラウドワークロードの環境負荷を最小化する',
+    keyPrinciples: [
+      '影響を理解する',
+      '持続可能性の目標を設定する',
+      '使用率を最大化する',
+      '効率的なハードウェア・ソフトウェアの使用',
+      'ダウンストリームへの影響を低減する',
+    ],
+    awsServices: ['Graviton（ARM）', 'Auto Scaling', 'Lambda', 'S3 Intelligent-Tiering', 'Spot Instances'],
+    examTips: '2021年追加の第6の柱。Graviton / Spot / サーバーレス活用が持続可能性に貢献。',
+    priority: 'star1',
+  },
+];
+
+const comparisons = [
+  { category: '障害対策', op: '運用手順で対応', sec: 'セキュリティイベント対応計画', rel: 'Auto Recovery / Multi-AZ', perf: 'サービス低下時の自動スケール', cost: '低コストで高可用性を実現', sus: 'サーバーレスで無駄をゼロに' },
+  { category: '主要KPI', op: '変更の成功率・MTTR', sec: 'セキュリティインシデント数', rel: 'MTBF・RTO・RPO', perf: 'レイテンシ・スループット', cost: 'コスト対効果・ユニットコスト', sus: 'リソース利用率・炭素排出量' },
+  { category: 'よく出るサービス', op: 'CloudFormation / CloudWatch', sec: 'IAM / KMS / GuardDuty', rel: 'ELB / Multi-AZ / Route 53', perf: 'ElastiCache / CloudFront', cost: 'Savings Plans / Budgets', sus: 'Graviton / Spot / Lambda' },
+];
+---
+
+<Layout title="AWS Well-Architected Framework" description="AWS Well-Architected Frameworkの概要と6つの柱の詳細を解説。SAA-C03試験対策に最適な学習ページ。">
+  <style>
+    /* ── DESIGN TOKENS (index.htmlと統一) ── */
+    :root {
+      --text-xs:   clamp(0.75rem,  0.7rem  + 0.25vw, 0.875rem);
+      --text-sm:   clamp(0.875rem, 0.8rem  + 0.35vw, 1rem);
+      --text-base: clamp(1rem,     0.95rem + 0.25vw, 1.125rem);
+      --text-lg:   clamp(1.125rem, 1rem    + 0.75vw, 1.5rem);
+      --text-xl:   clamp(1.5rem,   1.2rem  + 1.25vw, 2.25rem);
+      --text-2xl:  clamp(2rem,     1.2rem  + 2.5vw,  3.5rem);
+      --text-hero: clamp(2.5rem,   1rem    + 5vw,    5rem);
+      --space-1: .25rem; --space-2: .5rem;  --space-3: .75rem;
+      --space-4: 1rem;   --space-5: 1.25rem;--space-6: 1.5rem;
+      --space-8: 2rem;   --space-10:2.5rem; --space-12:3rem;
+      --space-16:4rem;   --space-20:5rem;   --space-24:6rem;
+      --radius-sm:.375rem; --radius-md:.5rem; --radius-lg:.75rem;
+      --radius-xl:1rem;    --radius-full:9999px;
+      --transition: 180ms cubic-bezier(0.16,1,0.3,1);
+      --font-body: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      /* Surfaces */
+      --bg: #f7f6f2; --surface: #ffffff; --surface-2: #f9f8f5;
+      --surface-off: #f0ede8; --border: rgba(0,0,0,0.09); --divider: #e8e5e0;
+      /* Text */
+      --text: #1a1a1a; --text-muted: #6b7280; --text-faint: #b0aaa3; --text-inverse: #ffffff;
+      /* Accent (AWS orange) */
+      --accent: #e67e00; --accent-hover: #c96d00; --accent-active: #a85a00;
+      --accent-hi: #fff4e0; --accent-subtle: rgba(230,126,0,0.10);
+      /* Semantic */
+      --ok: #1D9E75; --ok-hi: #ecfdf5;
+      --err: #dc2626; --err-hi: #fef2f2;
+      --info: #2563eb; --info-hi: #eff6ff;
+      /* Shadows */
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.07);
+      --shadow-md: 0 4px 12px rgba(0,0,0,.09);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,.12);
+      --content: 1200px; --content-narrow: 800px;
+    }
+    [data-theme="dark"] {
+      --bg: #13120f; --surface: #1a1916; --surface-2: #1f1e1b;
+      --surface-off: #252320; --border: rgba(255,255,255,0.08); --divider: #2a2826;
+      --text: #e8e6e1; --text-muted: #9ca3af; --text-faint: #4b5563;
+      --accent: #f59e0b; --accent-hover: #d97706; --accent-active: #b45309;
+      --accent-hi: #2a1f07; --accent-subtle: rgba(245,158,11,0.12);
+      --ok: #34d399; --ok-hi: #052e16;
+      --err: #f87171; --err-hi: rgba(220,38,38,0.15);
+      --info: #60a5fa; --info-hi: rgba(37,99,235,0.15);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.3);
+      --shadow-md: 0 4px 12px rgba(0,0,0,.4);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,.5);
+    }
+
+    /* ── BASE ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; scroll-padding-top: 5rem; }
+    body { min-height: 100dvh; font-family: var(--font-body); font-size: var(--text-base); color: var(--text); background: var(--bg); line-height: 1.65; }
+    img { display: block; max-width: 100%; height: auto; }
+    button { cursor: pointer; background: none; border: none; font: inherit; color: inherit; }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: var(--accent-subtle); color: var(--text); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: var(--radius-sm); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+
+    /* ── LAYOUT ── */
+    .container { max-width: var(--content); margin-inline: auto; padding-inline: var(--space-6); }
+    .container--narrow { max-width: var(--content-narrow); margin-inline: auto; padding-inline: var(--space-6); }
+
+    /* ── HEADER ── */
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(247,246,242,0.85); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border); height: 56px;
+      display: flex; align-items: center;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    [data-theme="dark"] .site-header { background: rgba(19,18,15,0.85); }
+    .header-inner { width: 100%; max-width: var(--content); margin-inline: auto; padding-inline: var(--space-6); display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+    .site-logo { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); font-weight: 700; letter-spacing: -.01em; transition: opacity var(--transition); }
+    .site-logo:hover { opacity: .75; }
+    .logo-mark { width: 28px; height: 28px; border-radius: 6px; background: var(--accent); display: grid; place-items: center; flex-shrink: 0; }
+    .logo-mark svg { color: #fff; }
+    .header-nav { display: flex; align-items: center; gap: var(--space-1); }
+    .nav-link { font-size: var(--text-sm); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); color: var(--text-muted); transition: color var(--transition), background var(--transition); }
+    .nav-link:hover { color: var(--text); background: var(--surface-off); }
+    .nav-link.active { color: var(--accent); font-weight: 600; }
+    .header-actions { display: flex; align-items: center; gap: var(--space-2); }
+    .theme-toggle { width: 36px; height: 36px; border-radius: var(--radius-md); display: grid; place-items: center; color: var(--text-muted); transition: color var(--transition), background var(--transition); }
+    .theme-toggle:hover { background: var(--surface-off); color: var(--text); }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb { padding: var(--space-4) 0 0; display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--text-faint); }
+    .breadcrumb a { color: var(--text-muted); transition: color var(--transition); }
+    .breadcrumb a:hover { color: var(--accent); }
+    .breadcrumb-sep { color: var(--text-faint); }
+
+    /* ── PAGE HERO ── */
+    .page-hero { padding: clamp(var(--space-10), 5vw, var(--space-16)) 0 clamp(var(--space-8), 4vw, var(--space-12)); position: relative; overflow: hidden; }
+    .page-hero-bg { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 50% 70% at 90% 50%, rgba(37,99,235,.06) 0, transparent 60%); }
+    [data-theme="dark"] .page-hero-bg { background: radial-gradient(ellipse 50% 70% at 90% 50%, rgba(96,165,250,.08) 0, transparent 60%); }
+    .page-hero-eyebrow { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-xs); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--info); background: var(--info-hi); border: 1px solid rgba(37,99,235,.2); padding: 4px 12px; border-radius: var(--radius-full); margin-bottom: var(--space-4); }
+    [data-theme="dark"] .page-hero-eyebrow { border-color: rgba(96,165,250,.25); }
+    .page-hero-title { font-size: var(--text-2xl); font-weight: 800; line-height: 1.1; letter-spacing: -.03em; margin-bottom: var(--space-4); }
+    .page-hero-title em { font-style: normal; color: var(--accent); }
+    .page-hero-lead { font-size: var(--text-base); color: var(--text-muted); max-width: 56ch; line-height: 1.7; margin-bottom: var(--space-8); }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: var(--space-6); padding-top: var(--space-6); border-top: 1px solid var(--divider); }
+    .meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .meta-val { font-size: var(--text-lg); font-weight: 800; font-family: var(--font-mono); color: var(--text); letter-spacing: -.02em; }
+    .meta-label { font-size: var(--text-xs); color: var(--text-muted); }
+
+    /* ── SECTION COMMON ── */
+    .section { padding: clamp(var(--space-12), 5vw, var(--space-20)) 0; }
+    .section-alt { background: var(--surface-2); }
+    .section-header { margin-bottom: var(--space-8); }
+    .section-eyebrow { font-size: var(--text-xs); font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--text-faint); margin-bottom: var(--space-2); }
+    .section-title { font-size: var(--text-xl); font-weight: 800; letter-spacing: -.02em; line-height: 1.2; }
+    .section-lead { font-size: var(--text-sm); color: var(--text-muted); max-width: 52ch; line-height: 1.6; margin-top: var(--space-2); }
+
+    /* ── PILLAR OVERVIEW (6-grid) ── */
+    .pillars-overview { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--space-4); }
+    .pillar-overview-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-xl); padding: var(--space-5) var(--space-6);
+      display: flex; flex-direction: column; gap: var(--space-3);
+      transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+      cursor: pointer; text-decoration: none;
+      position: relative; overflow: hidden;
+    }
+    .pillar-overview-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--pillar-color); border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    }
+    .pillar-overview-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--divider); }
+    .pillar-card-head { display: flex; align-items: center; gap: var(--space-3); }
+    .pillar-num { font-size: var(--text-xs); font-family: var(--font-mono); font-weight: 700; color: var(--text-faint); }
+    .pillar-icon-wrap { width: 36px; height: 36px; border-radius: var(--radius-md); display: grid; place-items: center; font-size: 18px; flex-shrink: 0; }
+    .pillar-overview-name { font-size: var(--text-sm); font-weight: 700; line-height: 1.3; flex: 1; }
+    .pillar-overview-en { font-size: var(--text-xs); color: var(--text-faint); font-family: var(--font-mono); }
+    .pillar-overview-tagline { font-size: var(--text-xs); color: var(--text-muted); line-height: 1.6; }
+    .pillar-services-row { display: flex; flex-wrap: wrap; gap: var(--space-1); margin-top: auto; }
+    .svc-chip { font-size: 10px; font-weight: 600; font-family: var(--font-mono); padding: 2px 7px; border-radius: 4px; background: var(--surface-off); color: var(--text-muted); border: 1px solid var(--border); }
+
+    /* ── PILLAR DETAIL CARDS ── */
+    .pillar-detail { display: flex; flex-direction: column; gap: var(--space-10); }
+    .pillar-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-xl); overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow var(--transition);
+    }
+    .pillar-card:hover { box-shadow: var(--shadow-md); }
+    .pillar-card-header {
+      padding: var(--space-6) var(--space-8);
+      display: flex; align-items: center; gap: var(--space-4);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+    .pillar-card-header::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+      background: var(--pillar-color);
+    }
+    .pillar-header-icon { width: 48px; height: 48px; border-radius: var(--radius-lg); display: grid; place-items: center; font-size: 24px; flex-shrink: 0; }
+    .pillar-header-text { flex: 1; }
+    .pillar-header-num { font-size: var(--text-xs); font-family: var(--font-mono); font-weight: 700; color: var(--text-faint); margin-bottom: 2px; }
+    .pillar-header-name { font-size: var(--text-lg); font-weight: 800; line-height: 1.2; }
+    .pillar-header-en { font-size: var(--text-sm); color: var(--text-muted); }
+    .pillar-badge { font-size: var(--text-xs); font-weight: 700; padding: 3px 10px; border-radius: var(--radius-full); align-self: flex-start; }
+    .badge-star2 { background: #ede9fe; color: #5b21b6; border: 1px solid rgba(91,33,182,.2); }
+    .badge-star1 { background: #ecfdf5; color: #065f46; border: 1px solid rgba(6,95,70,.2); }
+    [data-theme="dark"] .badge-star2 { background: rgba(91,33,182,.2); color: #c4b5fd; }
+    [data-theme="dark"] .badge-star1 { background: rgba(6,95,70,.2); color: #6ee7b7; }
+
+    .pillar-card-body { padding: var(--space-6) var(--space-8); display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); }
+    @media (max-width: 640px) { .pillar-card-body { grid-template-columns: 1fr; } }
+
+    .pillar-section-label { font-size: var(--text-xs); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); margin-bottom: var(--space-3); }
+    .principle-list { display: flex; flex-direction: column; gap: var(--space-2); }
+    .principle-item { display: flex; align-items: flex-start; gap: var(--space-2); font-size: var(--text-sm); color: var(--text); line-height: 1.5; }
+    .principle-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+
+    .services-grid { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+    .service-tag {
+      font-size: var(--text-xs); font-weight: 600; font-family: var(--font-mono);
+      padding: 4px 10px; border-radius: var(--radius-md);
+      border: 1px solid var(--border); background: var(--surface-off); color: var(--text-muted);
+      transition: background var(--transition), color var(--transition), border-color var(--transition);
+    }
+    .service-tag:hover { background: var(--accent-subtle); color: var(--accent); border-color: rgba(230,126,0,.3); }
+    [data-theme="dark"] .service-tag:hover { border-color: rgba(245,158,11,.3); }
+
+    .exam-tip-box {
+      grid-column: 1 / -1;
+      background: var(--accent-hi); border: 1px solid rgba(230,126,0,.2);
+      border-radius: var(--radius-lg); padding: var(--space-4) var(--space-5);
+      display: flex; align-items: flex-start; gap: var(--space-3);
+    }
+    [data-theme="dark"] .exam-tip-box { border-color: rgba(245,158,11,.2); }
+    .exam-tip-icon { font-size: 16px; flex-shrink: 0; margin-top: 2px; }
+    .exam-tip-label { font-size: var(--text-xs); font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
+    .exam-tip-text { font-size: var(--text-sm); color: var(--text); line-height: 1.6; }
+
+    /* ── COMPARISON TABLE ── */
+    .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius-xl); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+    .comparison-table { width: 100%; border-collapse: collapse; font-size: var(--text-xs); }
+    .comparison-table th {
+      padding: var(--space-3) var(--space-4); text-align: left;
+      font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--text-faint); background: var(--surface-2);
+      border-bottom: 1px solid var(--border); white-space: nowrap;
+    }
+    .comparison-table td {
+      padding: var(--space-3) var(--space-4);
+      border-bottom: 1px solid var(--border); color: var(--text-muted);
+      vertical-align: top; line-height: 1.5;
+    }
+    .comparison-table tr:last-child td { border-bottom: none; }
+    .comparison-table tr:hover td { background: var(--surface-off); }
+    .comparison-table td:first-child { font-weight: 600; color: var(--text); white-space: nowrap; background: var(--surface-2); }
+
+    /* ── SUMMARY CHECKLIST ── */
+    .checklist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-4); }
+    .check-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-xl); padding: var(--space-5) var(--space-6);
+      display: flex; flex-direction: column; gap: var(--space-3);
+    }
+    .check-card-title { font-size: var(--text-sm); font-weight: 700; display: flex; align-items: center; gap: var(--space-2); }
+    .check-list { display: flex; flex-direction: column; gap: var(--space-2); }
+    .check-item { font-size: var(--text-xs); color: var(--text-muted); display: flex; align-items: flex-start; gap: var(--space-2); line-height: 1.5; }
+    .check-item::before { content: '✓'; color: var(--ok); font-weight: 700; flex-shrink: 0; }
+
+    /* ── BACK LINK ── */
+    .back-section { padding: var(--space-8) 0; }
+    .back-link { display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); color: var(--text-muted); transition: color var(--transition); }
+    .back-link:hover { color: var(--accent); }
+
+    /* ── FOOTER ── */
+    .site-footer { padding: var(--space-8) 0; border-top: 1px solid var(--divider); background: var(--surface-2); }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-4); }
+    .footer-copy { font-size: var(--text-xs); color: var(--text-faint); }
+    .footer-links { display: flex; gap: var(--space-4); }
+    .footer-link { font-size: var(--text-xs); color: var(--text-faint); transition: color var(--transition); }
+    .footer-link:hover { color: var(--text-muted); }
+
+    /* ── SCROLL ANIMATION ── */
+    @supports (animation-timeline: scroll()) {
+      .fade-in { opacity: 0; animation: fade-in-anim linear both; animation-timeline: view(); animation-range: entry 0 entry 75%; }
+      @keyframes fade-in-anim { to { opacity: 1; } }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .header-nav { display: none; }
+      .pillar-card-header { padding: var(--space-4) var(--space-5); }
+      .pillar-card-body { padding: var(--space-5); }
+      .page-hero-title { font-size: var(--text-xl); }
+    }
+  </style>
+  <section class="page-hero">
+    <div class="page-hero-bg" aria-hidden="true"></div>
+    <div class="container">
+      <div class="page-hero-eyebrow">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+        Chapter 06 · マネジメントとガバナンス
+      </div>
+      <h1 class="page-hero-title">AWS <em>Well-Architected</em><br>Framework</h1>
+      <p class="page-hero-lead">
+        クラウドシステムの設計・運用における<strong>6つの柱</strong>のベストプラクティス集。
+        SAA-C03 では各柱の設計原則・代表サービスの紐付けが頻出です。
+      </p>
+      <div class="hero-meta">
+        <div class="meta-item">
+          <span class="meta-val">6</span>
+          <span class="meta-label">設計の柱</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-val">2021</span>
+          <span class="meta-label">第6柱（持続可能性）追加</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-val">★★</span>
+          <span class="meta-label">試験重要度（信頼性・コスト）</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 6 PILLARS OVERVIEW ── -->
+  <section class="section fade-in">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">Overview</p>
+        <h2 class="section-title">6つの柱 — 一覧</h2>
+        <p class="section-lead">各カードをクリックすると詳細セクションにジャンプします。</p>
+      </div>
+      <div class="pillars-overview">
+        {pillars.map((p) => (
+          <a
+            href={`#pillar-${p.id}`}
+            class="pillar-overview-card"
+            style={`--pillar-color: ${p.color};`}
+          >
+            <div class="pillar-card-head">
+              <span class="pillar-num">{p.num}</span>
+              <div class="pillar-icon-wrap" style={`background: ${p.colorBg};`}>
+                {p.icon}
+              </div>
+              <div>
+                <div class="pillar-overview-name">{p.name}</div>
+                <div class="pillar-overview-en">{p.nameEn}</div>
+              </div>
+            </div>
+            <p class="pillar-overview-tagline">{p.tagline}</p>
+            <div class="pillar-services-row">
+              {p.awsServices.slice(0, 3).map(s => (
+                <span class="svc-chip">{s}</span>
+              ))}
+              {p.awsServices.length > 3 && (
+                <span class="svc-chip">+{p.awsServices.length - 3}</span>
+              )}
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PILLAR DETAILS ── -->
+  <section class="section section-alt fade-in">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">Details</p>
+        <h2 class="section-title">各柱の詳細</h2>
+        <p class="section-lead">設計原則・関連AWSサービス・試験頻出ポイントをまとめました。</p>
+      </div>
+      <div class="pillar-detail">
+        {pillars.map((p) => (
+          <div
+            id={`pillar-${p.id}`}
+            class="pillar-card"
+            style={`--pillar-color: ${p.color};`}
+          >
+            <!-- カードヘッダー -->
+            <div class="pillar-card-header">
+              <div class="pillar-header-icon" style={`background: ${p.colorBg};`}>
+                {p.icon}
+              </div>
+              <div class="pillar-header-text">
+                <div class="pillar-header-num">柱 {p.num}</div>
+                <div class="pillar-header-name">{p.name}</div>
+                <div class="pillar-header-en">{p.nameEn}</div>
+              </div>
+              <span class={`pillar-badge badge-${p.priority}`}>
+                {p.priority === 'star2' ? '★★ 頻出' : '★ 重要'}
+              </span>
+            </div>
+
+            <!-- カードボディ -->
+            <div class="pillar-card-body">
+              <!-- 設計原則 -->
+              <div>
+                <p class="pillar-section-label">設計原則</p>
+                <ul class="principle-list" role="list">
+                  {p.keyPrinciples.map(pr => (
+                    <li class="principle-item">
+                      <span class="principle-dot" style={`background: ${p.color};`}></span>
+                      {pr}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <!-- 関連サービス -->
+              <div>
+                <p class="pillar-section-label">関連 AWS サービス</p>
+                <div class="services-grid">
+                  {p.awsServices.map(s => (
+                    <span class="service-tag">{s}</span>
+                  ))}
+                </div>
+              </div>
+
+              <!-- 試験Tip -->
+              <div class="exam-tip-box">
+                <span class="exam-tip-icon">💡</span>
+                <div>
+                  <div class="exam-tip-label">試験頻出ポイント</div>
+                  <p class="exam-tip-text">{p.examTips}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ── COMPARISON TABLE ── -->
+  <section class="section fade-in">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">Comparison</p>
+        <h2 class="section-title">6柱 横断比較</h2>
+        <p class="section-lead">カテゴリ別に各柱の観点を並べて確認できます。</p>
+      </div>
+      <div class="table-wrapper">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>カテゴリ</th>
+              <th>⚙️ 運用上の優秀性</th>
+              <th>🔐 セキュリティ</th>
+              <th>🔄 信頼性</th>
+              <th>⚡ パフォーマンス</th>
+              <th>💰 コスト最適化</th>
+              <th>🌱 持続可能性</th>
+            </tr>
+          </thead>
+          <tbody>
+            {comparisons.map(row => (
+              <tr>
+                <td>{row.category}</td>
+                <td>{row.op}</td>
+                <td>{row.sec}</td>
+                <td>{row.rel}</td>
+                <td>{row.perf}</td>
+                <td>{row.cost}</td>
+                <td>{row.sus}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── EXAM CHECKLIST ── -->
+  <section class="section section-alt fade-in">
+    <div class="container">
+      <div class="section-header">
+        <p class="section-eyebrow">Exam Ready</p>
+        <h2 class="section-title">試験前チェックリスト</h2>
+        <p class="section-lead">この内容を理解していれば Well-Architected 関連問題は完璧です。</p>
+      </div>
+      <div class="checklist-grid">
+        <div class="check-card">
+          <div class="check-card-title">🔐 セキュリティ</div>
+          <ul class="check-list" role="list">
+            <li class="check-item">IAM 最小権限の原則を説明できる</li>
+            <li class="check-item">KMS の CMK と AWS管理キーの違いを言える</li>
+            <li class="check-item">GuardDuty・Macie・Inspector の違いを言える</li>
+            <li class="check-item">Shield Standard vs Advanced を区別できる</li>
+          </ul>
+        </div>
+        <div class="check-card">
+          <div class="check-card-title">🔄 信頼性</div>
+          <ul class="check-list" role="list">
+            <li class="check-item">RTO / RPO の定義を説明できる</li>
+            <li class="check-item">Multi-AZ と Multi-Region の使い分けを言える</li>
+            <li class="check-item">ELB + Auto Scaling の組み合わせ効果を言える</li>
+            <li class="check-item">Route 53 のフェイルオーバー設定を知っている</li>
+          </ul>
+        </div>
+        <div class="check-card">
+          <div class="check-card-title">💰 コスト最適化</div>
+          <ul class="check-list" role="list">
+            <li class="check-item">Reserved / Spot / On-Demand の使い分けを言える</li>
+            <li class="check-item">Savings Plans の種類（Compute / EC2）を言える</li>
+            <li class="check-item">S3 ストレージクラスとライフサイクル設定を知っている</li>
+            <li class="check-item">Trusted Advisor のコスト最適化チェック項目を知っている</li>
+          </ul>
+        </div>
+        <div class="check-card">
+          <div class="check-card-title">⚡ パフォーマンス</div>
+          <ul class="check-list" role="list">
+            <li class="check-item">ElastiCache（Redis vs Memcached）の違いを言える</li>
+            <li class="check-item">CloudFront のオリジン設定を知っている</li>
+            <li class="check-item">RDS Read Replica の用途を説明できる</li>
+            <li class="check-item">Kinesis の種類（Data Streams / Firehose）を区別できる</li>
+          </ul>
+        </div>
+        <div class="check-card">
+          <div class="check-card-title">⚙️ 運用上の優秀性</div>
+          <ul class="check-list" role="list">
+            <li class="check-item">CloudFormation でのIaC管理を説明できる</li>
+            <li class="check-item">CloudWatch Alarms / Logs / Metrics の違いを言える</li>
+            <li class="check-item">Systems Manager の主要機能（SSM Session Manager等）を知っている</li>
+          </ul>
+        </div>
+        <div class="check-card">
+          <div class="check-card-title">🌱 持続可能性</div>
+          <ul class="check-list" role="list">
+            <li class="check-item">Graviton（ARM）の利点を言える</li>
+            <li class="check-item">Spot Instances が持続可能性に貢献する理由を言える</li>
+            <li class="check-item">サーバーレス（Lambda）が環境負荷を下げる理由を言える</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── BACK LINK ── -->
+  <div class="back-section">
+    <div class="container">
+      <a href="/" class="back-link">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        章一覧に戻る
+      </a>
+    </div>
+  </div>
+</Layout>
+
+<script>
+
+  (function() {
+    const root = document.documentElement;
+    const btn  = document.getElementById('theme-toggle');
+    let dark   = matchMedia('(prefers-color-scheme: dark)').matches;
+
+    function applyTheme(d) {
+      root.setAttribute('data-theme', d ? 'dark' : 'light');
+      if (btn) {
+        btn.innerHTML = d
+          ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`
+          : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+        btn.setAttribute('aria-label', d ? 'ライトモードに切り替え' : 'ダークモードに切り替え');
+      }
+    }
+
+    applyTheme(dark);
+    if (btn) btn.addEventListener('click', () => { dark = !dark; applyTheme(dark); });
+  })();
+</script>

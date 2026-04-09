@@ -1,0 +1,164 @@
+---
+---
+<div>
+  <style>
+    .saa-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
+    .dark .saa-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
+    .saa-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
+    .saa-panel{display:none;}
+    .saa-panel.active{display:block;}
+  </style>
+
+  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
+    <button class="saa-btn active" onclick="saaTab('overview')">全体構成</button>
+    <button class="saa-btn" onclick="saaTab('d1')">分野1: セキュリティ 30%</button>
+    <button class="saa-btn" onclick="saaTab('d2')">分野2: レジリエンス 26%</button>
+    <button class="saa-btn" onclick="saaTab('d3')">分野3: パフォーマンス 24%</button>
+    <button class="saa-btn" onclick="saaTab('d4')">分野4: コスト最適化 20%</button>
+  </div>
+
+  <div id="saa-overview" class="saa-panel active">
+    <svg width="100%" viewBox="0 0 680 360">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">SAA-C03 試験構成：合格スコア 720/1000・全65問</text>
+
+      <!-- D1: 30% -->
+      <rect x="40" y="44" width="180" height="240" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="130" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">分野1</text>
+      <text x="130" y="100" text-anchor="middle" font-size="12" fill="#993C1D">セキュア</text>
+      <text x="130" y="118" text-anchor="middle" font-size="12" fill="#993C1D">アーキテクチャ</text>
+      <text x="130" y="168" text-anchor="middle" font-size="28" font-weight="700" fill="#712B13">30%</text>
+      <text x="130" y="210" text-anchor="middle" font-size="11" fill="#993C1D">IAM / KMS</text>
+      <text x="130" y="228" text-anchor="middle" font-size="11" fill="#993C1D">VPC設計 / WAF</text>
+      <text x="130" y="246" text-anchor="middle" font-size="11" fill="#993C1D">暗号化 / Shield</text>
+
+      <!-- D2: 26% -->
+      <rect x="240" y="44" width="150" height="240" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="315" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">分野2</text>
+      <text x="315" y="100" text-anchor="middle" font-size="12" fill="#534AB7">レジリエント</text>
+      <text x="315" y="118" text-anchor="middle" font-size="12" fill="#534AB7">アーキテクチャ</text>
+      <text x="315" y="168" text-anchor="middle" font-size="28" font-weight="700" fill="#3C3489">26%</text>
+      <text x="315" y="210" text-anchor="middle" font-size="11" fill="#534AB7">SQS / SNS</text>
+      <text x="315" y="228" text-anchor="middle" font-size="11" fill="#534AB7">Auto Scaling</text>
+      <text x="315" y="246" text-anchor="middle" font-size="11" fill="#534AB7">Multi-AZ / DR</text>
+
+      <!-- D3: 24% -->
+      <rect x="410" y="44" width="140" height="240" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="480" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">分野3</text>
+      <text x="480" y="100" text-anchor="middle" font-size="12" fill="#085041">高パフォーマンス</text>
+      <text x="480" y="118" text-anchor="middle" font-size="12" fill="#085041">アーキテクチャ</text>
+      <text x="480" y="168" text-anchor="middle" font-size="28" font-weight="700" fill="#085041">24%</text>
+      <text x="480" y="210" text-anchor="middle" font-size="11" fill="#085041">ELB / CloudFront</text>
+      <text x="480" y="228" text-anchor="middle" font-size="11" fill="#085041">ElastiCache</text>
+      <text x="480" y="246" text-anchor="middle" font-size="11" fill="#085041">S3 / RDS</text>
+
+      <!-- D4: 20% -->
+      <rect x="570" y="44" width="100" height="240" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="620" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">分野4</text>
+      <text x="620" y="100" text-anchor="middle" font-size="12" fill="#633806">コスト</text>
+      <text x="620" y="118" text-anchor="middle" font-size="12" fill="#633806">最適化</text>
+      <text x="620" y="168" text-anchor="middle" font-size="28" font-weight="700" fill="#633806">20%</text>
+      <text x="620" y="210" text-anchor="middle" font-size="11" fill="#633806">RI / SP</text>
+      <text x="620" y="228" text-anchor="middle" font-size="11" fill="#633806">Spot</text>
+      <text x="620" y="246" text-anchor="middle" font-size="11" fill="#633806">S3 Glacier</text>
+
+      <!-- Bottom bar -->
+      <rect x="40" y="304" width="630" height="44" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="320" text-anchor="middle" font-size="12" font-weight="500" fill="#633806" dominant-baseline="central">合格スコア 720/1000（約72%）・65問中50問が採点対象</text>
+      <text x="340" y="338" text-anchor="middle" font-size="11" fill="#633806" dominant-baseline="central">分野1（セキュリティ）が最大配点 → IAM・VPC・暗号化を最優先で学習</text>
+    </svg>
+  </div>
+
+  <div id="saa-d1" class="saa-panel">
+    <svg width="100%" viewBox="0 0 680 320">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">分野1：セキュアなアーキテクチャ（30%）</text>
+      <rect x="40"  y="44" width="290" height="68" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="185" y="68" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">IAM / Organizations</text>
+      <text x="185" y="90" text-anchor="middle" font-size="11" fill="#993C1D">ポリシー評価・SCP・権限境界・ロール</text>
+      <rect x="350" y="44" width="290" height="68" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="495" y="68" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">VPC設計</text>
+      <text x="495" y="90" text-anchor="middle" font-size="11" fill="#993C1D">SG・NACL・エンドポイント・PrivateLink</text>
+      <rect x="40"  y="128" width="290" height="68" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="185" y="152" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">暗号化</text>
+      <text x="185" y="172" text-anchor="middle" font-size="11" fill="#993C1D">KMS・SSE-S3・SSE-KMS・ACM・TLS</text>
+      <rect x="350" y="128" width="290" height="68" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
+      <text x="495" y="152" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">境界防御</text>
+      <text x="495" y="172" text-anchor="middle" font-size="11" fill="#993C1D">WAF・Shield・GuardDuty・Macie</text>
+      <rect x="40" y="216" width="600" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="240" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出テーマ</text>
+      <text x="340" y="260" text-anchor="middle" font-size="11" fill="#633806">「最小権限」「ロールで一時クレデンシャル」「プライベートサブネット＋VPCエンドポイント」</text>
+    </svg>
+  </div>
+
+  <div id="saa-d2" class="saa-panel">
+    <svg width="100%" viewBox="0 0 680 320">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">分野2：レジリエントなアーキテクチャ（26%）</text>
+      <rect x="40"  y="44" width="290" height="68" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="185" y="68" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">高可用性設計</text>
+      <text x="185" y="90" text-anchor="middle" font-size="11" fill="#534AB7">ELB・Auto Scaling・Multi-AZ RDS</text>
+      <rect x="350" y="44" width="290" height="68" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="495" y="68" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">疎結合アーキテクチャ</text>
+      <text x="495" y="90" text-anchor="middle" font-size="11" fill="#534AB7">SQS・SNS・EventBridge・Step Functions</text>
+      <rect x="40"  y="128" width="290" height="68" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="185" y="152" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">DR戦略</text>
+      <text x="185" y="172" text-anchor="middle" font-size="11" fill="#534AB7">バックアップ・パイロットライト・ウォームスタンバイ</text>
+      <rect x="350" y="128" width="290" height="68" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <text x="495" y="152" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">Lambda / Fargate</text>
+      <text x="495" y="172" text-anchor="middle" font-size="11" fill="#534AB7">サーバーレスで障害点を減らす設計</text>
+      <rect x="40" y="216" width="600" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="240" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出テーマ</text>
+      <text x="340" y="260" text-anchor="middle" font-size="11" fill="#633806">「単一障害点の排除」「SQSで非同期化」「RTO・RPOに応じたDR戦略選択」</text>
+    </svg>
+  </div>
+
+  <div id="saa-d3" class="saa-panel">
+    <svg width="100%" viewBox="0 0 680 320">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">分野3：高パフォーマンスなアーキテクチャ（24%）</text>
+      <rect x="40"  y="44" width="290" height="68" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="185" y="68" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">コンピューティング最適化</text>
+      <text x="185" y="90" text-anchor="middle" font-size="11" fill="#085041">EC2購入オプション・Lambda・Fargate</text>
+      <rect x="350" y="44" width="290" height="68" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="495" y="68" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">ストレージ・DB最適化</text>
+      <text x="495" y="90" text-anchor="middle" font-size="11" fill="#085041">S3・EBS・Aurora・ElastiCache</text>
+      <rect x="40"  y="128" width="290" height="68" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="185" y="152" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">ネットワーク最適化</text>
+      <text x="185" y="172" text-anchor="middle" font-size="11" fill="#085041">CloudFront・Global Accelerator・VPC</text>
+      <rect x="350" y="128" width="290" height="68" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+      <text x="495" y="152" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">データ移行・分析</text>
+      <text x="495" y="172" text-anchor="middle" font-size="11" fill="#085041">Kinesis・Athena・Glue・EMR</text>
+      <rect x="40" y="216" width="600" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="240" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出テーマ</text>
+      <text x="340" y="260" text-anchor="middle" font-size="11" fill="#633806">「読み取り負荷→ElastiCacheやリードレプリカ」「グローバル低レイテンシー→CloudFront」</text>
+    </svg>
+  </div>
+
+  <div id="saa-d4" class="saa-panel">
+    <svg width="100%" viewBox="0 0 680 320">
+      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">分野4：コスト最適化なアーキテクチャ（20%）</text>
+      <rect x="40"  y="44" width="290" height="68" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="185" y="68" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">EC2購入オプション</text>
+      <text x="185" y="90" text-anchor="middle" font-size="11" fill="#633806">オンデマンド・RI・Savings Plans・Spot</text>
+      <rect x="350" y="44" width="290" height="68" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="495" y="68" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">ストレージコスト削減</text>
+      <text x="495" y="90" text-anchor="middle" font-size="11" fill="#633806">S3ライフサイクル→Glacier移行</text>
+      <rect x="40"  y="128" width="290" height="68" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="185" y="152" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">サーバーレス活用</text>
+      <text x="185" y="172" text-anchor="middle" font-size="11" fill="#633806">Lambda・Fargate→使った分だけ課金</text>
+      <rect x="350" y="128" width="290" height="68" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="495" y="152" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">適切なサービス選定</text>
+      <text x="495" y="172" text-anchor="middle" font-size="11" fill="#633806">用途に合わせてDB・ストレージを選ぶ</text>
+      <rect x="40" y="216" width="600" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
+      <text x="340" y="240" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出テーマ</text>
+      <text x="340" y="260" text-anchor="middle" font-size="11" fill="#633806">「安定継続利用→RI or Savings Plans」「一時的ワークロード→Spot」「古いデータ→Glacier」</text>
+    </svg>
+  </div>
+</div>
+
+<script>
+  function saaTab(t: string) {
+    document.querySelectorAll('[id^="saa-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('saa-' + t)?.classList.add('active');
+    document.querySelectorAll('.saa-btn').forEach(el => el.classList.remove('active'));
+    (event?.target as HTMLElement)?.classList.add('active');
+  }
+  (window as any).saaTab = saaTab;
+</script>

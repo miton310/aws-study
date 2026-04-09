@@ -29,33 +29,13 @@
 .elb-box-pulse { animation: elb-pulse 1.6s ease-in-out infinite; }
 .elb-status-ok { animation: elb-blink-ok 2s ease-in-out infinite; }
 .elb-status-ng { animation: elb-blink-ng 0.8s ease-in-out infinite; }
-.elb-ctrl-btn {
-  cursor: pointer;
-  font-size: 13px;
-  padding: 4px 14px;
-  border-radius: 6px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-  color: #111827;
-  font-family: inherit;
-}
-.dark .elb-ctrl-btn {
-  border-color: #374151;
-  background: #1f2937;
-  color: #f9fafb;
-}
-.elb-ctrl-btn.active {
-  background: #534AB7;
-  color: #fff;
-  border-color: #534AB7;
-}
 </style>
 
-<div style="display:flex;gap:8px;margin:0 0 8px 0;flex-wrap:wrap;align-items:center;">
+<div class="tab-btn-group items-center">
   <span style="font-size:13px;color:#6b7280;">シナリオ：</span>
-  <button class="elb-ctrl-btn active" id="elb-btn-normal" onclick="elbSetMode('normal')">通常分散</button>
-  <button class="elb-ctrl-btn" id="elb-btn-fail" onclick="elbSetMode('fail')">EC2-2 障害</button>
-  <button class="elb-ctrl-btn" id="elb-btn-spike" onclick="elbSetMode('spike')">スパイク流入</button>
+  <button class="tab-btn active" id="elb-btn-normal" onclick="elbSetMode('normal')">通常分散</button>
+  <button class="tab-btn" id="elb-btn-fail" onclick="elbSetMode('fail')">EC2-2 障害</button>
+  <button class="tab-btn" id="elb-btn-spike" onclick="elbSetMode('spike')">スパイク流入</button>
 </div>
 
 <svg width="100%" viewBox="0 0 680 380">

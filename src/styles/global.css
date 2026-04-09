@@ -1,3 +1,150 @@
 @import "tailwindcss";
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 @variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --bg: #f7f6f2;
+    --surface: #ffffff;
+    --surface-2: #f9f8f5;
+    --surface-off: #f0ede8;
+    --divider: #e8e5e0;
+    --border: rgba(0,0,0,0.09);
+    --text: #1a1a1a;
+    --text-muted: #6b7280;
+    --text-faint: #b0aaa3;
+    --brand: #e67e00;
+    --brand-hi: #fff4e0;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.09);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
+  }
+
+  .dark {
+    --bg: #13120f;
+    --surface: #1a1916;
+    --surface-2: #1f1e1b;
+    --surface-off: #252320;
+    --divider: #2a2826;
+    --border: rgba(255,255,255,0.08);
+    --text: #e8e6e1;
+    --text-muted: #9ca3af;
+    --text-faint: #4b5563;
+    --brand: #f59e0b;
+    --brand-hi: rgba(245,158,11,0.15);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 4.5rem;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  ::selection {
+    background: rgba(230,126,0,0.15);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-white transition-all duration-200;
+    background: var(--brand);
+  }
+  .btn-primary:hover {
+    background: var(--brand-hover, #c96d00);
+    @apply shadow-md;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    @apply rounded-xl shadow-sm;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold;
+  }
+
+  /* 図解セクション見出し */
+  .section-title {
+    @apply text-center text-xl font-bold mb-3;
+  }
+
+  /* ページセクション見出し */
+  .heading-section {
+    @apply text-xl font-bold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700;
+  }
+
+  /* 図解の注釈ボックス（amber） */
+  .note-box {
+    @apply bg-[#FAEEDA] border border-[#854F0B] text-[#633806] rounded-lg px-4 py-2 text-center font-medium;
+  }
+
+  /* 図解タブボタン */
+  .tab-btn {
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    color: #111827;
+    font-family: inherit;
+  }
+  .dark .tab-btn {
+    border-color: #374151;
+    background: #1f2937;
+    color: #f9fafb;
+  }
+  .tab-btn.active {
+    background: #534AB7;
+    color: #fff;
+    border-color: #534AB7;
+  }
+
+  /* 図解タブボタン ラッパー */
+  .tab-btn-group {
+    @apply flex gap-1.5 flex-wrap mb-8;
+  }
+
+  /* 図解タブパネル */
+  .tab-panel {
+    display: none;
+  }
+  .tab-panel.active {
+    display: block;
+  }
+
+  /* アニメーション */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
+  }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(0.85); }
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.4s ease both;
+  }
+  .animate-pulse-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+}

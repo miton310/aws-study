@@ -1,0 +1,189 @@
+---
+---
+<style>
+  .nsf-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
+  .dark .nsf-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
+  .nsf-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
+  #nsf-step-desc{font-size:13px;color:#6b7280;margin:8px 0 0;min-height:40px;line-height:1.6;}
+</style>
+
+<div style="display:flex;gap:6px;margin:0 0 6px;flex-wrap:wrap;align-items:center;">
+  <button class="nsf-btn active" id="nsf-btn-before" onclick="nsfSetMode('before')">設定前（全拒否）</button>
+  <button class="nsf-btn"       id="nsf-btn-after"  onclick="nsfSetMode('after')">設定後（正解）</button>
+</div>
+<div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap;align-items:center;">
+  <button class="nsf-btn" onclick="nsfPrev()">◀ 前へ</button>
+  <button class="nsf-btn" onclick="nsfNext()">次へ ▶</button>
+  <span id="nsf-step-num" style="font-size:12px;color:#9ca3af;margin-left:4px;"></span>
+</div>
+<p id="nsf-step-desc"></p>
+
+<svg width="100%" viewBox="0 0 680 360">
+  <defs>
+    <marker id="nsf-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Internet -->
+  <rect x="20" y="150" width="90" height="44" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+  <text x="65" y="168" text-anchor="middle" font-size="12" font-weight="500" fill="#2C2C2A" dominant-baseline="central">インターネット</text>
+  <text x="65" y="184" text-anchor="middle" font-size="11" fill="#5F5E5A" dominant-baseline="central">HTTP :80</text>
+
+  <!-- NACL IN wall -->
+  <rect id="nsf-nacl-in-wall" x="148" y="80" width="16" height="200" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
+  <text x="156" y="72" text-anchor="middle" font-size="11" fill="#534AB7">NACL IN</text>
+  <text id="nsf-nacl-in-icon" x="156" y="186" text-anchor="middle" font-size="18" fill="#534AB7">?</text>
+
+  <!-- Subnet -->
+  <rect x="168" y="80" width="340" height="200" rx="10" fill="none" stroke="#378ADD" stroke-width="1" stroke-dasharray="5 3"/>
+  <text x="184" y="100" font-size="11" fill="#185FA5">パブリックサブネット</text>
+
+  <!-- SG IN wall -->
+  <rect x="330" y="100" width="16" height="160" rx="4" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
+  <text x="338" y="92" text-anchor="middle" font-size="11" fill="#0F6E56">SG IN</text>
+  <text id="nsf-sg-in-icon" x="338" y="186" text-anchor="middle" font-size="18" fill="#0F6E56">?</text>
+
+  <!-- EC2 -->
+  <rect x="370" y="148" width="110" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
+  <text x="425" y="172" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">EC2</text>
+  <text x="425" y="190" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">Webサーバー</text>
+
+  <!-- SG OUT wall -->
+  <rect x="484" y="100" width="16" height="160" rx="4" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
+  <text x="492" y="92" text-anchor="middle" font-size="11" fill="#0F6E56">SG OUT</text>
+  <text id="nsf-sg-out-icon" x="492" y="186" text-anchor="middle" font-size="18" fill="#0F6E56">?</text>
+
+  <!-- NACL OUT wall -->
+  <rect x="508" y="80" width="16" height="200" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
+  <text x="516" y="72" text-anchor="middle" font-size="11" fill="#534AB7">NACL OUT</text>
+  <text id="nsf-nacl-out-icon" x="516" y="186" text-anchor="middle" font-size="18" fill="#534AB7">?</text>
+
+  <!-- Labels -->
+  <text x="340" y="314" text-anchor="middle" font-size="11" fill="#9ca3af">← レスポンス（戻り通信）</text>
+  <text x="340" y="334" text-anchor="middle" font-size="11" fill="#9ca3af">リクエスト（インバウンド）→</text>
+
+  <!-- Block marks -->
+  <text id="nsf-block-nacl-in"  x="156" y="240" text-anchor="middle" font-size="28" fill="#E24B4A" opacity="0">✕</text>
+  <text id="nsf-block-sg-in"    x="338" y="240" text-anchor="middle" font-size="28" fill="#E24B4A" opacity="0">✕</text>
+  <text id="nsf-block-nacl-out" x="516" y="240" text-anchor="middle" font-size="28" fill="#E24B4A" opacity="0">✕</text>
+
+  <!-- Highlight overlays -->
+  <rect id="nsf-hl-nacl-in"  x="140" y="76"  width="32" height="208" rx="6" fill="#534AB7" opacity="0"/>
+  <rect id="nsf-hl-sg-in"    x="322" y="96"  width="32" height="168" rx="6" fill="#1D9E75" opacity="0"/>
+  <rect id="nsf-hl-ec2"      x="362" y="140" width="126" height="72" rx="10" fill="#1D9E75" opacity="0"/>
+  <rect id="nsf-hl-sg-out"   x="476" y="96"  width="32" height="168" rx="6" fill="#1D9E75" opacity="0"/>
+  <rect id="nsf-hl-nacl-out" x="500" y="76"  width="32" height="208" rx="6" fill="#534AB7" opacity="0"/>
+</svg>
+
+<div class="mb-4">
+核心ポイントはSTEP 5。SGはステートフルなので戻り通信は自動許可されますが、NACLはステートレスなのでアウトバウンドも明示的に許可しないと戻れません。設定3が必要な理由がここにあります。
+</div>
+
+<div>SGはデフォルト（インバウンド全拒否・アウトバウンド全許可）<br>
+NACLは全通信拒否<br>
+<br>
+この2つを突破してHTTP 80番を通す必要があります。<br>
+1 ✅ NACLインバウンドに80番許可 → 外からの80番をサブネットに通す<br>
+2 ✅ SGインバウンドに80番許可 → EC2インスタンスに通す<br>
+3 ✅ NACLアウトバウンドに全許可 → NACLはステートレスなので戻り通信も明示的に許可が必要</div>
+<div>
+  インターネット<br>
+  ↓<br>
+NACL インバウンド（1で解決）← ステートレス<br>
+  ↓<br>
+EC2 / SG インバウンド（2で解決）← ステートフル<br>
+  ↓ レスポンス<br>
+SG アウトバウンド（デフォルト全許可・設定不要）<br>
+  ↓<br>
+NACL アウトバウンド（3で解決）← ステートレスなので必要<br>
+  ↓<br>
+ユーザー
+</div>
+<script>
+  const NSF_MODES: Record<string, Record<string, {icon:string,color:string,pass:boolean}>> = {
+    before: {
+      'nacl-in':  { icon:'✕', color:'#E24B4A', pass:false },
+      'sg-in':    { icon:'✕', color:'#E24B4A', pass:false },
+      'sg-out':   { icon:'✅', color:'#1D9E75', pass:true  },
+      'nacl-out': { icon:'✕', color:'#E24B4A', pass:false },
+    },
+    after: {
+      'nacl-in':  { icon:'✅', color:'#1D9E75', pass:true  },
+      'sg-in':    { icon:'✅', color:'#1D9E75', pass:true  },
+      'sg-out':   { icon:'✅', color:'#1D9E75', pass:true  },
+      'nacl-out': { icon:'✅', color:'#1D9E75', pass:true  },
+    }
+  };
+
+  const NSF_STEPS: Record<string, {hl:string, desc:string}[]> = {
+    before: [
+      { hl:'nacl-in', desc:'【STEP 1】インターネットからHTTP :80 リクエストが届く。NACLインバウンドで判定。→ 全拒否設定なのでここでブロック。パケットは届かない。' },
+    ],
+    after: [
+      { hl:'nacl-in',  desc:'【STEP 1】NACLインバウンド：ポート80 / 0.0.0.0/0 許可を追加済み → 通過 ✅' },
+      { hl:'sg-in',    desc:'【STEP 2】SGインバウンド：ポート80 / 0.0.0.0/0 許可を追加済み → 通過 ✅' },
+      { hl:'ec2',      desc:'【STEP 3】EC2のWebサーバーがHTTPリクエストを処理。レスポンスを返す。' },
+      { hl:'sg-out',   desc:'【STEP 4】SGアウトバウンド：デフォルトで全許可済み → 通過 ✅（追加設定不要）' },
+      { hl:'nacl-out', desc:'【STEP 5】NACLアウトバウンド：ステートレスなので戻り通信も明示的に許可が必要 → 通過 ✅' },
+    ]
+  };
+
+  let nsfMode = 'before';
+  let nsfStep = 0;
+
+  function nsfApplyIcons() {
+    const m = NSF_MODES[nsfMode];
+    const entries: [string, string][] = [
+      ['nsf-nacl-in-icon',  'nacl-in'],
+      ['nsf-sg-in-icon',    'sg-in'],
+      ['nsf-sg-out-icon',   'sg-out'],
+      ['nsf-nacl-out-icon', 'nacl-out'],
+    ];
+    entries.forEach(([elId, key]) => {
+      const el = document.getElementById(elId)!;
+      el.textContent = m[key].icon;
+      el.setAttribute('fill', m[key].color);
+    });
+    document.getElementById('nsf-block-nacl-in')!.setAttribute('opacity',  m['nacl-in'].pass  ? '0' : '1');
+    document.getElementById('nsf-block-sg-in')!.setAttribute('opacity',    m['sg-in'].pass    ? '0' : '1');
+    document.getElementById('nsf-block-nacl-out')!.setAttribute('opacity', m['nacl-out'].pass ? '0' : '1');
+  }
+
+  function nsfRender() {
+    ['nacl-in','sg-in','ec2','sg-out','nacl-out'].forEach(id => {
+      document.getElementById('nsf-hl-'+id)!.setAttribute('opacity','0');
+    });
+    const steps = NSF_STEPS[nsfMode];
+    if(nsfStep >= steps.length) nsfStep = steps.length - 1;
+    if(nsfStep < 0) nsfStep = 0;
+    const s = steps[nsfStep];
+    document.getElementById('nsf-hl-'+s.hl)!.setAttribute('opacity','0.12');
+    document.getElementById('nsf-step-desc')!.textContent = s.desc;
+    document.getElementById('nsf-step-num')!.textContent = `${nsfStep+1} / ${steps.length}`;
+    nsfApplyIcons();
+  }
+
+  function nsfSetMode(m: string) {
+    nsfMode = m;
+    nsfStep = 0;
+    ['before','after'].forEach(id => {
+      document.getElementById('nsf-btn-'+id)!.classList.toggle('active', id===m);
+    });
+    nsfRender();
+  }
+
+  function nsfNext() {
+    if(nsfStep < NSF_STEPS[nsfMode].length - 1){ nsfStep++; nsfRender(); }
+  }
+
+  function nsfPrev() {
+    if(nsfStep > 0){ nsfStep--; nsfRender(); }
+  }
+
+  (window as any).nsfSetMode = nsfSetMode;
+  (window as any).nsfNext = nsfNext;
+  (window as any).nsfPrev = nsfPrev;
+
+  nsfSetMode('before');
+</script>
