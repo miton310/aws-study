@@ -1,0 +1,363 @@
+---
+/**
+ * NATインスタンス vs NAT Gateway 比較解説
+ * ポート転送・NATインスタンスの特徴・使い分け
+ */
+---
+
+<div>
+  <!-- Tabs -->
+  <div class="tab-btn-group">
+    <button class="tab-btn active" id="ni-tab-compare" onclick="niSetTab('compare')">NAT GW vs NATインスタンス</button>
+    <button class="tab-btn" id="ni-tab-port" onclick="niSetTab('port')">ポート転送</button>
+    <button class="tab-btn" id="ni-tab-arch" onclick="niSetTab('arch')">構成図</button>
+  </div>
+
+  <!-- Tab: 比較 -->
+  <div class="tab-panel active" id="ni-panel-compare">
+    <div style="overflow-x:auto;">
+      <table class="dia-table">
+        <thead>
+          <tr>
+            <th style="text-align:center;min-width:120px;">項目</th>
+            <th style="text-align:center;min-width:200px;">NAT Gateway</th>
+            <th style="text-align:center;min-width:200px;">NATインスタンス</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">実体</td>
+            <td>AWSマネージドサービス</td>
+            <td>EC2インスタンス（自分で構築）</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">可用性</td>
+            <td>AZ内で冗長化済み（自動）</td>
+            <td>自分でマルチAZ構成を組む必要あり</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">帯域幅</td>
+            <td>最大100 Gbps（自動スケーリング）</td>
+            <td>インスタンスタイプに依存</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">メンテナンス</td>
+            <td>不要（AWS管理）</td>
+            <td>OS・パッチ適用が必要</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">セキュリティグループ</td>
+            <td>関連付け不可</td>
+            <td>関連付け可能</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">ポート転送</td>
+            <td style="color:#dc2626;font-weight:500;">不可</td>
+            <td style="color:#059669;font-weight:500;">可能（iptables等で設定）</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">踏み台利用</td>
+            <td style="color:#dc2626;font-weight:500;">不可</td>
+            <td style="color:#059669;font-weight:500;">可能（SSH接続可）</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">送信元/送信先チェック</td>
+            <td>自動で無効化</td>
+            <td>手動で無効化が必要</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">コスト</td>
+            <td>時間課金 + データ処理課金</td>
+            <td>EC2インスタンス料金</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="dia-note warn" style="margin-top:12px;">
+      <strong>SAA頻出ポイント：</strong>
+      「ポート転送」「踏み台サーバー兼用」「セキュリティグループの適用」が求められる場合 → <strong>NATインスタンス</strong><br>
+      それ以外の一般的なアウトバウンド通信 → <strong>NAT Gateway</strong>（推奨）
+    </div>
+  </div>
+
+  <!-- Tab: ポート転送 -->
+  <div class="tab-panel" id="ni-panel-port">
+    <p style="font-size:15px;color:#6b7280;text-align:center;margin-bottom:14px;">
+      インターネットからプライベートサブネットのEC2にアクセスする方法
+    </p>
+
+    <div class="dia-diagram">
+      <!-- 問題の整理 -->
+      <div class="dia-note info">
+        <strong>問題：</strong>プライベートサブネットのEC2にはパブリックIPがなく、インターネットから直接アクセスできない。<br>
+        <strong>解決策：</strong>パブリックサブネットにNATインスタンスを配置し、<strong>ポート転送（Port Forwarding）</strong>でトラフィックを転送する。
+      </div>
+
+      <!-- Flow -->
+      <div style="margin-top:16px;">
+        <div class="dia-row">
+          <div class="dia-box dia-internet">
+            <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Internet_48_Light.svg" alt="Internet">
+            <div class="dia-box-label">インターネット</div>
+            <div class="dia-box-sub">例: SSH (ポート22)</div>
+          </div>
+        </div>
+
+        <div class="dia-row">
+          <div class="dia-arrow"><div class="dia-arrow-v green"></div></div>
+          <span style="font-size:12px;color:#059669;">ポート2222宛て</span>
+        </div>
+
+        <div class="dia-row">
+          <div class="dia-box dia-ec2" style="border:2px solid #f59e0b;background:#fef3c7;">
+            <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+            <div class="dia-box-label" style="color:#92400e;">NATインスタンス</div>
+            <div class="dia-box-sub" style="color:#92400e;">パブリックサブネット<br>EIP: 54.x.x.x</div>
+          </div>
+        </div>
+
+        <div class="dia-row">
+          <div class="dia-arrow"><div class="dia-arrow-v green"></div></div>
+          <span style="font-size:12px;color:#059669;">iptablesでポート22に転送</span>
+        </div>
+
+        <div class="dia-row">
+          <div class="dia-box dia-ec2">
+            <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+            <div class="dia-box-label">EC2（ターゲット）</div>
+            <div class="dia-box-sub">プライベートサブネット<br>10.0.2.10</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ポート転送の仕組み -->
+    <div class="dia-checklist" style="margin-top:16px;">
+      <div class="dia-checklist-title">NATインスタンスでのポート転送 設定手順</div>
+      <div class="dia-checklist-item ok">① NATインスタンスをパブリックサブネットに作成（Amazon Linux AMI）</div>
+      <div class="dia-checklist-item ok">② Elastic IP を割り当て</div>
+      <div class="dia-checklist-item ok">③ 送信元/送信先チェックを無効化</div>
+      <div class="dia-checklist-item ok">④ iptablesでポート転送ルールを設定</div>
+      <div class="dia-checklist-item ok">⑤ セキュリティグループで転送ポートを許可</div>
+      <div class="dia-checklist-item ok">⑥ プライベートサブネットのルートテーブル → NATインスタンス</div>
+    </div>
+
+    <div class="dia-note warn" style="margin-top:12px;">
+      <strong>SAA試験での出題パターン：</strong><br>
+      「プライベートサブネットのEC2にインターネットからポート転送でアクセスしたい」<br>
+      → <strong>パブリックサブネットにNATインスタンスを作成し、NATインスタンスへのルーティングを設定する</strong><br><br>
+      NAT Gatewayではポート転送機能がないため、この要件には使えない。
+    </div>
+  </div>
+
+  <!-- Tab: 構成図アニメーション -->
+  <div class="tab-panel" id="ni-panel-arch">
+    <!-- Step nav -->
+    <div class="dia-step-info">
+      <button class="tab-btn" id="ni-btn-prev" onclick="niPrev()">◀ 前へ</button>
+      <button class="tab-btn" id="ni-btn-next" onclick="niNext()">次へ ▶</button>
+      <span id="ni-step-num">1 / 6</span>
+    </div>
+
+    <!-- Step description -->
+    <div id="ni-step-desc" class="dia-step-desc"></div>
+
+    <!-- Legend -->
+    <div class="dia-legend">
+      <span><div class="dia-legend-box" style="background:#059669;"></div> 通過中</span>
+      <span><div class="dia-legend-box" style="background:#d1d5db;"></div> 未到達</span>
+    </div>
+
+    <div class="dia-diagram">
+      <!-- Internet -->
+      <div class="dia-row">
+        <div id="ni-internet" class="dia-box dia-internet">
+          <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Internet_48_Light.svg" alt="Internet">
+          <div class="dia-box-label">インターネット</div>
+          <div class="dia-box-sub">SSH: 54.x.x.x:2222</div>
+        </div>
+      </div>
+
+      <div class="dia-row">
+        <div class="dia-arrow"><div id="ni-arr-1" class="dia-arrow-v gray"></div></div>
+      </div>
+
+      <!-- IGW -->
+      <div class="dia-row">
+        <div id="ni-igw" class="dia-box dia-igw">
+          <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Internet-Gateway_48.svg" alt="IGW">
+          <div class="dia-box-label">Internet Gateway</div>
+        </div>
+      </div>
+
+      <div class="dia-row">
+        <div class="dia-arrow"><div id="ni-arr-2" class="dia-arrow-v gray"></div></div>
+      </div>
+
+      <!-- VPC -->
+      <div class="dia-vpc">
+        <div class="dia-vpc-header">
+          <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Virtual-private-cloud-VPC_48.svg" alt="VPC">
+          <span>VPC（IPv4）</span>
+        </div>
+
+        <div class="dia-row" style="gap:16px;align-items:flex-start;flex-wrap:wrap;">
+          <!-- Public Subnet -->
+          <div class="dia-subnet public" style="flex:1;min-width:180px;">
+            <div class="dia-subnet-header">
+              <img src="/AWS-icons/Architecture-Group-Icons_07312025/Public-subnet_32.svg" alt="public">
+              <span>パブリックサブネット</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+              <div id="ni-nat-inst" class="dia-box dia-ec2" style="border:2px solid #f59e0b;background:#fef3c7;">
+                <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+                <div class="dia-box-label" style="color:#92400e;">NATインスタンス</div>
+                <div class="dia-box-sub" style="color:#92400e;">EIP: 54.x.x.x<br>送信元/送信先チェック無効</div>
+              </div>
+              <div id="ni-rt-pub" class="dia-box dia-rt">
+                <div class="dia-box-label">ルートテーブル</div>
+                <div class="dia-box-sub">0.0.0.0/0 → IGW</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Arrow between subnets -->
+          <div style="display:flex;align-items:center;padding-top:40px;">
+            <div class="dia-arrow"><div id="ni-arr-3" class="dia-arrow-h gray"></div></div>
+          </div>
+
+          <!-- Private Subnet -->
+          <div class="dia-subnet private" style="flex:1;min-width:180px;">
+            <div class="dia-subnet-header">
+              <img src="/AWS-icons/Architecture-Group-Icons_07312025/Private-subnet_32.svg" alt="private">
+              <span>プライベートサブネット</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+              <div id="ni-ec2-priv" class="dia-box dia-ec2">
+                <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+                <div class="dia-box-label">EC2</div>
+                <div class="dia-box-sub">APサーバー<br>10.0.2.10:22</div>
+              </div>
+              <div id="ni-rt-priv" class="dia-box dia-rt">
+                <div class="dia-box-label">ルートテーブル</div>
+                <div class="dia-box-sub">0.0.0.0/0 → NATインスタンス</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-note info" style="margin-top:12px;">
+      <strong>NATインスタンスの必須設定：</strong><br>
+      ・<strong>送信元/送信先チェックの無効化</strong> — EC2はデフォルトで自分宛て以外のパケットを破棄する。NATインスタンスは他のEC2のトラフィックを中継するため、このチェックを無効にする必要がある。<br>
+      ・<strong>Elastic IP</strong> — インターネットからアクセスするために固定パブリックIPが必要。<br>
+      ・<strong>セキュリティグループ</strong> — NAT GWと異なり、NATインスタンスにはSGを設定可能（かつ必須）。
+    </div>
+  </div>
+</div>
+
+<script>
+  interface NiStep {
+    highlight: string;
+    desc: string;
+    arrows: [string, string, string]; // arr-1, arr-2, arr-3
+  }
+
+  const NI_STEPS: NiStep[] = [
+    {
+      highlight: 'ni-internet',
+      desc: '【STEP 1】インターネットからNATインスタンスのEIP（54.x.x.x）のポート2222宛てにSSH接続リクエストを送信。',
+      arrows: ['gray', 'gray', 'gray'],
+    },
+    {
+      highlight: 'ni-igw',
+      desc: '【STEP 2】リクエストがInternet Gatewayに到達。EIPをNATインスタンスのプライベートIPに変換してVPC内へ転送。',
+      arrows: ['green', 'gray', 'gray'],
+    },
+    {
+      highlight: 'ni-nat-inst',
+      desc: '【STEP 3】NATインスタンスがポート2222でパケットを受信。<strong>送信元/送信先チェックが無効</strong>のため、自分宛て以外のパケットも処理できる。',
+      arrows: ['green', 'green', 'gray'],
+    },
+    {
+      highlight: 'ni-rt-pub',
+      desc: '【STEP 4】NATインスタンスのiptablesルール：<strong>ポート2222 → 10.0.2.10:22</strong> にDNAT変換。パブリックサブネットのルートテーブルからIGWへのルートも確認。',
+      arrows: ['green', 'green', 'gray'],
+    },
+    {
+      highlight: 'ni-rt-priv',
+      desc: '【STEP 5】プライベートサブネットのルートテーブル：<strong>0.0.0.0/0 → NATインスタンス</strong>。戻りのトラフィックもNATインスタンス経由でルーティングされる。',
+      arrows: ['green', 'green', 'green'],
+    },
+    {
+      highlight: 'ni-ec2-priv',
+      desc: '【完了】プライベートEC2（10.0.2.10）のポート22にSSH接続が完了！<br>レスポンスは逆順でNATインスタンス → IGW → インターネットへ戻る。',
+      arrows: ['green', 'green', 'green'],
+    },
+  ];
+
+  const NI_BOX_IDS = ['ni-internet', 'ni-igw', 'ni-nat-inst', 'ni-rt-pub', 'ni-rt-priv', 'ni-ec2-priv'];
+  const NI_ARR_IDS = ['ni-arr-1', 'ni-arr-2', 'ni-arr-3'];
+  let niCurrentStep = 0;
+
+  function niRender() {
+    const step = NI_STEPS[niCurrentStep];
+
+    // Update step info
+    document.getElementById('ni-step-num')!.textContent = `${niCurrentStep + 1} / ${NI_STEPS.length}`;
+    document.getElementById('ni-step-desc')!.innerHTML = step.desc;
+
+    // Remove all highlights
+    NI_BOX_IDS.forEach(id => {
+      document.getElementById(id)?.classList.remove('highlight');
+    });
+
+    // Add highlight
+    document.getElementById(step.highlight)?.classList.add('highlight');
+
+    // Update arrows
+    step.arrows.forEach((color, i) => {
+      const el = document.getElementById(NI_ARR_IDS[i])!;
+      const isV = el.className.includes('-v');
+      el.className = isV ? `dia-arrow-v ${color}` : `dia-arrow-h ${color}`;
+    });
+
+    // Update buttons
+    (document.getElementById('ni-btn-prev') as HTMLButtonElement).disabled = niCurrentStep <= 0;
+    (document.getElementById('ni-btn-next') as HTMLButtonElement).disabled = niCurrentStep >= NI_STEPS.length - 1;
+  }
+
+  function niNext() {
+    if (niCurrentStep < NI_STEPS.length - 1) {
+      niCurrentStep++;
+      niRender();
+    }
+  }
+
+  function niPrev() {
+    if (niCurrentStep > 0) {
+      niCurrentStep--;
+      niRender();
+    }
+  }
+
+  function niSetTab(t: string) {
+    document.querySelectorAll('[id^="ni-panel-"]').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('[id^="ni-tab-"]').forEach(el => el.classList.remove('active'));
+    document.getElementById('ni-panel-' + t)?.classList.add('active');
+    document.getElementById('ni-tab-' + t)?.classList.add('active');
+    if (t === 'arch') {
+      niCurrentStep = 0;
+      niRender();
+    }
+  }
+
+  (window as any).niSetTab = niSetTab;
+  (window as any).niNext = niNext;
+  (window as any).niPrev = niPrev;
+
+  // Initialize arch tab (runs when first shown)
+  niRender();
+</script>

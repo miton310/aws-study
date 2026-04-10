@@ -1,0 +1,10 @@
+/* Component: カード・バッジ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  @apply rounded-xl shadow-sm;
+}
+
+.badge {
+  @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold;
+}

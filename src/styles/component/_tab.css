@@ -1,0 +1,32 @@
+/* Component: タブ */
+.tab-btn {
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #111827;
+  font-family: inherit;
+}
+.dark .tab-btn {
+  border-color: #374151;
+  background: #1f2937;
+  color: #f9fafb;
+}
+.tab-btn.active {
+  background: #534AB7;
+  color: #fff;
+  border-color: #534AB7;
+}
+
+.tab-btn-group {
+  @apply flex gap-1.5 flex-wrap mb-8;
+}
+
+.tab-panel {
+  display: none;
+}
+.tab-panel.active {
+  display: block;
+}

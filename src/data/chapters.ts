@@ -30,6 +30,7 @@ export const chapters: Chapter[] = [
     moreServices: [
       { name: 'Global Accelerator',slug: 'network/global-accelerator',priority: 'star1', hasDiagram: false, isNew: false },
       { name: 'Direct Connect',    slug: 'network/direct-connect',    priority: 'star1', hasDiagram: false, isNew: false },
+      { name: 'PrivateLink',       slug: 'network/privatelink',       priority: 'star1', hasDiagram: true,  isNew: true  },
       { name: 'VPN',               slug: 'network/vpn',               priority: 'none',  hasDiagram: false, isNew: false },
     ],
   },

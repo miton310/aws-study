@@ -55,6 +55,7 @@
 
       <!-- Route Table note -->
       <rect x="50" y="290" width="570" height="72" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
+      <img src="/home/mito/study/aws/aws-study/public/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-Route-53_Route-Table_48.svg" alt="">
       <text x="340" y="316" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">ルートテーブル</text>
       <text x="340" y="338" text-anchor="middle" font-size="12" fill="#534AB7">パブリック: 0.0.0.0/0 → IGW</text>
       <text x="340" y="356" text-anchor="middle" font-size="12" fill="#534AB7">プライベート: 0.0.0.0/0 → NAT GW</text>
@@ -124,41 +125,37 @@
     </svg>
   </div>
 
+  <!-- NAT Gateway：プライベートサブネット→インターネット -->
   <div id="vpc-tab-nat" class="tab-panel">
-    <svg width="100%" viewBox="0 0 680 360">
-      <defs>
-        <marker id="vpc-arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </marker>
-      </defs>
-      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">NAT Gateway：プライベートサブネット→インターネット</text>
-
-      <rect x="270" y="44" width="140" height="36" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
-      <text x="340" y="66" text-anchor="middle" font-size="13" fill="#2C2C2A">インターネット</text>
-
-      <rect x="255" y="100" width="170" height="36" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
-      <text x="340" y="122" text-anchor="middle" font-size="13" fill="#085041">Internet Gateway</text>
-      <line x1="340" y1="80" x2="340" y2="100" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#vpc-arrow2)"/>
-
-      <rect x="220" y="156" width="240" height="44" rx="8" fill="#9FE1CB" stroke="#0F6E56" stroke-width="0.5"/>
-      <text x="340" y="176" text-anchor="middle" font-size="13" font-weight="500" fill="#04342C">NAT Gateway</text>
-      <text x="340" y="192" text-anchor="middle" font-size="11" fill="#085041">パブリックサブネットに配置</text>
-      <line x1="340" y1="136" x2="340" y2="156" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#vpc-arrow2)"/>
-
-      <rect x="200" y="226" width="280" height="44" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
-      <text x="340" y="246" text-anchor="middle" font-size="13" font-weight="500" fill="#412402">プライベートEC2</text>
-      <text x="340" y="262" text-anchor="middle" font-size="11" fill="#633806">インターネットには出られるが入れない</text>
-      <line x1="340" y1="200" x2="340" y2="226" stroke="#854F0B" stroke-width="1.5" marker-end="url(#vpc-arrow2)"/>
-
-      <rect x="40" y="290" width="600" height="44" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-      <text x="340" y="310" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">Egress-Only IGW</text>
-      <text x="340" y="328" text-anchor="middle" font-size="12" fill="#534AB7">IPv6専用のNAT GW的な機能・アウトバウンドのみ許可</text>
-
-      <!-- Egress-Only IGW -->
-      <rect x="40" y="302" width="600" height="44" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-      <text x="340" y="320" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489" dominant-baseline="central">Egress-Only Internet Gateway</text>
-      <text x="340" y="338" text-anchor="middle" font-size="11" fill="#534AB7" dominant-baseline="central">IPv6専用のNAT GW的機能・アウトバウンドのみ許可（インバウンド不可）</text>
-    </svg>
+    <p class="text-center font-medium mb-4">NAT Gateway：プライベートサブネット→インターネット</p>
+    <div class="flex flex-col items-center gap-0">
+      <!-- インターネット -->
+      <div class="rounded-lg bg-[#F1EFE8] border border-[#D3D1C7] px-8 py-2 text-center text-[#2C2C2A] text-sm">
+        インターネット
+      </div>
+      <div class="text-[#1D9E75] text-lg leading-none">↕</div>
+      <!-- IGW -->
+      <div class="rounded-lg bg-[#E1F5EE] border border-[#0F6E56] px-8 py-2 text-center text-[#085041] text-sm">
+        Internet Gateway
+      </div>
+      <div class="text-[#1D9E75] text-lg leading-none">↕</div>
+      <!-- NAT Gateway -->
+      <div class="rounded-lg bg-[#9FE1CB] border border-[#0F6E56] px-6 py-3 text-center">
+        <p class="font-medium text-[#04342C] text-sm">NAT Gateway</p>
+        <p class="text-xs text-[#085041]">パブリックサブネットに配置</p>
+      </div>
+      <div class="text-[#854F0B] text-lg leading-none">↕</div>
+      <!-- プライベートEC2 -->
+      <div class="rounded-lg bg-[#FAEEDA] border border-[#854F0B] px-6 py-3 text-center">
+        <p class="font-medium text-[#412402] text-sm">プライベートEC2</p>
+        <p class="text-xs text-[#633806]">インターネットには出られるが入れない</p>
+      </div>
+    </div>
+    <!-- Egress-Only IGW -->
+    <div class="mt-4 rounded-lg bg-[#EEEDFE] border border-[#534AB7] px-4 py-3 text-center">
+      <p class="font-medium text-[#3C3489] text-sm">Egress-Only Internet Gateway</p>
+      <p class="text-xs text-[#534AB7]">IPv6専用のNAT GW的機能・アウトバウンドのみ許可（インバウンド不可）</p>
+    </div>
   </div>
 
   <div id="vpc-tab-nacl" class="tab-panel">

@@ -1,0 +1,409 @@
+---
+/**
+ * AWS PrivateLink 解説ダイアグラム
+ * VPCエンドポイントサービス / Interface型エンドポイント / Gateway型との比較
+ */
+---
+
+<style>
+  .pl-col-gw {
+    background: rgba(16, 185, 129, 0.05);
+  }
+  .dark .pl-col-gw {
+    background: rgba(16, 185, 129, 0.1);
+  }
+  .pl-col-if {
+    background: rgba(99, 102, 241, 0.05);
+  }
+  .dark .pl-col-if {
+    background: rgba(99, 102, 241, 0.1);
+  }
+</style>
+
+<div>
+  <!-- Tabs -->
+  <div class="tab-btn-group">
+    <button class="tab-btn active" id="pl-tab-overview" onclick="plSetTab('overview')">概要</button>
+    <button class="tab-btn" id="pl-tab-architecture" onclick="plSetTab('architecture')">アーキテクチャ</button>
+    <button class="tab-btn" id="pl-tab-compare" onclick="plSetTab('compare')">Gateway型 vs Interface型</button>
+    <button class="tab-btn" id="pl-tab-custom" onclick="plSetTab('custom')">カスタムサービス公開</button>
+  </div>
+
+  <!-- Tab: Overview -->
+  <div class="tab-panel active" id="pl-panel-overview">
+    <div class="dia-diagram">
+      <p style="font-size:15px;color:#6b7280;text-align:center;margin-bottom:14px;">
+        PrivateLink = インターネットを経由せず、AWS内部ネットワークでサービスに接続する仕組み
+      </p>
+
+      <!-- Before: via Internet -->
+      <div style="margin-bottom:24px;">
+        <p style="font-size:14px;font-weight:600;color:#dc2626;margin-bottom:10px;">❌ PrivateLinkなし（従来）</p>
+        <div class="dia-row">
+          <div style="text-align:center;">
+            <div class="dia-box dia-ec2">
+              <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+              <div class="dia-box-label">EC2</div>
+              <div class="dia-box-sub">プライベートサブネット</div>
+            </div>
+          </div>
+          <div class="dia-arrow">
+            <div class="dia-arrow-h red"></div>
+          </div>
+          <div style="text-align:center;">
+            <div class="dia-box dia-igw">
+              <div class="dia-box-label">NAT GW</div>
+              <div class="dia-box-sub">→ IGW</div>
+            </div>
+          </div>
+          <div class="dia-arrow">
+            <div class="dia-arrow-h red"></div>
+          </div>
+          <div style="text-align:center;">
+            <div class="dia-box dia-internet">
+              <div class="dia-box-label">インターネット</div>
+            </div>
+          </div>
+          <div class="dia-arrow">
+            <div class="dia-arrow-h red"></div>
+          </div>
+          <div style="text-align:center;">
+            <div class="dia-box" style="background:#eef2ff;border:1px solid #6366f1;">
+              <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Storage/48/Arch_Amazon-Simple-Storage-Service_48.svg" alt="S3">
+              <div class="dia-box-label" style="color:#4338ca;">S3</div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;font-size:12px;color:#dc2626;margin-top:4px;">
+          パブリックインターネットを経由 → セキュリティリスク・NAT GWコスト発生
+        </div>
+      </div>
+
+      <!-- After: via PrivateLink -->
+      <div>
+        <p style="font-size:14px;font-weight:600;color:#059669;margin-bottom:10px;">✅ PrivateLink利用（VPCエンドポイント）</p>
+        <div class="dia-row">
+          <div style="text-align:center;">
+            <div class="dia-box dia-ec2">
+              <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+              <div class="dia-box-label">EC2</div>
+              <div class="dia-box-sub">プライベートサブネット</div>
+            </div>
+          </div>
+          <div class="dia-arrow">
+            <div class="dia-arrow-h green"></div>
+          </div>
+          <div style="text-align:center;">
+            <div class="dia-box" style="background:#eef2ff;border:1px solid #6366f1;">
+              <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Networking-Content-Delivery/48/Arch_AWS-PrivateLink_48.svg" alt="PrivateLink">
+              <div class="dia-box-label" style="color:#4338ca;">VPC Endpoint</div>
+              <div class="dia-box-sub">PrivateLink</div>
+            </div>
+          </div>
+          <div class="dia-arrow">
+            <div class="dia-arrow-h green"></div>
+          </div>
+          <div style="text-align:center;">
+            <div class="dia-box" style="background:#eef2ff;border:1px solid #6366f1;">
+              <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Storage/48/Arch_Amazon-Simple-Storage-Service_48.svg" alt="S3">
+              <div class="dia-box-label" style="color:#4338ca;">S3</div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;font-size:12px;color:#059669;margin-top:4px;">
+          AWSバックボーンネットワーク内で完結 → セキュア・NAT GW不要・低レイテンシ
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-note info">
+      <strong>PrivateLinkとは：</strong>
+      VPCからAWSサービスやサードパーティサービスに、インターネットを経由せずプライベートに接続する技術。
+      Interface型VPCエンドポイント（ENIベース）が PrivateLink の実体。
+      Gateway型エンドポイント（S3/DynamoDB専用）は厳密にはPrivateLinkではないが、同じ「VPCエンドポイント」の仲間。
+    </div>
+  </div>
+
+  <!-- Tab: Architecture -->
+  <div class="tab-panel" id="pl-panel-architecture">
+    <div class="dia-diagram">
+      <p style="font-size:15px;color:#6b7280;text-align:center;margin-bottom:14px;">
+        Interface型エンドポイント（PrivateLink）のアーキテクチャ
+      </p>
+
+      <!-- Consumer VPC -->
+      <div class="dia-vpc">
+        <div class="dia-vpc-header">
+          <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Virtual-private-cloud-VPC_48.svg" alt="VPC">
+          <span>利用者VPC（Consumer）</span>
+        </div>
+
+        <div class="dia-subnet private">
+          <div class="dia-subnet-header">
+            <img src="/AWS-icons/Architecture-Group-Icons_07312025/Private-subnet_32.svg" alt="private">
+            <span>プライベートサブネット</span>
+          </div>
+          <div class="dia-row" style="gap:24px;flex-wrap:wrap;">
+            <div style="text-align:center;">
+              <div class="dia-box dia-ec2">
+                <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+                <div class="dia-box-label">EC2</div>
+                <div class="dia-box-sub">アプリケーション</div>
+              </div>
+            </div>
+            <div class="dia-arrow">
+              <div class="dia-arrow-h green"></div>
+            </div>
+            <div style="text-align:center;">
+              <div class="dia-box" style="background:#eef2ff;border:1px solid #6366f1;">
+                <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Elastic-Network-Interface_48.svg" alt="ENI">
+                <div class="dia-box-label" style="color:#4338ca;">ENI</div>
+                <div class="dia-box-sub">プライベートIP<br>10.0.1.50</div>
+              </div>
+              <div class="dia-ip-tag private" style="margin-top:4px;">VPCエンドポイント</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow down -->
+      <div class="dia-row">
+        <div class="dia-arrow">
+          <div class="dia-arrow-v green"></div>
+        </div>
+        <span style="font-size:12px;color:#059669;font-weight:600;">AWSバックボーン（プライベート接続）</span>
+        <div class="dia-arrow">
+          <div class="dia-arrow-v green"></div>
+        </div>
+      </div>
+
+      <!-- AWS Service -->
+      <div class="dia-row" style="gap:16px;flex-wrap:wrap;">
+        <div style="text-align:center;">
+          <div class="dia-box" style="background:#eef2ff;border:1px solid #6366f1;">
+            <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Storage/48/Arch_Amazon-Simple-Storage-Service_48.svg" alt="S3">
+            <div class="dia-box-label" style="color:#4338ca;">S3</div>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div class="dia-box" style="background:#eef2ff;border:1px solid #6366f1;">
+            <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Management-Governance/48/Arch_AWS-CloudFormation_48.svg" alt="CloudFormation">
+            <div class="dia-box-label" style="color:#4338ca;">SQS</div>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div class="dia-box" style="background:#eef2ff;border:1px solid #6366f1;">
+            <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Security-Identity-Compliance/48/Arch_AWS-Secrets-Manager_48.svg" alt="Secrets Manager">
+            <div class="dia-box-label" style="color:#4338ca;">Secrets Manager</div>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <div class="dia-box" style="background:#f0fdf4;border:1px solid #16a34a;">
+            <div class="dia-box-label" style="color:#166534;">…他100+</div>
+            <div class="dia-box-sub">AWSサービス</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-note info">
+      <strong>仕組み：</strong>
+      Interface型エンドポイントを作成すると、指定したサブネットに<strong>ENI（Elastic Network Interface）</strong>が自動生成される。
+      EC2からはこのENIのプライベートIPを経由してAWSサービスに到達する。
+      DNS名は自動的にプライベートIPに解決される（プライベートDNS有効時）。
+    </div>
+
+    <div class="dia-note warn" style="margin-top:8px;">
+      <strong>コスト：</strong>
+      Interface型は <strong>$0.01/時間/AZ</strong> + <strong>データ処理 $0.01/GB</strong>。
+      Gateway型（S3/DynamoDB）は<strong>無料</strong>。
+      コスト面ではGateway型が有利なので、S3/DynamoDBにはGateway型を優先。
+    </div>
+  </div>
+
+  <!-- Tab: Compare -->
+  <div class="tab-panel" id="pl-panel-compare">
+    <table class="dia-table">
+      <thead>
+        <tr>
+          <th style="min-width:120px;">項目</th>
+          <th class="pl-col-gw" style="min-width:180px;">Gateway型</th>
+          <th class="pl-col-if" style="min-width:180px;">Interface型（PrivateLink）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>対象サービス</strong></td>
+          <td class="pl-col-gw"><strong>S3・DynamoDB</strong> のみ</td>
+          <td class="pl-col-if">ほぼ<strong>全AWSサービス</strong><br>+ サードパーティ・自社サービス</td>
+        </tr>
+        <tr>
+          <td><strong>仕組み</strong></td>
+          <td class="pl-col-gw"><strong>ルートテーブル</strong>にエントリ追加<br>プレフィックスリスト経由</td>
+          <td class="pl-col-if">サブネットに<strong>ENI</strong>を作成<br>プライベートIPで接続</td>
+        </tr>
+        <tr>
+          <td><strong>料金</strong></td>
+          <td class="pl-col-gw">✅ <strong>無料</strong></td>
+          <td class="pl-col-if">⚠️ $0.01/h/AZ + $0.01/GB</td>
+        </tr>
+        <tr>
+          <td><strong>アクセス制御</strong></td>
+          <td class="pl-col-gw">エンドポイントポリシー<br>（リソースベース）</td>
+          <td class="pl-col-if">エンドポイントポリシー<br>+ <strong>セキュリティグループ</strong></td>
+        </tr>
+        <tr>
+          <td><strong>クロスリージョン</strong></td>
+          <td class="pl-col-gw">❌ 同一リージョンのみ</td>
+          <td class="pl-col-if">✅ クロスリージョン対応<br>（一部サービス）</td>
+        </tr>
+        <tr>
+          <td><strong>オンプレ接続</strong></td>
+          <td class="pl-col-gw">❌ VPC内からのみ</td>
+          <td class="pl-col-if">✅ Direct Connect / VPN経由で<br>オンプレからも利用可能</td>
+        </tr>
+        <tr>
+          <td><strong>DNS</strong></td>
+          <td class="pl-col-gw">パブリックDNSのまま<br>（ルーティングで制御）</td>
+          <td class="pl-col-if">プライベートDNS名<br>（vpce-xxx.service.region...）</td>
+        </tr>
+        <tr>
+          <td><strong>HA構成</strong></td>
+          <td class="pl-col-gw">リージョンレベルで冗長</td>
+          <td class="pl-col-if">AZごとにENI作成<br>→ マルチAZ推奨</td>
+        </tr>
+        <tr>
+          <td><strong>SAA頻出</strong></td>
+          <td class="pl-col-gw">「S3にプライベート接続」<br>→ Gateway型</td>
+          <td class="pl-col-if">「セキュアにAWSサービス接続」<br>「オンプレから利用」→ Interface型</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="dia-note info" style="margin-top:12px;">
+      <strong>S3のエンドポイント選択：</strong>
+      S3はGateway型・Interface型の<strong>両方</strong>に対応。
+      VPC内のEC2からのアクセスなら<strong>Gateway型（無料）</strong>を優先。
+      オンプレからDirect Connect経由でS3にアクセスしたい場合は<strong>Interface型</strong>が必要。
+    </div>
+  </div>
+
+  <!-- Tab: Custom Service -->
+  <div class="tab-panel" id="pl-panel-custom">
+    <div class="dia-diagram">
+      <p style="font-size:15px;color:#6b7280;text-align:center;margin-bottom:14px;">
+        PrivateLinkで自社サービスを他VPC/アカウントに公開
+      </p>
+
+      <!-- Provider VPC -->
+      <div class="dia-vpc" style="border-color:#f97316;">
+        <div class="dia-vpc-header" style="color:#ea580c;">
+          <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Virtual-private-cloud-VPC_48.svg" alt="VPC">
+          <span>提供者VPC（Provider） — アカウントA</span>
+        </div>
+        <div class="dia-row" style="gap:16px;flex-wrap:wrap;">
+          <div style="text-align:center;">
+            <div class="dia-box dia-ec2">
+              <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+              <div class="dia-box-label">サービス群</div>
+              <div class="dia-box-sub">EC2 / ECS / Lambda</div>
+            </div>
+          </div>
+          <div class="dia-arrow">
+            <div class="dia-arrow-h green"></div>
+          </div>
+          <div style="text-align:center;">
+            <div class="dia-box" style="background:#fff7ed;border:1px solid #f97316;">
+              <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Networking-Content-Delivery/48/Arch_Elastic-Load-Balancing_48.svg" alt="NLB">
+              <div class="dia-box-label" style="color:#c2410c;">NLB / GWLB</div>
+              <div class="dia-box-sub">ロードバランサー</div>
+            </div>
+          </div>
+          <div class="dia-arrow">
+            <div class="dia-arrow-h green"></div>
+          </div>
+          <div style="text-align:center;">
+            <div class="dia-box" style="background:#eef2ff;border:1px solid #6366f1;">
+              <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Networking-Content-Delivery/48/Arch_AWS-PrivateLink_48.svg" alt="PrivateLink">
+              <div class="dia-box-label" style="color:#4338ca;">エンドポイント<br>サービス</div>
+              <div class="dia-box-sub">VPC Endpoint Service</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Arrow between VPCs -->
+      <div class="dia-row">
+        <div class="dia-arrow">
+          <div class="dia-arrow-v green"></div>
+        </div>
+        <span style="font-size:12px;color:#059669;font-weight:600;">AWSバックボーン（PrivateLink接続）</span>
+        <div class="dia-arrow">
+          <div class="dia-arrow-v green"></div>
+        </div>
+      </div>
+
+      <!-- Consumer VPC -->
+      <div class="dia-vpc">
+        <div class="dia-vpc-header">
+          <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Virtual-private-cloud-VPC_48.svg" alt="VPC">
+          <span>利用者VPC（Consumer） — アカウントB</span>
+        </div>
+        <div class="dia-row" style="gap:16px;flex-wrap:wrap;">
+          <div style="text-align:center;">
+            <div class="dia-box dia-ec2">
+              <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+              <div class="dia-box-label">EC2</div>
+              <div class="dia-box-sub">利用者アプリ</div>
+            </div>
+          </div>
+          <div class="dia-arrow">
+            <div class="dia-arrow-h green"></div>
+          </div>
+          <div style="text-align:center;">
+            <div class="dia-box" style="background:#eef2ff;border:1px solid #6366f1;">
+              <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Elastic-Network-Interface_48.svg" alt="ENI">
+              <div class="dia-box-label" style="color:#4338ca;">ENI</div>
+              <div class="dia-box-sub">VPCエンドポイント</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-note info">
+      <strong>エンドポイントサービスの仕組み：</strong>
+      提供者側で <strong>NLB（またはGWLB）+ エンドポイントサービス</strong> を作成。
+      利用者側で <strong>Interface型VPCエンドポイント</strong> を作成して接続。
+      VPCピアリングやTransit Gatewayと異なり、<strong>CIDR重複OK</strong>・<strong>IPアドレス空間の共有不要</strong>。
+    </div>
+
+    <div class="dia-note warn" style="margin-top:8px;">
+      <strong>VPCピアリングとの違い：</strong>
+      ピアリングはネットワーク全体を接続（双方向）するが、PrivateLinkは<strong>特定サービスだけ</strong>を一方向に公開。
+      セキュリティ的にPrivateLinkの方が最小権限の原則に沿う。SaaSプロバイダーのサービス提供に最適。
+    </div>
+
+    <div class="dia-checklist" style="margin-top:12px;">
+      <div class="dia-checklist-title">PrivateLink カスタムサービス構成手順</div>
+      <div class="dia-checklist-item ok">① 提供者: NLBまたはGWLBを作成</div>
+      <div class="dia-checklist-item ok">② 提供者: VPCエンドポイントサービスを作成（NLB/GWLBを指定）</div>
+      <div class="dia-checklist-item ok">③ 提供者: 利用者のAWSアカウントIDをホワイトリストに追加</div>
+      <div class="dia-checklist-item ok">④ 利用者: Interface型VPCエンドポイントを作成（サービス名を指定）</div>
+      <div class="dia-checklist-item ok">⑤ 提供者: 接続リクエストを承認</div>
+      <div class="dia-checklist-item ok">⑥ 利用者: ENIのプライベートIPまたはDNS名でサービスに接続</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function plSetTab(tab: string) {
+    document.querySelectorAll('#pl-tab-overview, #pl-tab-architecture, #pl-tab-compare, #pl-tab-custom').forEach(el => el.classList.remove('active'));
+    document.getElementById(`pl-tab-${tab}`)?.classList.add('active');
+
+    document.querySelectorAll('#pl-panel-overview, #pl-panel-architecture, #pl-panel-compare, #pl-panel-custom').forEach(el => el.classList.remove('active'));
+    document.getElementById(`pl-panel-${tab}`)?.classList.add('active');
+  }
+
+  (window as any).plSetTab = plSetTab;
+</script>

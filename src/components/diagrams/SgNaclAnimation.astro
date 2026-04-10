@@ -1,218 +1,798 @@
 ---
 /**
- * セキュリティグループとNACLの違い解説
- * HTTP通信を許可する際の設定パターンを視覚化
+ * セキュリティグループとNACLの違い解説（統合版）
+ * - シナリオ切り替え
+ * - ステップごとの通信フロー解説
  */
 ---
 
 <style>
-  .sgn-btn{cursor:pointer;font-size:12px;padding:6px 14px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;transition:all 0.2s;}
-  .dark .sgn-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
-  .sgn-btn:hover{background:#f3f4f6;}
-  .dark .sgn-btn:hover{background:#374151;}
-  .sgn-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
-  #sgn-result{font-size:14px;margin:12px 0;padding:12px 16px;border-radius:8px;line-height:1.7;background:#f8fafc;border:1px solid #e2e8f0;}
-  .dark #sgn-result{background:#1e293b;border-color:#334155;color:#e2e8f0;}
-  .sgn-legend{display:flex;gap:16px;margin:8px 0;font-size:12px;color:#6b7280;flex-wrap:wrap;}
-  .sgn-legend span{display:flex;align-items:center;gap:4px;}
+  .sgn-container {
+    font-family: inherit;
+  }
+
+  /* Buttons */
+  .sgn-btn {
+    cursor: pointer;
+    font-size: 16px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    color: #111827;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .dark .sgn-btn {
+    border-color: #374151;
+    background: #1f2937;
+    color: #f9fafb;
+  }
+  .sgn-btn:hover {
+    background: #f3f4f6;
+  }
+  .dark .sgn-btn:hover {
+    background: #374151;
+  }
+  .sgn-btn.active {
+    background: #534AB7;
+    color: #fff;
+    border-color: #534AB7;
+  }
+  .sgn-btn.success {
+    background: #059669;
+    color: #fff;
+    border-color: #059669;
+  }
+  .sgn-btn.fail {
+    background: #dc2626;
+    color: #fff;
+    border-color: #dc2626;
+  }
+  .sgn-btn-nav {
+    padding: 4px 12px;
+  }
+
+  /* Step display */
+  .sgn-step-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    font-size: 12px;
+    color: #6b7280;
+  }
+  .sgn-step-desc {
+    font-size: 14px;
+    margin: 12px 0;
+    padding: 12px 16px;
+    border-radius: 8px;
+    line-height: 1.7;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    min-height: 60px;
+  }
+  .dark .sgn-step-desc {
+    background: #1e293b;
+    border-color: #334155;
+    color: #e2e8f0;
+  }
+
+  /* Legend */
+  .sgn-legend {
+    display: flex;
+    gap: 16px;
+    margin: 8px 0;
+    font-size: 16px;
+    color: #6b7280;
+    flex-wrap: wrap;
+  }
+  .sgn-legend span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .sgn-legend-box {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+  }
+
+  /* Main diagram */
+  .sgn-diagram {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    padding: 16px 8px;
+    overflow-x: auto;
+  }
+
+  /* Flow column */
+  .sgn-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Client box */
+  .sgn-client {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 14px;
+    background: #f1f5f9;
+    border: 1px solid #94a3b8;
+    border-radius: 8px;
+    min-width: 70px;
+    transition: all 0.3s;
+  }
+  .dark .sgn-client {
+    background: #334155;
+    border-color: #64748b;
+  }
+  .sgn-client.highlight {
+    box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.3);
+  }
+  .sgn-client-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 4px;
+  }
+  .sgn-client-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #334155;
+  }
+  .dark .sgn-client-label {
+    color: #e2e8f0;
+  }
+  .sgn-client-port {
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  /* Arrow */
+  .sgn-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 2px;
+    min-width: 30px;
+  }
+  .sgn-arrow-line {
+    width: 24px;
+    height: 3px;
+    border-radius: 2px;
+    position: relative;
+    transition: background 0.3s;
+  }
+  .sgn-arrow-line::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 4px solid transparent;
+    transition: border-left-color 0.3s;
+  }
+  .sgn-arrow-line.green {
+    background: #059669;
+  }
+  .sgn-arrow-line.green::after {
+    border-left-color: #059669;
+  }
+  .sgn-arrow-line.red {
+    background: #dc2626;
+  }
+  .sgn-arrow-line.red::after {
+    border-left-color: #dc2626;
+  }
+  .sgn-arrow-line.gray {
+    background: #d1d5db;
+  }
+  .sgn-arrow-line.gray::after {
+    border-left-color: #d1d5db;
+  }
+  .sgn-arrow-label {
+    font-size: 12px;
+    color: #9ca3af;
+    white-space: nowrap;
+    margin-bottom: 2px;
+  }
+
+  /* VPC box */
+  .sgn-vpc {
+    display: flex;
+    flex-direction: column;
+    border: 2px dashed #3b82f6;
+    border-radius: 12px;
+    padding: 8px;
+    background: rgba(239, 246, 255, 0.3);
+  }
+  .dark .sgn-vpc {
+    background: rgba(30, 58, 138, 0.2);
+    border-color: #60a5fa;
+  }
+  .sgn-vpc-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 6px;
+    padding: 0 4px;
+  }
+  .sgn-vpc-header img {
+    width: 40px;
+    height: 40px;
+  }
+  .sgn-vpc-header span {
+    font-size: 16px;
+    font-weight: 500;
+    color: #2563eb;
+  }
+  .dark .sgn-vpc-header span {
+    color: #93c5fd;
+  }
+
+  /* Subnet box */
+  .sgn-subnet {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #93c5fd;
+    border-radius: 8px;
+    padding: 6px;
+    background: #eff6ff;
+  }
+  .dark .sgn-subnet {
+    background: rgba(30, 64, 175, 0.3);
+    border-color: #60a5fa;
+  }
+  .sgn-subnet-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 6px;
+    padding: 0 2px;
+  }
+  .sgn-subnet-header img {
+    width: 14px;
+    height: 14px;
+  }
+  .sgn-subnet-header span {
+    font-size: 16px;
+    color: #3b82f6;
+  }
+  .dark .sgn-subnet-header span {
+    color: #93c5fd;
+  }
+
+  /* Flow row inside subnet */
+  .sgn-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* Gate (NACL/SG) */
+  .sgn-gate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 6px;
+    min-width: 50px;
+    transition: all 0.3s;
+  }
+  .sgn-gate.highlight {
+    box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.4);
+    transform: scale(1.05);
+  }
+  .sgn-gate.nacl {
+    background: #f5f3ff;
+    border: 1px solid #8b5cf6;
+  }
+  .dark .sgn-gate.nacl {
+    background: rgba(91, 33, 182, 0.3);
+    border-color: #a78bfa;
+  }
+  .sgn-gate.sg {
+    background: #ecfdf5;
+    border: 1px solid #10b981;
+  }
+  .dark .sgn-gate.sg {
+    background: rgba(5, 150, 105, 0.2);
+    border-color: #34d399;
+  }
+  .sgn-gate-icon {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 2px;
+  }
+  .sgn-gate-label {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .sgn-gate.nacl .sgn-gate-label {
+    color: #7c3aed;
+  }
+  .dark .sgn-gate.nacl .sgn-gate-label {
+    color: #c4b5fd;
+  }
+  .sgn-gate.sg .sgn-gate-label {
+    color: #059669;
+  }
+  .dark .sgn-gate.sg .sgn-gate-label {
+    color: #6ee7b7;
+  }
+  .sgn-gate-dir {
+    font-size: 12px;
+    color: #6b7280;
+  }
+  .sgn-gate-status {
+    font-size: 14px;
+    margin-top: 2px;
+    transition: color 0.3s;
+  }
+  .sgn-gate-status.pass {
+    color: #059669;
+  }
+  .sgn-gate-status.block {
+    color: #dc2626;
+  }
+  .sgn-gate-status.gray {
+    color: #9ca3af;
+  }
+  .sgn-gate-type {
+    font-size: 12px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    margin-top: 2px;
+  }
+  .sgn-gate.nacl .sgn-gate-type {
+    background: #ede9fe;
+    color: #6d28d9;
+  }
+  .dark .sgn-gate.nacl .sgn-gate-type {
+    background: rgba(91, 33, 182, 0.5);
+    color: #c4b5fd;
+  }
+  .sgn-gate.sg .sgn-gate-type {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  .dark .sgn-gate.sg .sgn-gate-type {
+    background: rgba(5, 150, 105, 0.3);
+    color: #6ee7b7;
+  }
+
+  /* EC2 */
+  .sgn-ec2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 10px;
+    background: #d1fae5;
+    border: 1px solid #10b981;
+    border-radius: 8px;
+    transition: all 0.3s;
+  }
+  .dark .sgn-ec2 {
+    background: rgba(5, 150, 105, 0.2);
+    border-color: #34d399;
+  }
+  .sgn-ec2.highlight {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.4);
+    transform: scale(1.05);
+  }
+  .sgn-ec2-icon {
+    width: 28px;
+    height: 28px;
+    margin-bottom: 2px;
+  }
+  .sgn-ec2-label {
+    font-size: 16px;
+    color: #065f46;
+    text-align: center;
+  }
+  .dark .sgn-ec2-label {
+    color: #6ee7b7;
+  }
+
+  /* Summary section */
+  .sgn-summary {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #fefce8;
+    border: 1px solid #fde047;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .dark .sgn-summary {
+    background: rgba(250, 204, 21, 0.1);
+    border-color: #ca8a04;
+    color: #fef9c3;
+  }
+  .sgn-summary-title {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #854d0e;
+  }
+  .dark .sgn-summary-title {
+    color: #fde047;
+  }
 </style>
 
-<div style="margin-bottom:12px;">
-  <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">シナリオを選択：</div>
-  <div style="display:flex;flex-wrap:wrap;gap:8px;">
-    <button class="sgn-btn active" id="sgn-opt1" onclick="sgnSelect(1)">
-      SGインバウンド許可
-    </button>
-    <button class="sgn-btn" id="sgn-opt2" onclick="sgnSelect(2)">
-      NACLのみ設定（その他拒否）
-    </button>
-    <button class="sgn-btn" id="sgn-opt3" onclick="sgnSelect(3)">
-      SGアウトバウンド許可
-    </button>
+<div class="sgn-container">
+  <!-- Scenario selection -->
+  <div style="margin-bottom:12px;">
+    <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">シナリオを選択：</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      <button class="sgn-btn success" id="sgn-scenario-1" onclick="sgnSetScenario(1)">
+        ✓ SGインバウンド許可（正解）
+      </button>
+      <button class="sgn-btn" id="sgn-scenario-2" onclick="sgnSetScenario(2)">
+        NACLのみ設定
+      </button>
+      <button class="sgn-btn" id="sgn-scenario-3" onclick="sgnSetScenario(3)">
+        SGアウトバウンド許可
+      </button>
+    </div>
+  </div>
+
+  <!-- Step navigation -->
+  <div class="sgn-step-info">
+    <button class="sgn-btn sgn-btn-nav" id="sgn-prev" onclick="sgnPrev()">◀ 前へ</button>
+    <button class="sgn-btn sgn-btn-nav" id="sgn-next" onclick="sgnNext()">次へ ▶</button>
+    <span id="sgn-step-num">1 / 5</span>
+  </div>
+
+  <!-- Step description -->
+  <div id="sgn-step-desc" class="sgn-step-desc"></div>
+
+  <!-- Legend -->
+  <div class="sgn-legend">
+    <span><div class="sgn-legend-box" style="background:#059669;"></div> 通過</span>
+    <span><div class="sgn-legend-box" style="background:#dc2626;"></div> ブロック</span>
+    <span><div class="sgn-legend-box" style="background:#d1d5db;"></div> 未到達</span>
+  </div>
+
+  <!-- Diagram -->
+  <div class="sgn-diagram">
+    <!-- Client (sender) -->
+    <div class="sgn-col">
+      <div id="sgn-client-send" class="sgn-client">
+        <img class="sgn-client-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Internet-alt2_48_Light.svg" alt="client">
+        <div class="sgn-client-label">クライアント</div>
+        <div class="sgn-client-port">HTTP :80</div>
+      </div>
+    </div>
+
+    <!-- Arrow -->
+    <div class="sgn-col">
+      <div class="sgn-arrow">
+        <div class="sgn-arrow-label">REQ</div>
+        <div id="sgn-arr-1" class="sgn-arrow-line green"></div>
+      </div>
+    </div>
+
+    <!-- VPC -->
+    <div class="sgn-col">
+      <div class="sgn-vpc">
+        <div class="sgn-vpc-header">
+          <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Virtual-private-cloud-VPC_48.svg" alt="VPC">
+          <span>VPC</span>
+        </div>
+
+        <div class="sgn-subnet">
+          <div class="sgn-subnet-header">
+            <img src="/AWS-icons/Architecture-Group-Icons_07312025/Private-subnet_32.png" alt="subnet">
+            <span>パブリックサブネット</span>
+          </div>
+
+          <div class="sgn-flow">
+            <!-- NACL IN -->
+            <div id="sgn-nacl-in" class="sgn-gate nacl">
+              <img class="sgn-gate-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Firewall_48_Light.svg" alt="NACL">
+              <div class="sgn-gate-label">NACL</div>
+              <div class="sgn-gate-dir">IN</div>
+              <div id="sgn-nacl-in-status" class="sgn-gate-status pass">✓</div>
+              <div class="sgn-gate-type">ステートレス</div>
+            </div>
+
+            <div class="sgn-arrow">
+              <div id="sgn-arr-2" class="sgn-arrow-line green"></div>
+            </div>
+
+            <!-- SG IN -->
+            <div id="sgn-sg-in" class="sgn-gate sg">
+              <img class="sgn-gate-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Firewall_48_Light.svg" alt="SG">
+              <div class="sgn-gate-label">SG</div>
+              <div class="sgn-gate-dir">IN</div>
+              <div id="sgn-sg-in-status" class="sgn-gate-status pass">✓</div>
+              <div class="sgn-gate-type">ステートフル</div>
+            </div>
+
+            <div class="sgn-arrow">
+              <div id="sgn-arr-3" class="sgn-arrow-line green"></div>
+            </div>
+
+            <!-- EC2 -->
+            <div id="sgn-ec2" class="sgn-ec2">
+              <img class="sgn-ec2-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+              <div class="sgn-ec2-label">Web<br>サーバー</div>
+            </div>
+
+            <div class="sgn-arrow">
+              <div id="sgn-arr-4" class="sgn-arrow-line green"></div>
+            </div>
+
+            <!-- SG OUT -->
+            <div id="sgn-sg-out" class="sgn-gate sg">
+              <img class="sgn-gate-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Firewall_48_Light.svg" alt="SG">
+              <div class="sgn-gate-label">SG</div>
+              <div class="sgn-gate-dir">OUT</div>
+              <div id="sgn-sg-out-status" class="sgn-gate-status pass">✓</div>
+              <div class="sgn-gate-type">ステートフル</div>
+            </div>
+
+            <div class="sgn-arrow">
+              <div id="sgn-arr-5" class="sgn-arrow-line green"></div>
+            </div>
+
+            <!-- NACL OUT -->
+            <div id="sgn-nacl-out" class="sgn-gate nacl">
+              <img class="sgn-gate-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Network-Access-Control-List_48.svg" alt="NACL">
+              <div class="sgn-gate-label">NACL</div>
+              <div class="sgn-gate-dir">OUT</div>
+              <div id="sgn-nacl-out-status" class="sgn-gate-status pass">✓</div>
+              <div class="sgn-gate-type">ステートレス</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Arrow -->
+    <div class="sgn-col">
+      <div class="sgn-arrow">
+        <div class="sgn-arrow-label">RES</div>
+        <div id="sgn-arr-6" class="sgn-arrow-line green"></div>
+      </div>
+    </div>
+
+    <!-- Client (receiver) -->
+    <div class="sgn-col">
+      <div id="sgn-client-recv" class="sgn-client">
+        <img class="sgn-client-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Internet-alt2_48_Light.svg" alt="client">
+        <div class="sgn-client-label">クライアント</div>
+        <div class="sgn-client-port">受信</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="sgn-summary">
+    <div class="sgn-summary-title">ポイント</div>
+    <div id="sgn-summary-text">
+      <strong>セキュリティグループはステートフル</strong>：インバウンドを許可すれば、戻り通信は自動許可。<br>
+      <strong>NACLはステートレス</strong>：戻り通信（エフェメラルポート1024-65535）も明示的に許可が必要。<br>
+      → デフォルトNACL（全許可）を使う場合、<strong>SGでインバウンド許可するだけでOK</strong>
+    </div>
   </div>
 </div>
 
-<div id="sgn-result"></div>
-
-<div class="sgn-legend">
-  <span><svg width="16" height="16"><rect width="16" height="16" rx="3" fill="#059669"/></svg> 通過</span>
-  <span><svg width="16" height="16"><rect width="16" height="16" rx="3" fill="#dc2626"/></svg> ブロック</span>
-  <span><svg width="16" height="16"><rect width="16" height="16" rx="3" fill="#9ca3af"/></svg> 未到達</span>
-</div>
-
-<svg width="100%" viewBox="0 0 700 320">
-  <defs>
-    <marker id="sgn-arr-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-      <path d="M2 2L8 5L2 8" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round"/>
-    </marker>
-    <marker id="sgn-arr-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-      <path d="M2 2L8 5L2 8" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/>
-    </marker>
-    <marker id="sgn-arr-gray" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-      <path d="M2 2L8 5L2 8" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
-    </marker>
-  </defs>
-
-  <!-- Background labels -->
-  <text x="350" y="20" text-anchor="middle" font-size="12" fill="#9ca3af">デフォルト設定：NACL=全許可、SG=インバウンド全拒否・アウトバウンド全許可</text>
-
-  <!-- Internet -->
-  <rect x="20" y="100" width="80" height="50" rx="8" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
-  <text x="60" y="120" text-anchor="middle" font-size="11" font-weight="500" fill="#334155">クライアント</text>
-  <text x="60" y="136" text-anchor="middle" font-size="10" fill="#64748b">HTTP :80</text>
-
-  <!-- VPC Box -->
-  <rect x="130" y="50" width="450" height="220" rx="12" fill="none" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="6 3"/>
-  <text x="145" y="72" font-size="11" fill="#2563eb" font-weight="500">VPC</text>
-
-  <!-- Subnet Box -->
-  <rect x="150" y="85" width="410" height="170" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1"/>
-  <text x="165" y="105" font-size="10" fill="#3b82f6">パブリックサブネット</text>
-
-  <!-- NACL IN -->
-  <rect id="sgn-nacl-in" x="170" y="115" width="60" height="120" rx="6" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1"/>
-  <text x="200" y="135" text-anchor="middle" font-size="10" fill="#7c3aed" font-weight="500">NACL</text>
-  <text x="200" y="150" text-anchor="middle" font-size="9" fill="#7c3aed">IN</text>
-  <text id="sgn-nacl-in-status" x="200" y="175" text-anchor="middle" font-size="18" fill="#059669">✓</text>
-  <text x="200" y="220" text-anchor="middle" font-size="9" fill="#6b7280">デフォルト</text>
-  <text x="200" y="230" text-anchor="middle" font-size="9" fill="#6b7280">全許可</text>
-
-  <!-- SG IN -->
-  <rect id="sgn-sg-in" x="280" y="115" width="60" height="120" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>
-  <text x="310" y="135" text-anchor="middle" font-size="10" fill="#059669" font-weight="500">SG</text>
-  <text x="310" y="150" text-anchor="middle" font-size="9" fill="#059669">IN</text>
-  <text id="sgn-sg-in-status" x="310" y="175" text-anchor="middle" font-size="18" fill="#059669">✓</text>
-  <text x="310" y="220" text-anchor="middle" font-size="9" fill="#6b7280">デフォルト</text>
-  <text x="310" y="230" text-anchor="middle" font-size="9" fill="#6b7280">全拒否</text>
-
-  <!-- EC2 -->
-  <rect x="365" y="130" width="70" height="90" rx="8" fill="#d1fae5" stroke="#10b981" stroke-width="1"/>
-  <text x="400" y="165" text-anchor="middle" font-size="11" font-weight="500" fill="#065f46">EC2</text>
-  <text x="400" y="180" text-anchor="middle" font-size="10" fill="#065f46">Web</text>
-  <text x="400" y="195" text-anchor="middle" font-size="10" fill="#065f46">サーバー</text>
-
-  <!-- SG OUT -->
-  <rect id="sgn-sg-out" x="460" y="115" width="60" height="120" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1"/>
-  <text x="490" y="135" text-anchor="middle" font-size="10" fill="#059669" font-weight="500">SG</text>
-  <text x="490" y="150" text-anchor="middle" font-size="9" fill="#059669">OUT</text>
-  <text id="sgn-sg-out-status" x="490" y="175" text-anchor="middle" font-size="18" fill="#059669">✓</text>
-  <text x="490" y="220" text-anchor="middle" font-size="9" fill="#6b7280">デフォルト</text>
-  <text x="490" y="230" text-anchor="middle" font-size="9" fill="#6b7280">全許可</text>
-
-  <!-- NACL OUT -->
-  <rect id="sgn-nacl-out" x="540" y="115" width="60" height="120" rx="6" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="1"/>
-  <text x="570" y="135" text-anchor="middle" font-size="10" fill="#7c3aed" font-weight="500">NACL</text>
-  <text x="570" y="150" text-anchor="middle" font-size="9" fill="#7c3aed">OUT</text>
-  <text id="sgn-nacl-out-status" x="570" y="175" text-anchor="middle" font-size="18" fill="#059669">✓</text>
-  <text x="570" y="220" text-anchor="middle" font-size="9" fill="#6b7280">デフォルト</text>
-  <text x="570" y="230" text-anchor="middle" font-size="9" fill="#6b7280">全許可</text>
-
-  <!-- Request Arrow (top) -->
-  <text x="350" y="92" text-anchor="middle" font-size="10" fill="#6b7280">リクエスト →</text>
-  <path id="sgn-arrow-req1" d="M100 125 L168 125" stroke="#059669" stroke-width="2" marker-end="url(#sgn-arr-green)"/>
-  <path id="sgn-arrow-req2" d="M232 125 L278 125" stroke="#059669" stroke-width="2" marker-end="url(#sgn-arr-green)"/>
-  <path id="sgn-arrow-req3" d="M342 160 L363 160" stroke="#059669" stroke-width="2" marker-end="url(#sgn-arr-green)"/>
-
-  <!-- Response Arrow (bottom) -->
-  <text x="350" y="300" text-anchor="middle" font-size="10" fill="#6b7280">← レスポンス（戻り通信）</text>
-  <path id="sgn-arrow-res1" d="M363 195 L342 195" stroke="#059669" stroke-width="2" marker-end="url(#sgn-arr-green)"/>
-  <path id="sgn-arrow-res3" d="M458 195 L520 195" stroke="#059669" stroke-width="2" marker-end="url(#sgn-arr-green)"/>
-  <path id="sgn-arrow-res4" d="M602 195 L650 195" stroke="#059669" stroke-width="2" marker-end="url(#sgn-arr-green)"/>
-
-  <!-- Stateful label for SG -->
-  <rect x="270" y="248" width="80" height="18" rx="4" fill="#d1fae5" stroke="#10b981" stroke-width="0.5"/>
-  <text x="310" y="260" text-anchor="middle" font-size="9" fill="#065f46">ステートフル</text>
-
-  <!-- Stateless label for NACL -->
-  <rect x="350" y="56" width="80" height="18" rx="4" fill="#ede9fe" stroke="#8b5cf6" stroke-width="0.5"/>
-  <text x="390" y="68" text-anchor="middle" font-size="9" fill="#6d28d9">ステートレス</text>
-</svg>
-
 <script>
-  const SGN_DATA: Record<number, {
-    naclIn: string; sgIn: string; sgOut: string; naclOut: string;
-    explanation: string;
-  }> = {
+  interface Step {
+    highlight: string;
+    desc: string;
+    gates: { naclIn: string; sgIn: string; sgOut: string; naclOut: string };
+    arrows: string[];
+  }
+
+  interface Scenario {
+    success: boolean;
+    steps: Step[];
+    summary: string;
+  }
+
+  const SGN_SCENARIOS: Record<number, Scenario> = {
     1: {
-      naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass',
-      explanation: `<strong>✅ 通信成功</strong><br>
-SGは<strong>ステートフル</strong>：インバウンドを許可すると、戻り通信（レスポンス）は自動的に許可される。<br>
-NACLはデフォルトで全許可なので追加設定不要。<br>
-→ <strong>SGでインバウンド許可するだけでHTTP通信が可能</strong>`
+      success: true,
+      steps: [
+        {
+          highlight: 'sgn-client-send',
+          desc: '【STEP 1】クライアントからHTTP :80 リクエストを送信。',
+          gates: { naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass' },
+          arrows: ['green', 'gray', 'gray', 'gray', 'gray', 'gray']
+        },
+        {
+          highlight: 'sgn-nacl-in',
+          desc: '【STEP 2】NACL IN：デフォルトで全許可 → <strong>通過 ✓</strong>',
+          gates: { naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass' },
+          arrows: ['green', 'green', 'gray', 'gray', 'gray', 'gray']
+        },
+        {
+          highlight: 'sgn-sg-in',
+          desc: '【STEP 3】SG IN：ポート80を許可設定 → <strong>通過 ✓</strong>',
+          gates: { naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass' },
+          arrows: ['green', 'green', 'green', 'gray', 'gray', 'gray']
+        },
+        {
+          highlight: 'sgn-ec2',
+          desc: '【STEP 4】EC2がリクエストを処理し、レスポンスを返す。',
+          gates: { naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass' },
+          arrows: ['green', 'green', 'green', 'green', 'gray', 'gray']
+        },
+        {
+          highlight: 'sgn-sg-out',
+          desc: '【STEP 5】SG OUT：<strong>ステートフル</strong>なのでインバウンド許可の戻り通信は自動許可 → <strong>通過 ✓</strong>',
+          gates: { naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass' },
+          arrows: ['green', 'green', 'green', 'green', 'green', 'gray']
+        },
+        {
+          highlight: 'sgn-nacl-out',
+          desc: '【STEP 6】NACL OUT：デフォルトで全許可 → <strong>通過 ✓</strong>',
+          gates: { naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass' },
+          arrows: ['green', 'green', 'green', 'green', 'green', 'green']
+        },
+        {
+          highlight: 'sgn-client-recv',
+          desc: '【完了】クライアントがレスポンスを受信。<strong>通信成功！</strong>',
+          gates: { naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass' },
+          arrows: ['green', 'green', 'green', 'green', 'green', 'green']
+        }
+      ],
+      summary: '<strong>✅ 正解パターン</strong><br>SGでインバウンド80番を許可するだけでOK。SGはステートフルなので戻り通信は自動許可。NACLはデフォルト全許可なので追加設定不要。'
     },
     2: {
-      naclIn: 'pass', sgIn: 'block', sgOut: 'gray', naclOut: 'block',
-      explanation: `<strong>❌ 通信失敗</strong><br>
-NACLは<strong>ステートレス</strong>：戻り通信も明示的に許可が必要。<br>
-「80番インバウンドのみ許可、その他拒否」だと、レスポンスのアウトバウンド（エフェメラルポート1024-65535）がブロックされる。<br>
-また、SGのインバウンド許可がないとEC2に到達できない。`
+      success: false,
+      steps: [
+        {
+          highlight: 'sgn-client-send',
+          desc: '【STEP 1】クライアントからHTTP :80 リクエストを送信。',
+          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'gray', naclOut: 'block' },
+          arrows: ['green', 'gray', 'gray', 'gray', 'gray', 'gray']
+        },
+        {
+          highlight: 'sgn-nacl-in',
+          desc: '【STEP 2】NACL IN：80番インバウンドを許可設定 → <strong>通過 ✓</strong>',
+          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'gray', naclOut: 'block' },
+          arrows: ['green', 'green', 'gray', 'gray', 'gray', 'gray']
+        },
+        {
+          highlight: 'sgn-sg-in',
+          desc: '【STEP 3】SG IN：許可設定がない → <strong>ブロック ✕</strong><br>リクエストはEC2に届かない！',
+          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'gray', naclOut: 'block' },
+          arrows: ['green', 'red', 'gray', 'gray', 'gray', 'gray']
+        },
+        {
+          highlight: 'sgn-nacl-out',
+          desc: '【問題点】さらに、NACL OUTで「その他拒否」していると、たとえEC2に届いても戻り通信（エフェメラルポート1024-65535）がブロックされる。NACLはステートレスなので両方向の設定が必要。',
+          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'gray', naclOut: 'block' },
+          arrows: ['green', 'red', 'gray', 'gray', 'gray', 'red']
+        }
+      ],
+      summary: '<strong>❌ 失敗パターン</strong><br>NACLだけ設定してもSGのインバウンド許可がないとEC2に到達できない。また「その他拒否」だと戻り通信もブロックされる。'
     },
     3: {
-      naclIn: 'pass', sgIn: 'block', sgOut: 'gray', naclOut: 'gray',
-      explanation: `<strong>❌ 通信失敗</strong><br>
-<strong>アウトバウンド</strong>＝EC2から外部への通信方向。<br>
-クライアントからEC2への通信は<strong>インバウンド</strong>。<br>
-SGのインバウンドが許可されていないため、リクエストがEC2に届かない。`
+      success: false,
+      steps: [
+        {
+          highlight: 'sgn-client-send',
+          desc: '【STEP 1】クライアントからHTTP :80 リクエストを送信。',
+          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'pass', naclOut: 'pass' },
+          arrows: ['green', 'gray', 'gray', 'gray', 'gray', 'gray']
+        },
+        {
+          highlight: 'sgn-nacl-in',
+          desc: '【STEP 2】NACL IN：デフォルト全許可 → <strong>通過 ✓</strong>',
+          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'pass', naclOut: 'pass' },
+          arrows: ['green', 'green', 'gray', 'gray', 'gray', 'gray']
+        },
+        {
+          highlight: 'sgn-sg-in',
+          desc: '【STEP 3】SG IN：<strong>インバウンド</strong>の許可がない → <strong>ブロック ✕</strong><br>アウトバウンドを許可しても、インバウンドがないと届かない！',
+          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'pass', naclOut: 'pass' },
+          arrows: ['green', 'red', 'gray', 'gray', 'gray', 'gray']
+        },
+        {
+          highlight: 'sgn-sg-out',
+          desc: '【解説】アウトバウンド＝EC2から外部への通信方向。クライアント→EC2は<strong>インバウンド</strong>。方向を間違えると通信できない。',
+          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'pass', naclOut: 'pass' },
+          arrows: ['green', 'red', 'gray', 'gray', 'gray', 'gray']
+        }
+      ],
+      summary: '<strong>❌ 失敗パターン</strong><br>アウトバウンドはEC2→外部の方向。クライアントからのアクセスはインバウンドなので、SGのインバウンド許可が必要。'
     }
   };
 
-  function sgnSelect(opt: number) {
-    const data = SGN_DATA[opt];
+  let currentScenario = 1;
+  let currentStep = 0;
 
-    // Update button styles
-    [1,2,3].forEach(i => {
-      const btn = document.getElementById(`sgn-opt${i}`)!;
-      btn.classList.toggle('active', i === opt);
+  function sgnSetScenario(num: number) {
+    currentScenario = num;
+    currentStep = 0;
+
+    // Update buttons
+    [1, 2, 3].forEach(i => {
+      const btn = document.getElementById(`sgn-scenario-${i}`)!;
+      btn.className = 'sgn-btn';
+      if (i === num) {
+        const scenario = SGN_SCENARIOS[i];
+        btn.classList.add(scenario.success ? 'success' : 'fail');
+      }
     });
 
-    // Show result
-    const result = document.getElementById('sgn-result')!;
-    result.innerHTML = data.explanation;
-
-    // Update diagram
-    sgnUpdateStatus('sgn-nacl-in-status', data.naclIn);
-    sgnUpdateStatus('sgn-sg-in-status', data.sgIn);
-    sgnUpdateStatus('sgn-sg-out-status', data.sgOut);
-    sgnUpdateStatus('sgn-nacl-out-status', data.naclOut);
-
-    // Update arrows
-    sgnUpdateArrow('sgn-arrow-req1', data.naclIn === 'pass' ? 'green' : 'red');
-    sgnUpdateArrow('sgn-arrow-req2', data.naclIn === 'pass' && data.sgIn !== 'gray' ? (data.sgIn === 'pass' ? 'green' : 'red') : 'gray');
-    sgnUpdateArrow('sgn-arrow-req3', data.sgIn === 'pass' ? 'green' : 'gray');
-
-    // Response arrows
-    sgnUpdateArrow('sgn-arrow-res1', data.sgIn === 'pass' ? 'green' : 'gray');
-    sgnUpdateArrow('sgn-arrow-res3', data.sgOut === 'pass' ? 'green' : 'gray');
-    sgnUpdateArrow('sgn-arrow-res4', data.naclOut === 'pass' ? 'green' : (data.naclOut === 'block' ? 'red' : 'gray'));
+    sgnRender();
   }
 
-  function sgnUpdateStatus(id: string, status: string) {
+  function sgnRender() {
+    const scenario = SGN_SCENARIOS[currentScenario];
+    const step = scenario.steps[currentStep];
+
+    // Update step info
+    document.getElementById('sgn-step-num')!.textContent = `${currentStep + 1} / ${scenario.steps.length}`;
+    document.getElementById('sgn-step-desc')!.innerHTML = step.desc;
+
+    // Update summary
+    document.getElementById('sgn-summary-text')!.innerHTML = scenario.summary;
+
+    // Remove all highlights
+    ['sgn-client-send', 'sgn-client-recv', 'sgn-nacl-in', 'sgn-sg-in', 'sgn-ec2', 'sgn-sg-out', 'sgn-nacl-out'].forEach(id => {
+      document.getElementById(id)?.classList.remove('highlight');
+    });
+
+    // Add highlight
+    document.getElementById(step.highlight)?.classList.add('highlight');
+
+    // Update gate statuses
+    sgnUpdateGate('sgn-nacl-in-status', step.gates.naclIn);
+    sgnUpdateGate('sgn-sg-in-status', step.gates.sgIn);
+    sgnUpdateGate('sgn-sg-out-status', step.gates.sgOut);
+    sgnUpdateGate('sgn-nacl-out-status', step.gates.naclOut);
+
+    // Update arrows
+    step.arrows.forEach((color, i) => {
+      const el = document.getElementById(`sgn-arr-${i + 1}`)!;
+      el.className = `sgn-arrow-line ${color}`;
+    });
+  }
+
+  function sgnUpdateGate(id: string, status: string) {
     const el = document.getElementById(id)!;
+    el.className = `sgn-gate-status ${status}`;
     if (status === 'pass') {
       el.textContent = '✓';
-      el.setAttribute('fill', '#059669');
     } else if (status === 'block') {
       el.textContent = '✕';
-      el.setAttribute('fill', '#dc2626');
     } else {
       el.textContent = '–';
-      el.setAttribute('fill', '#9ca3af');
     }
   }
 
-  function sgnUpdateArrow(id: string, color: string) {
-    const el = document.getElementById(id)!;
-    const colorMap: Record<string, string> = {
-      green: '#059669',
-      red: '#dc2626',
-      gray: '#9ca3af'
-    };
-    el.setAttribute('stroke', colorMap[color]);
-    el.setAttribute('marker-end', `url(#sgn-arr-${color})`);
+  function sgnNext() {
+    const scenario = SGN_SCENARIOS[currentScenario];
+    if (currentStep < scenario.steps.length - 1) {
+      currentStep++;
+      sgnRender();
+    }
   }
 
-  (window as any).sgnSelect = sgnSelect;
+  function sgnPrev() {
+    if (currentStep > 0) {
+      currentStep--;
+      sgnRender();
+    }
+  }
+
+  // Export to window
+  (window as any).sgnSetScenario = sgnSetScenario;
+  (window as any).sgnNext = sgnNext;
+  (window as any).sgnPrev = sgnPrev;
 
   // Initialize
-  sgnSelect(1);
+  sgnSetScenario(1);
 </script>

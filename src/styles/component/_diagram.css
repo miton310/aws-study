@@ -1,0 +1,547 @@
+/* Component: 共通図解 (dia-*) */
+
+/* レイアウト */
+.dia-diagram {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 16px;
+  overflow-x: auto;
+}
+.dia-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 8px 0;
+}
+
+/* ボックス共通 */
+.dia-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 8px;
+  min-width: 90px;
+  transition: all 0.3s;
+}
+.dia-box.highlight {
+  box-shadow: 0 0 0 3px rgba(83, 74, 183, 0.4);
+  transform: scale(1.05);
+}
+.dia-box-icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 6px;
+}
+.dia-box-label {
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+.dia-box-sub {
+  font-size: 12px;
+  color: #6b7280;
+  text-align: center;
+  margin-top: 3px;
+}
+
+/* テーマ: インターネット */
+.dia-internet {
+  background: #f1f5f9;
+  border: 1px solid #94a3b8;
+}
+.dia-internet .dia-box-label { color: #334155; }
+.dark .dia-internet {
+  background: #334155;
+  border-color: #64748b;
+}
+.dark .dia-internet .dia-box-label { color: #e2e8f0; }
+
+/* テーマ: EC2 */
+.dia-ec2 {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+}
+.dia-ec2 .dia-box-label { color: #92400e; }
+.dark .dia-ec2 {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #fbbf24;
+}
+.dark .dia-ec2 .dia-box-label { color: #fcd34d; }
+
+/* テーマ: IGW */
+.dia-igw {
+  background: #ecfdf5;
+  border: 1px solid #10b981;
+}
+.dia-igw .dia-box-label { color: #065f46; }
+.dark .dia-igw {
+  background: rgba(5, 150, 105, 0.2);
+  border-color: #34d399;
+}
+.dark .dia-igw .dia-box-label { color: #6ee7b7; }
+
+/* テーマ: NAT GW */
+.dia-natgw {
+  background: #d1fae5;
+  border: 1px solid #10b981;
+}
+.dia-natgw .dia-box-label { color: #065f46; }
+.dark .dia-natgw {
+  background: rgba(5, 150, 105, 0.3);
+  border-color: #34d399;
+}
+.dark .dia-natgw .dia-box-label { color: #6ee7b7; }
+
+/* テーマ: EIP */
+.dia-eip {
+  background: #fff7ed;
+  border: 1px solid #f97316;
+}
+.dia-eip .dia-box-label { color: #9a3412; }
+.dark .dia-eip {
+  background: rgba(249, 115, 22, 0.2);
+  border-color: #fb923c;
+}
+.dark .dia-eip .dia-box-label { color: #fdba74; }
+
+/* テーマ: ルートテーブル */
+.dia-rt {
+  background: #f5f3ff;
+  border: 1px solid #8b5cf6;
+  padding: 6px 10px;
+}
+.dia-rt .dia-box-label { color: #6d28d9; }
+.dia-rt.error {
+  border-color: #dc2626;
+  background: #fef2f2;
+}
+.dia-rt.error .dia-box-label { color: #dc2626; }
+.dark .dia-rt {
+  background: rgba(91, 33, 182, 0.2);
+  border-color: #a78bfa;
+}
+.dark .dia-rt .dia-box-label { color: #c4b5fd; }
+.dark .dia-rt.error {
+  background: rgba(220, 38, 38, 0.2);
+  border-color: #f87171;
+}
+.dark .dia-rt.error .dia-box-label { color: #fca5a5; }
+
+/* VPC コンテナ */
+.dia-vpc {
+  border: 2px dashed #3b82f6;
+  border-radius: 12px;
+  padding: 12px;
+  margin: 8px 0;
+  background: rgba(239, 246, 255, 0.3);
+}
+.dark .dia-vpc {
+  background: rgba(30, 58, 138, 0.2);
+  border-color: #60a5fa;
+}
+.dia-vpc-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2563eb;
+}
+.dia-vpc-header img {
+  width: 20px;
+  height: 20px;
+}
+.dark .dia-vpc-header { color: #93c5fd; }
+
+/* サブネット */
+.dia-subnet {
+  border: 1px solid;
+  border-radius: 8px;
+  padding: 10px;
+  margin: 4px;
+}
+.dia-subnet.public {
+  background: #ecfdf5;
+  border-color: #10b981;
+}
+.dark .dia-subnet.public {
+  background: rgba(5, 150, 105, 0.1);
+  border-color: #34d399;
+}
+.dia-subnet.private {
+  background: #fef9c3;
+  border-color: #eab308;
+}
+.dark .dia-subnet.private {
+  background: rgba(234, 179, 8, 0.1);
+  border-color: #facc15;
+}
+.dia-subnet-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.dia-subnet-header img {
+  width: 18px;
+  height: 18px;
+}
+.dia-subnet.public .dia-subnet-header { color: #059669; }
+.dia-subnet.private .dia-subnet-header { color: #ca8a04; }
+.dark .dia-subnet.public .dia-subnet-header { color: #6ee7b7; }
+.dark .dia-subnet.private .dia-subnet-header { color: #fde047; }
+
+/* 矢印 */
+.dia-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4px;
+}
+.dia-arrow-v {
+  width: 3px;
+  height: 20px;
+  border-radius: 2px;
+  background: #059669;
+  position: relative;
+  transition: background 0.3s;
+}
+.dia-arrow-v::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 4px solid transparent;
+  border-top-color: #059669;
+  transition: border-top-color 0.3s;
+}
+.dia-arrow-h {
+  width: 20px;
+  height: 3px;
+  border-radius: 2px;
+  background: #059669;
+  position: relative;
+  transition: background 0.3s;
+}
+.dia-arrow-h::after {
+  content: '';
+  position: absolute;
+  right: -3px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 4px solid transparent;
+  border-left-color: #059669;
+  transition: border-left-color 0.3s;
+}
+.dia-arrow-label {
+  font-size: 12px;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+/* 矢印カラー */
+.dia-arrow-v.green, .dia-arrow-h.green { background: #059669; }
+.dia-arrow-v.green::after { border-top-color: #059669; }
+.dia-arrow-h.green::after { border-left-color: #059669; }
+.dia-arrow-v.red, .dia-arrow-h.red { background: #dc2626; }
+.dia-arrow-v.red::after { border-top-color: #dc2626; }
+.dia-arrow-h.red::after { border-left-color: #dc2626; }
+.dia-arrow-v.gray, .dia-arrow-h.gray { background: #d1d5db; }
+.dia-arrow-v.gray::after { border-top-color: #d1d5db; }
+.dia-arrow-h.gray::after { border-left-color: #d1d5db; }
+.dia-arrow-v.diagonal {
+  transform: rotate(35deg);
+  height: 28px;
+}
+
+/* IPタグ */
+.dia-ip-tag {
+  display: inline-block;
+  font-size: 13px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 4px;
+}
+.dia-ip-tag.public {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+.dark .dia-ip-tag.public {
+  background: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+  border-color: #3b82f6;
+}
+.dia-ip-tag.private {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+.dark .dia-ip-tag.private {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fcd34d;
+  border-color: #f59e0b;
+}
+.dia-ip-tag.eip {
+  background: #ffedd5;
+  color: #9a3412;
+  border: 1px solid #fb923c;
+}
+.dark .dia-ip-tag.eip {
+  background: rgba(249, 115, 22, 0.2);
+  color: #fdba74;
+  border-color: #f97316;
+}
+
+/* ノートボックス */
+.dia-note {
+  margin-top: 12px;
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.8;
+}
+.dia-note strong { font-weight: 600; }
+.dia-note.info {
+  background: #eff6ff;
+  border: 1px solid #93c5fd;
+  color: #1e40af;
+}
+.dark .dia-note.info {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
+  color: #93c5fd;
+}
+.dia-note.warn {
+  background: #fefce8;
+  border: 1px solid #fde047;
+  color: #854d0e;
+}
+.dark .dia-note.warn {
+  background: rgba(250, 204, 21, 0.1);
+  border-color: #ca8a04;
+  color: #fef9c3;
+}
+
+/* 比較テーブル */
+.dia-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-top: 12px;
+}
+.dia-table th {
+  background: #f1f5f9;
+  padding: 10px 14px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+  color: #334155;
+}
+.dark .dia-table th {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+.dia-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #475569;
+}
+.dark .dia-table td {
+  border-color: #334155;
+  color: #94a3b8;
+}
+.dia-table tr:last-child td { border-bottom: none; }
+
+/* タイムライン */
+.dia-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 12px;
+  position: relative;
+  padding-left: 20px;
+}
+.dia-timeline::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: #e2e8f0;
+}
+.dark .dia-timeline::before { background: #334155; }
+.dia-tl-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 0;
+  position: relative;
+}
+.dia-tl-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #3b82f6;
+  position: absolute;
+  left: -17px;
+  top: 12px;
+  z-index: 1;
+}
+.dia-tl-dot.warn { background: #f59e0b; }
+.dia-tl-dot.danger { background: #dc2626; }
+.dia-tl-dot.success { background: #059669; }
+.dia-tl-content {
+  font-size: 14px;
+  line-height: 1.7;
+  color: #475569;
+}
+.dark .dia-tl-content { color: #94a3b8; }
+.dia-tl-title {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 2px;
+}
+.dark .dia-tl-title { color: #e2e8f0; }
+
+/* ステップナビゲーション */
+.dia-step-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0;
+  font-size: 14px;
+  color: #6b7280;
+}
+.dia-step-desc {
+  font-size: 14px;
+  margin: 12px 0;
+  padding: 12px 16px;
+  border-radius: 8px;
+  line-height: 1.7;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  min-height: 60px;
+}
+.dark .dia-step-desc {
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+/* 凡例 */
+.dia-legend {
+  display: flex;
+  gap: 16px;
+  margin: 8px 0;
+  font-size: 13px;
+  color: #6b7280;
+  flex-wrap: wrap;
+}
+.dia-legend span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.dia-legend-box {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+}
+
+/* チェックリスト */
+.dia-checklist {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.dark .dia-checklist {
+  background: #1e293b;
+  border-color: #334155;
+}
+.dia-checklist-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #334155;
+}
+.dark .dia-checklist-title { color: #e2e8f0; }
+.dia-checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+.dia-checklist-item.ok { color: #059669; }
+.dia-checklist-item.ng { color: #dc2626; font-weight: 500; }
+.dark .dia-checklist-item.ok { color: #6ee7b7; }
+.dark .dia-checklist-item.ng { color: #fca5a5; }
+
+/* AWSアカウントコンテナ */
+.dia-account {
+  border: 2px dashed #db2777;
+  border-radius: 14px;
+  padding: 16px;
+  background: rgba(219, 39, 119, 0.03);
+}
+.dark .dia-account {
+  background: rgba(219, 39, 119, 0.06);
+  border-color: #f472b6;
+}
+.dia-account-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #be185d;
+}
+.dia-account-header img {
+  width: 24px;
+  height: 24px;
+}
+.dark .dia-account-header {
+  color: #f9a8d4;
+}
+
+/* テーマ: Lattice */
+.dia-lattice {
+  background: #eef2ff;
+  border: 2px solid #534AB7;
+}
+.dia-lattice .dia-box-label { color: #534AB7; }
+.dark .dia-lattice {
+  background: rgba(83, 74, 183, 0.2);
+  border-color: #7c73d6;
+}
+.dark .dia-lattice .dia-box-label { color: #a5b4fc; }
+
+/* 機能バー */
+.dia-features {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: #EEEDFE;
+  border: 1px solid #534AB7;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #3C3489;
+}
+.dark .dia-features {
+  background: rgba(83, 74, 183, 0.15);
+  border-color: #7c73d6;
+  color: #c4b5fd;
+}

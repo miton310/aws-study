@@ -1,0 +1,12 @@
+/* Component: 見出し・注釈 */
+.section-title {
+  @apply text-center text-xl font-bold mb-3;
+}
+
+.heading-section {
+  @apply text-xl font-bold mb-6 pb-2 border-b border-gray-200 dark:border-gray-700;
+}
+
+.note-box {
+  @apply bg-[#FAEEDA] border border-[#854F0B] text-[#633806] rounded-lg px-4 py-2 text-center font-medium;
+}

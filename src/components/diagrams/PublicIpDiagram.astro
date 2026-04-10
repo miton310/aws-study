@@ -1,0 +1,356 @@
+---
+/**
+ * パブリックIPアドレス解説
+ * 自動割り当てパブリックIP vs Elastic IP の違いと仕組み
+ */
+---
+
+<style>
+  .pip-col-auto {
+    background: rgba(59, 130, 246, 0.05);
+  }
+  .dark .pip-col-auto {
+    background: rgba(59, 130, 246, 0.1);
+  }
+  .pip-col-eip {
+    background: rgba(249, 115, 22, 0.05);
+  }
+  .dark .pip-col-eip {
+    background: rgba(249, 115, 22, 0.1);
+  }
+</style>
+
+<div>
+  <!-- Tabs -->
+  <div class="tab-btn-group">
+    <button class="tab-btn active" id="pip-tab-overview" onclick="pipSetTab('overview')">概要</button>
+    <button class="tab-btn" id="pip-tab-compare" onclick="pipSetTab('compare')">自動割り当て vs EIP</button>
+    <button class="tab-btn" id="pip-tab-lifecycle" onclick="pipSetTab('lifecycle')">IPのライフサイクル</button>
+    <button class="tab-btn" id="pip-tab-igw" onclick="pipSetTab('igw')">IGWとNAT変換</button>
+  </div>
+
+  <!-- Tab: Overview -->
+  <div class="tab-panel active" id="pip-panel-overview">
+    <div class="dia-diagram">
+      <!-- Internet -->
+      <div class="dia-row">
+        <div class="dia-box dia-internet">
+          <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Internet_48_Light.svg" alt="Internet">
+          <div class="dia-box-label">インターネット</div>
+          <div class="dia-box-sub">外部からのアクセス</div>
+        </div>
+      </div>
+
+      <div class="dia-row">
+        <div class="dia-arrow">
+          <div class="dia-arrow-label">パブリックIPで通信</div>
+          <div class="dia-arrow-v"></div>
+        </div>
+      </div>
+
+      <!-- VPC -->
+      <div class="dia-vpc">
+        <div class="dia-vpc-header">
+          <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Virtual-private-cloud-VPC_48.svg" alt="VPC">
+          <span>VPC</span>
+        </div>
+
+        <!-- IGW -->
+        <div class="dia-row">
+          <div class="dia-box dia-igw">
+            <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Internet-Gateway_48.svg" alt="IGW">
+            <div class="dia-box-label">Internet Gateway</div>
+            <div class="dia-box-sub">パブリックIP ↔ プライベートIP の変換</div>
+          </div>
+        </div>
+
+        <div class="dia-row">
+          <div class="dia-arrow">
+            <div class="dia-arrow-v"></div>
+          </div>
+        </div>
+
+        <!-- Public Subnet with EC2 -->
+        <div class="dia-subnet public">
+          <div class="dia-subnet-header">
+            <img src="/AWS-icons/Architecture-Group-Icons_07312025/Public-subnet_32.svg" alt="public">
+            <span>パブリックサブネット</span>
+          </div>
+          <div class="dia-row" style="gap: 24px; flex-wrap: wrap;">
+            <!-- Auto Public IP -->
+            <div style="text-align:center;">
+              <div class="dia-box dia-ec2">
+                <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+                <div class="dia-box-label">EC2 インスタンス A</div>
+                <div class="dia-box-sub">自動割り当てパブリックIP</div>
+              </div>
+              <div class="dia-ip-tag public" style="margin-top:6px;">54.xx.xx.10（変動）</div>
+              <div class="dia-ip-tag private">10.0.1.10（固定）</div>
+            </div>
+
+            <!-- EIP -->
+            <div style="text-align:center;">
+              <div class="dia-box dia-ec2">
+                <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+                <div class="dia-box-label">EC2 インスタンス B</div>
+                <div class="dia-box-sub">Elastic IP 割り当て</div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:6px;">
+                <img src="/AWS-icons/Resource-Icons_07312025/Res_Compute/Res_Amazon-EC2_Elastic-IP-Address_48.svg" alt="EIP" style="width:20px;height:20px;">
+                <div class="dia-ip-tag eip">52.xx.xx.99（固定）</div>
+              </div>
+              <div class="dia-ip-tag private">10.0.1.20（固定）</div>
+            </div>
+
+            <!-- Private only -->
+            <div style="text-align:center;">
+              <div class="dia-box dia-ec2" style="opacity:0.6;">
+                <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+                <div class="dia-box-label">EC2 インスタンス C</div>
+                <div class="dia-box-sub">パブリックIPなし</div>
+              </div>
+              <div class="dia-ip-tag private" style="margin-top:6px;">10.0.1.30（固定）</div>
+              <div style="font-size:12px;color:#dc2626;margin-top:3px;">直接インターネット不可</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-note info">
+      <strong>パブリックIPアドレスとは：</strong>インターネットから直接到達可能なIPアドレス。
+      AWSでは「自動割り当てパブリックIP」と「Elastic IP（EIP）」の2種類がある。
+      どちらもIGWを経由してプライベートIPとの間でNAT変換される。
+    </div>
+  </div>
+
+  <!-- Tab: Compare -->
+  <div class="tab-panel" id="pip-panel-compare">
+    <table class="dia-table">
+      <thead>
+        <tr>
+          <th style="min-width:120px;">項目</th>
+          <th class="pip-col-auto" style="min-width:160px;">自動割り当てパブリックIP</th>
+          <th class="pip-col-eip" style="min-width:160px;">Elastic IP（EIP）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>IPの固定性</strong></td>
+          <td class="pip-col-auto">❌ 停止→起動で<strong>変わる</strong></td>
+          <td class="pip-col-eip">✅ 明示的に解放するまで<strong>固定</strong></td>
+        </tr>
+        <tr>
+          <td><strong>課金</strong></td>
+          <td class="pip-col-auto">✅ 起動中は無料<br><span style="font-size:12px;color:#dc2626;">※2024/2〜 使用中でも$0.005/h</span></td>
+          <td class="pip-col-eip">⚠️ 未使用（未関連付け）で課金<br><span style="font-size:12px;color:#dc2626;">※2024/2〜 使用中でも$0.005/h</span></td>
+        </tr>
+        <tr>
+          <td><strong>割り当て方法</strong></td>
+          <td class="pip-col-auto">サブネットの「パブリックIP自動割り当て」を有効化 or 起動時に指定</td>
+          <td class="pip-col-eip">EIPを取得 → EC2/ENIに関連付け</td>
+        </tr>
+        <tr>
+          <td><strong>停止時の動作</strong></td>
+          <td class="pip-col-auto">IPが解放される（再起動で新しいIP）</td>
+          <td class="pip-col-eip">EIPは保持される（再起動後も同じIP）</td>
+        </tr>
+        <tr>
+          <td><strong>他リソースへ移動</strong></td>
+          <td class="pip-col-auto">❌ 不可</td>
+          <td class="pip-col-eip">✅ 別のEC2/ENIに再関連付け可能</td>
+        </tr>
+        <tr>
+          <td><strong>ユースケース</strong></td>
+          <td class="pip-col-auto">一時的な検証・開発環境<br>IPが変わっても問題ない場合</td>
+          <td class="pip-col-eip">DNS登録するサーバー<br>IPホワイトリスト必要な場合<br>障害時にIPを別インスタンスへ切替</td>
+        </tr>
+        <tr>
+          <td><strong>上限</strong></td>
+          <td class="pip-col-auto">制限なし（サブネット設定）</td>
+          <td class="pip-col-eip">リージョンあたり5個（デフォルト）<br>上限緩和申請可能</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="dia-note warn">
+      <strong>⚠️ 2024年2月以降の料金変更：</strong>パブリックIPv4アドレスはすべて <strong>$0.005/時間</strong>（約$3.6/月）の課金対象。
+      自動割り当てもEIPも同額。不要なパブリックIPは削除してコスト削減を。
+    </div>
+  </div>
+
+  <!-- Tab: Lifecycle -->
+  <div class="tab-panel" id="pip-panel-lifecycle">
+    <p style="font-size:16px;font-weight:600;margin-bottom:8px;color:#1e40af;">自動割り当てパブリックIPのライフサイクル</p>
+    <div class="dia-timeline">
+      <div class="dia-tl-item">
+        <div class="dia-tl-dot success"></div>
+        <div class="dia-tl-content">
+          <div class="dia-tl-title">① インスタンス起動</div>
+          パブリックIPが自動的に割り当てられる（例: 54.xx.xx.10）<br>
+          IGWが内部的にパブリックIP ↔ プライベートIPのNAT変換を行う
+        </div>
+      </div>
+      <div class="dia-tl-item">
+        <div class="dia-tl-dot"></div>
+        <div class="dia-tl-content">
+          <div class="dia-tl-title">② 稼働中</div>
+          パブリックIP: 54.xx.xx.10 でインターネットからアクセス可能<br>
+          EC2内部からは <code>ifconfig</code> でプライベートIPのみ見える（10.0.1.10）
+        </div>
+      </div>
+      <div class="dia-tl-item">
+        <div class="dia-tl-dot warn"></div>
+        <div class="dia-tl-content">
+          <div class="dia-tl-title">③ インスタンス停止</div>
+          パブリックIPが<strong>解放</strong>される → 54.xx.xx.10 は消滅
+        </div>
+      </div>
+      <div class="dia-tl-item">
+        <div class="dia-tl-dot danger"></div>
+        <div class="dia-tl-content">
+          <div class="dia-tl-title">④ インスタンス再起動</div>
+          <strong>新しい</strong>パブリックIPが割り当てられる（例: 54.xx.xx.77）<br>
+          ⚠️ 元のIP（54.xx.xx.10）には戻らない
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:24px;">
+      <p style="font-size:16px;font-weight:600;margin-bottom:8px;color:#f97316;">Elastic IP のライフサイクル</p>
+      <div class="dia-timeline">
+        <div class="dia-tl-item">
+          <div class="dia-tl-dot success"></div>
+          <div class="dia-tl-content">
+            <div class="dia-tl-title">① EIPを取得（Allocate）</div>
+            AWSのIPプールからEIPを確保（例: 52.xx.xx.99）
+          </div>
+        </div>
+        <div class="dia-tl-item">
+          <div class="dia-tl-dot success"></div>
+          <div class="dia-tl-content">
+            <div class="dia-tl-title">② EC2に関連付け（Associate）</div>
+            EIPをインスタンスまたはENIに関連付ける → 自動割り当てIPがあれば置き換わる
+          </div>
+        </div>
+        <div class="dia-tl-item">
+          <div class="dia-tl-dot"></div>
+          <div class="dia-tl-content">
+            <div class="dia-tl-title">③ インスタンス停止→起動</div>
+            EIPは<strong>そのまま維持</strong>。52.xx.xx.99 で引き続きアクセス可能
+          </div>
+        </div>
+        <div class="dia-tl-item">
+          <div class="dia-tl-dot"></div>
+          <div class="dia-tl-content">
+            <div class="dia-tl-title">④ 別のEC2に再関連付け</div>
+            障害時に別インスタンスへIPを移動可能（フェイルオーバー）
+          </div>
+        </div>
+        <div class="dia-tl-item">
+          <div class="dia-tl-dot danger"></div>
+          <div class="dia-tl-content">
+            <div class="dia-tl-title">⑤ EIPを解放（Release）</div>
+            不要になったら解放。解放後はIPがプールに戻る（同じIPは取れない可能性あり）
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: IGW -->
+  <div class="tab-panel" id="pip-panel-igw">
+    <div class="dia-diagram">
+      <p style="font-size:15px;color:#6b7280;text-align:center;margin-bottom:14px;">IGWが行うNAT変換の仕組み（1対1 NAT）</p>
+
+      <!-- Outbound -->
+      <div style="margin-bottom:20px;">
+        <p style="font-size:14px;font-weight:600;color:#059669;margin-bottom:10px;">📤 アウトバウンド（EC2 → インターネット）</p>
+        <div class="dia-row">
+          <div style="text-align:center;">
+            <div class="dia-box dia-ec2">
+              <div class="dia-box-label">EC2</div>
+            </div>
+            <div class="dia-ip-tag private">送信元: 10.0.1.10</div>
+          </div>
+          <div class="dia-arrow">
+            <div class="dia-arrow-h"></div>
+          </div>
+          <div style="text-align:center;">
+            <div class="dia-box dia-igw">
+              <div class="dia-box-label">IGW</div>
+              <div class="dia-box-sub">送信元IPを変換</div>
+            </div>
+            <div style="font-size:12px;color:#dc2626;font-weight:600;">10.0.1.10 → 54.xx.xx.10</div>
+          </div>
+          <div class="dia-arrow">
+            <div class="dia-arrow-h"></div>
+          </div>
+          <div style="text-align:center;">
+            <div class="dia-box dia-internet">
+              <div class="dia-box-label">インターネット</div>
+            </div>
+            <div class="dia-ip-tag public">宛先から見える: 54.xx.xx.10</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inbound -->
+      <div>
+        <p style="font-size:14px;font-weight:600;color:#3b82f6;margin-bottom:10px;">📥 インバウンド（インターネット → EC2）</p>
+        <div class="dia-row">
+          <div style="text-align:center;">
+            <div class="dia-box dia-internet">
+              <div class="dia-box-label">インターネット</div>
+            </div>
+            <div class="dia-ip-tag public">宛先: 54.xx.xx.10</div>
+          </div>
+          <div class="dia-arrow">
+            <div class="dia-arrow-h"></div>
+          </div>
+          <div style="text-align:center;">
+            <div class="dia-box dia-igw">
+              <div class="dia-box-label">IGW</div>
+              <div class="dia-box-sub">宛先IPを変換</div>
+            </div>
+            <div style="font-size:12px;color:#dc2626;font-weight:600;">54.xx.xx.10 → 10.0.1.10</div>
+          </div>
+          <div class="dia-arrow">
+            <div class="dia-arrow-h"></div>
+          </div>
+          <div style="text-align:center;">
+            <div class="dia-box dia-ec2">
+              <div class="dia-box-label">EC2</div>
+            </div>
+            <div class="dia-ip-tag private">受信: 10.0.1.10</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-note info">
+      <strong>IGWの1対1 NAT：</strong>
+      EC2インスタンスはプライベートIPしか持たない。パブリックIPはIGWのマッピングテーブルで管理される。
+      EC2内部で <code>ifconfig</code> / <code>ip addr</code> を実行してもパブリックIPは表示されない。
+      メタデータ（<code>169.254.169.254</code>）から確認可能。
+    </div>
+
+    <div class="dia-note warn" style="margin-top:8px;">
+      <strong>NAT Gatewayとの違い：</strong>
+      IGWの変換は「1対1 NAT」（パブリックIP 1つ = EC2 1台）。
+      NAT Gatewayは「多対1 NAT」（複数EC2 → NAT GWの1つのIP）で、プライベートサブネットのEC2が外部通信するために使う。
+    </div>
+  </div>
+</div>
+
+<script>
+  function pipSetTab(tab: string) {
+    document.querySelectorAll('#pip-tab-overview, #pip-tab-compare, #pip-tab-lifecycle, #pip-tab-igw').forEach(el => el.classList.remove('active'));
+    document.getElementById(`pip-tab-${tab}`)?.classList.add('active');
+
+    document.querySelectorAll('#pip-panel-overview, #pip-panel-compare, #pip-panel-lifecycle, #pip-panel-igw').forEach(el => el.classList.remove('active'));
+    document.getElementById(`pip-panel-${tab}`)?.classList.add('active');
+  }
+
+  (window as any).pipSetTab = pipSetTab;
+</script>

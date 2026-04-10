@@ -1,0 +1,16 @@
+/* Foundation: ベースリセット・グローバルスタイル */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 4.5rem;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans JP', system-ui, sans-serif;
+}
+
+::selection {
+  background: rgba(230,126,0,0.15);
+}
