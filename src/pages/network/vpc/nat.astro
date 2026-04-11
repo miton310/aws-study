@@ -26,6 +26,60 @@ import NatInstanceDiagram from "../../../components/diagrams/NatInstanceDiagram.
     </section>
 
     <section class="mb-12">
+      <h2 class="heading-section">NAT Gateway通信フロー</h2>
+      <div class="bg-white border border-gray-200 rounded-lg p-8">
+        <p class="text-center font-medium mb-4">
+          NAT Gateway：プライベートサブネット→インターネット
+        </p>
+        <div class="flex flex-col items-center gap-0">
+          <!-- インターネット -->
+          <div
+            class="rounded-lg bg-[#F1EFE8] border border-[#D3D1C7] px-8 py-2 text-center text-[#2C2C2A] text-sm"
+          >
+            インターネット
+          </div>
+          <div class="text-[#1D9E75] text-lg leading-none">↕</div>
+          <!-- IGW -->
+          <div
+            class="rounded-lg bg-[#E1F5EE] border border-[#0F6E56] px-8 py-2 text-center text-[#085041] text-sm"
+          >
+            Internet Gateway
+          </div>
+          <div class="text-[#1D9E75] text-lg leading-none">↕</div>
+          <!-- NAT Gateway -->
+          <div
+            class="rounded-lg bg-[#9FE1CB] border border-[#0F6E56] px-6 py-3 text-center"
+          >
+            <p class="font-medium text-[#04342C] text-sm">NAT Gateway</p>
+            <p class="text-xs text-[#085041]">パブリックサブネットに配置</p>
+          </div>
+          <div class="text-[#854F0B] text-lg leading-none">↕</div>
+          <!-- プライベートEC2 -->
+          <div
+            class="rounded-lg bg-[#FAEEDA] border border-[#854F0B] px-6 py-3 text-center"
+          >
+            <p class="font-medium text-[#412402] text-sm">プライベートEC2</p>
+            <p class="text-xs text-[#633806]">
+              インターネットには出られるが入れない
+            </p>
+          </div>
+        </div>
+
+        <!-- Egress-Only IGW -->
+        <div
+          class="mt-6 rounded-lg bg-[#EEEDFE] border border-[#534AB7] px-4 py-3 text-center"
+        >
+          <p class="font-medium text-[#3C3489] text-sm">
+            Egress-Only Internet Gateway
+          </p>
+          <p class="text-xs text-[#534AB7]">
+            IPv6専用のNAT GW的機能・アウトバウンドのみ許可（インバウンド不可）
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-12">
       <h2 class="heading-section">
         NATインスタンス：ポート転送と NAT Gateway との違い
       </h2>

@@ -63,6 +63,257 @@ import Layout from "../../../layouts/Layout.astro";
     </section>
 
     <section class="mb-12">
+      <h2 class="heading-section">ENI詳細図解</h2>
+      <div class="bg-white border border-gray-200 rounded-lg p-6">
+        <svg width="100%" viewBox="0 0 680 360">
+          <defs
+            ><marker
+              id="vpc-eni-arr"
+              viewBox="0 0 10 10"
+              refX="8"
+              refY="5"
+              markerWidth="6"
+              markerHeight="6"
+              orient="auto-start-reverse"
+              ><path
+                d="M2 1L8 5L2 9"
+                fill="none"
+                stroke="context-stroke"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"></path></marker
+            ></defs
+          >
+          <text
+            x="340"
+            y="26"
+            text-anchor="middle"
+            font-size="14"
+            font-weight="500"
+            fill="currentColor">ENI（Elastic Network Interface）= 仮想NIC</text
+          >
+
+          <!-- Physical NIC vs ENI -->
+          <rect
+            x="40"
+            y="50"
+            width="260"
+            height="100"
+            rx="8"
+            fill="#F1EFE8"
+            stroke="#D3D1C7"
+            stroke-width="0.5"></rect>
+          <text
+            x="170"
+            y="78"
+            text-anchor="middle"
+            font-size="13"
+            font-weight="500"
+            fill="#444441">物理サーバーのNIC</text
+          >
+          <text
+            x="170"
+            y="102"
+            text-anchor="middle"
+            font-size="11"
+            fill="#5F5E5A">LANケーブルを挿す差し込み口</text
+          >
+          <text
+            x="170"
+            y="122"
+            text-anchor="middle"
+            font-size="11"
+            fill="#5F5E5A">MACアドレス・IPアドレスを持つ</text
+          >
+
+          <text
+            x="340"
+            y="105"
+            text-anchor="middle"
+            font-size="14"
+            font-weight="500"
+            fill="#534AB7">≒ クラウド版</text
+          >
+
+          <rect
+            x="380"
+            y="50"
+            width="260"
+            height="100"
+            rx="8"
+            fill="#EEEDFE"
+            stroke="#534AB7"
+            stroke-width="0.5"></rect>
+          <text
+            x="510"
+            y="78"
+            text-anchor="middle"
+            font-size="13"
+            font-weight="500"
+            fill="#3C3489">ENI（仮想NIC）</text
+          >
+          <text
+            x="510"
+            y="102"
+            text-anchor="middle"
+            font-size="11"
+            fill="#534AB7">EC2に取り付ける仮想ネットワーク</text
+          >
+          <text
+            x="510"
+            y="122"
+            text-anchor="middle"
+            font-size="11"
+            fill="#534AB7">プライベートIP・EIPを持てる</text
+          >
+
+          <!-- EC2 with ENIs -->
+          <rect
+            x="30"
+            y="170"
+            width="620"
+            height="110"
+            rx="14"
+            fill="none"
+            stroke="#1D9E75"
+            stroke-width="1.5"
+            stroke-dasharray="6 3"></rect>
+          <text x="46" y="190" font-size="12" fill="#085041"
+            >VPC内のEC2インスタンス</text
+          >
+
+          <rect
+            x="100"
+            y="196"
+            width="460"
+            height="68"
+            rx="10"
+            fill="#E6F1FB"
+            stroke="#185FA5"
+            stroke-width="1"></rect>
+          <text
+            x="330"
+            y="216"
+            text-anchor="middle"
+            font-size="12"
+            fill="#185FA5">EC2インスタンス</text
+          >
+
+          <rect
+            x="120"
+            y="226"
+            width="140"
+            height="32"
+            rx="6"
+            fill="#EEEDFE"
+            stroke="#534AB7"
+            stroke-width="0.5"></rect>
+          <text
+            x="190"
+            y="246"
+            text-anchor="middle"
+            font-size="12"
+            font-weight="500"
+            fill="#3C3489"
+            dominant-baseline="central">ENI（プライマリ）eth0</text
+          >
+
+          <rect
+            x="300"
+            y="226"
+            width="140"
+            height="32"
+            rx="6"
+            fill="#E1F5EE"
+            stroke="#0F6E56"
+            stroke-width="0.5"></rect>
+          <text
+            x="370"
+            y="246"
+            text-anchor="middle"
+            font-size="12"
+            font-weight="500"
+            fill="#085041"
+            dominant-baseline="central">ENI（セカンダリ）eth1</text
+          >
+
+          <!-- Subnet arrows -->
+          <line
+            x1="190"
+            y1="258"
+            x2="190"
+            y2="290"
+            stroke="#534AB7"
+            stroke-width="1.5"
+            marker-end="url(#vpc-eni-arr)"></line>
+          <line
+            x1="370"
+            y1="258"
+            x2="370"
+            y2="290"
+            stroke="#0F6E56"
+            stroke-width="1.5"
+            marker-end="url(#vpc-eni-arr)"></line>
+          <rect
+            x="130"
+            y="292"
+            width="120"
+            height="28"
+            rx="6"
+            fill="#F1EFE8"
+            stroke="#D3D1C7"
+            stroke-width="0.5"></rect>
+          <text
+            x="190"
+            y="310"
+            text-anchor="middle"
+            font-size="11"
+            fill="#5F5E5A"
+            dominant-baseline="central">サブネットA</text
+          >
+          <rect
+            x="310"
+            y="292"
+            width="120"
+            height="28"
+            rx="6"
+            fill="#F1EFE8"
+            stroke="#D3D1C7"
+            stroke-width="0.5"></rect>
+          <text
+            x="370"
+            y="310"
+            text-anchor="middle"
+            font-size="11"
+            fill="#5F5E5A"
+            dominant-baseline="central">サブネットB</text
+          >
+
+          <!-- SAA tip -->
+          <rect
+            x="30"
+            y="332"
+            width="620"
+            height="24"
+            rx="6"
+            fill="#FAEEDA"
+            stroke="#854F0B"
+            stroke-width="0.5"></rect>
+          <text
+            x="340"
+            y="348"
+            text-anchor="middle"
+            font-size="11"
+            font-weight="500"
+            fill="#633806"
+            dominant-baseline="central"
+            >SAA頻出：ENIを別のEC2に付け替えてIPアドレスごと移動できる（フェイルオーバー用途）</text
+          >
+        </svg>
+      </div>
+    </section>
+
+    <section class="mb-12">
       <h2 class="heading-section">ENI の構成例</h2>
       <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
         <div class="bg-green-50 border-b border-green-200 p-4">

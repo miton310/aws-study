@@ -23,5 +23,60 @@ import SgNaclAnimation from "../../../components/diagrams/SgNaclAnimation.astro"
       </p>
       <SgNaclAnimation />
     </section>
+
+    <section class="mb-12">
+      <h2 class="heading-section">
+        セキュリティグループ vs ネットワークACL 比較表
+      </h2>
+      <div class="grid grid-cols-2 gap-4 mb-3">
+        <div class="border border-[#0F6E56] rounded-lg bg-[#E1F5EE] p-4">
+          <p class="text-center font-medium text-[#085041] mb-2">
+            セキュリティグループ（SG）
+          </p>
+          <ul class="text-sm text-[#04342C] space-y-1.5">
+            <li class="bg-[#9FE1CB] rounded px-3 py-1.5">
+              インスタンスレベルで適用
+            </li>
+            <li class="bg-[#9FE1CB] rounded px-3 py-1.5">
+              ステートフル（戻り通信自動許可）
+            </li>
+            <li class="bg-[#9FE1CB] rounded px-3 py-1.5">
+              許可ルールのみ（拒否は書けない）
+            </li>
+            <li class="bg-[#9FE1CB] rounded px-3 py-1.5">
+              デフォルト: インバウンド全拒否
+            </li>
+            <li class="bg-[#9FE1CB] rounded px-3 py-1.5">
+              デフォルト: アウトバウンド全許可
+            </li>
+          </ul>
+        </div>
+        <div class="border border-[#534AB7] rounded-lg bg-[#EEEDFE] p-4">
+          <p class="text-center font-medium text-[#3C3489] mb-2">
+            ネットワークACL（NACL）
+          </p>
+          <ul class="text-sm text-[#26215C] space-y-1.5">
+            <li class="bg-[#CECBF6] rounded px-3 py-1.5">
+              サブネットレベルで適用
+            </li>
+            <li class="bg-[#CECBF6] rounded px-3 py-1.5">
+              ステートレス（戻り通信も設定必要）
+            </li>
+            <li class="bg-[#CECBF6] rounded px-3 py-1.5">
+              許可・拒否の両方書ける
+            </li>
+            <li class="bg-[#CECBF6] rounded px-3 py-1.5">
+              番号順に評価（小さい番号が優先）
+            </li>
+            <li class="bg-[#CECBF6] rounded px-3 py-1.5">
+              デフォルト: 全通信許可
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-box text-sm">
+        SAA頻出：NACLはステートレスなのでアウトバウンドも明示的に許可が必要
+      </div>
+    </section>
   </div>
 </Layout>

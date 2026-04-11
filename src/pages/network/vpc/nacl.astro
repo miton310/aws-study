@@ -51,201 +51,450 @@ import SgNaclAnimation from "../../../components/diagrams/SgNaclAnimation.astro"
             </div>
           </div>
         </div>
-
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 class="text-lg font-bold text-blue-800 mb-4">
-            ⚙️ デフォルト設定
-          </h3>
-          <div class="space-y-3 text-blue-700">
-            <div>
-              <p class="font-medium">デフォルト NACL</p>
-              <p class="text-sm">• すべての通信を許可</p>
-              <p class="text-sm">• VPC作成時に自動作成</p>
-            </div>
-            <div>
-              <p class="font-medium">カスタム NACL</p>
-              <p class="text-sm">• デフォルトですべて拒否</p>
-              <p class="text-sm">• 明示的にルールを追加する必要</p>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
 
     <section class="mb-12">
-      <h2 class="heading-section">ルール번号と評価順序</h2>
-      <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
-        <h3 class="text-lg font-bold text-gray-800 mb-4">📋 評価ルール</h3>
-        <div class="space-y-4">
-          <div class="bg-white border rounded-lg p-4">
-            <h4 class="font-medium text-gray-800 mb-2">評価の流れ</h4>
-            <ol class="space-y-2 text-gray-700 text-sm">
-              <li>
-                <span class="font-medium text-blue-600">1.</span> 最も小さい番号のルールから順番に評価
-              </li>
-              <li>
-                <span class="font-medium text-blue-600">2.</span> マッチしたルールで即座に判定（ALLOW
-                or DENY）
-              </li>
-              <li>
-                <span class="font-medium text-blue-600">3.</span> マッチしない場合は次の番号のルールを評価
-              </li>
-              <li>
-                <span class="font-medium text-blue-600">4.</span> 最後まで一致しなければデフォルトルール（*）が適用（通常はDENY）
-              </li>
-            </ol>
-          </div>
+      <h2 class="heading-section">NACL詳細図解</h2>
+      <div class="bg-white border border-gray-200 rounded-lg p-6">
+        <svg width="100%" viewBox="0 0 680 380">
+          <text
+            x="340"
+            y="26"
+            text-anchor="middle"
+            font-size="14"
+            font-weight="500"
+            fill="currentColor">ネットワークACL（NACL）の特徴</text
+          >
 
-          <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h4 class="font-medium text-yellow-800 mb-2">⚠️ 注意点</h4>
-            <div class="text-yellow-700 text-sm space-y-1">
-              <p>• ルール番号は 1〜32766 の範囲で設定</p>
-              <p>• 100 番刻みで設定するのが推奨（後から挿入しやすい）</p>
-              <p>• 重複する番号は設定不可</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+          <!-- VPC -->
+          <rect
+            x="30"
+            y="44"
+            width="620"
+            height="190"
+            rx="14"
+            fill="none"
+            stroke="#1D9E75"
+            stroke-width="1.5"
+            stroke-dasharray="8 4"></rect>
+          <text x="46" y="62" font-size="12" fill="#085041">VPC</text>
 
-    <section class="mb-12">
-      <h2 class="heading-section">実用的な設定例</h2>
-      <div class="bg-green-50 border border-green-200 rounded-lg p-6">
-        <h3 class="text-lg font-bold text-green-800 mb-4">
-          🛡️ よくあるNACL設定パターン
-        </h3>
+          <!-- Subnet -->
+          <rect
+            x="50"
+            y="70"
+            width="560"
+            height="154"
+            rx="10"
+            fill="none"
+            stroke="#534AB7"
+            stroke-width="1.5"></rect>
+          <text x="70" y="90" font-size="12" font-weight="500" fill="#3C3489"
+            >サブネット</text
+          >
 
-        <div class="space-y-6">
-          <div>
-            <h4 class="font-medium text-green-800 mb-2">
-              パターン1: Webサーバー用（パブリックサブネット）
-            </h4>
-            <div class="bg-white border rounded-lg overflow-hidden">
-              <table class="w-full text-sm">
-                <thead class="bg-gray-100">
-                  <tr>
-                    <th class="px-3 py-2 text-left">番号</th>
-                    <th class="px-3 py-2 text-left">タイプ</th>
-                    <th class="px-3 py-2 text-left">プロトコル</th>
-                    <th class="px-3 py-2 text-left">ポート範囲</th>
-                    <th class="px-3 py-2 text-left">ソース</th>
-                    <th class="px-3 py-2 text-left">アクション</th>
-                  </tr>
-                </thead>
-                <tbody class="text-gray-700">
-                  <tr class="border-t">
-                    <td class="px-3 py-2">100</td>
-                    <td class="px-3 py-2">HTTP</td>
-                    <td class="px-3 py-2">TCP</td>
-                    <td class="px-3 py-2">80</td>
-                    <td class="px-3 py-2">0.0.0.0/0</td>
-                    <td class="px-3 py-2 text-green-600">ALLOW</td>
-                  </tr>
-                  <tr class="border-t">
-                    <td class="px-3 py-2">200</td>
-                    <td class="px-3 py-2">HTTPS</td>
-                    <td class="px-3 py-2">TCP</td>
-                    <td class="px-3 py-2">443</td>
-                    <td class="px-3 py-2">0.0.0.0/0</td>
-                    <td class="px-3 py-2 text-green-600">ALLOW</td>
-                  </tr>
-                  <tr class="border-t">
-                    <td class="px-3 py-2">300</td>
-                    <td class="px-3 py-2">SSH</td>
-                    <td class="px-3 py-2">TCP</td>
-                    <td class="px-3 py-2">22</td>
-                    <td class="px-3 py-2">管理用IP/32</td>
-                    <td class="px-3 py-2 text-green-600">ALLOW</td>
-                  </tr>
-                  <tr class="border-t">
-                    <td class="px-3 py-2">*</td>
-                    <td class="px-3 py-2">ALL</td>
-                    <td class="px-3 py-2">ALL</td>
-                    <td class="px-3 py-2">ALL</td>
-                    <td class="px-3 py-2">0.0.0.0/0</td>
-                    <td class="px-3 py-2 text-red-600">DENY</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          <!-- NACL border -->
+          <rect
+            x="50"
+            y="70"
+            width="560"
+            height="16"
+            rx="4"
+            fill="#EEEDFE"
+            stroke="#534AB7"
+            stroke-width="0.5"></rect>
+          <text
+            x="330"
+            y="81"
+            text-anchor="middle"
+            font-size="11"
+            fill="#534AB7">NACL（サブネット境界に設置）</text
+          >
 
-          <div>
-            <h4 class="font-medium text-green-800 mb-2">
-              パターン2: 特定IPをブロック
-            </h4>
-            <div class="bg-white border rounded-lg overflow-hidden">
-              <table class="w-full text-sm">
-                <thead class="bg-gray-100">
-                  <tr>
-                    <th class="px-3 py-2 text-left">番号</th>
-                    <th class="px-3 py-2 text-left">プロトコル</th>
-                    <th class="px-3 py-2 text-left">ポート範囲</th>
-                    <th class="px-3 py-2 text-left">ソース</th>
-                    <th class="px-3 py-2 text-left">アクション</th>
-                  </tr>
-                </thead>
-                <tbody class="text-gray-700">
-                  <tr class="border-t">
-                    <td class="px-3 py-2">50</td>
-                    <td class="px-3 py-2">ALL</td>
-                    <td class="px-3 py-2">ALL</td>
-                    <td class="px-3 py-2">悪意のあるIP/32</td>
-                    <td class="px-3 py-2 text-red-600">DENY</td>
-                  </tr>
-                  <tr class="border-t">
-                    <td class="px-3 py-2">100</td>
-                    <td class="px-3 py-2">TCP</td>
-                    <td class="px-3 py-2">80</td>
-                    <td class="px-3 py-2">0.0.0.0/0</td>
-                    <td class="px-3 py-2 text-green-600">ALLOW</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <p class="text-sm text-green-700 mt-2">
-              💡
-              セキュリティグループは拒否ルールが書けないため、特定IPのブロックにはNACLを使用
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
+          <!-- EC2 instances -->
+          <rect
+            x="100"
+            y="110"
+            width="140"
+            height="56"
+            rx="8"
+            fill="#E1F5EE"
+            stroke="#0F6E56"
+            stroke-width="0.5"></rect>
+          <text
+            x="170"
+            y="136"
+            text-anchor="middle"
+            font-size="13"
+            font-weight="500"
+            fill="#085041"
+            dominant-baseline="central">EC2-A</text
+          >
+          <text
+            x="170"
+            y="154"
+            text-anchor="middle"
+            font-size="11"
+            fill="#085041"
+            dominant-baseline="central">10.0.0.10</text
+          >
 
-    <section class="mb-12">
-      <h2 class="heading-section">SAA試験のポイント</h2>
-      <div class="bg-red-50 border border-red-200 rounded-lg p-6">
-        <h3 class="text-lg font-bold text-red-800 mb-4">📋 頻出問題パターン</h3>
-        <div class="space-y-4 text-red-700">
-          <div class="border-l-4 border-red-400 pl-4">
-            <p class="font-medium">「特定のIPアドレスをブロックしたい」</p>
-            <p class="text-sm mt-1">
-              → <strong>Network ACL</strong> を使用（セキュリティグループは拒否ルール不可）
-            </p>
-          </div>
-          <div class="border-l-4 border-red-400 pl-4">
-            <p class="font-medium">「ステートレスとは何か？」</p>
-            <p class="text-sm mt-1">
-              → <strong>戻り通信も明示的に許可が必要</strong
-              >（セキュリティグループは自動許可）
-            </p>
-          </div>
-          <div class="border-l-4 border-red-400 pl-4">
-            <p class="font-medium">
-              「同一サブネット内のEC2間通信がブロックされる？」
-            </p>
-            <p class="text-sm mt-1">
-              → <strong>No</strong> - NACLはサブネット境界でのみ動作
-            </p>
-          </div>
-          <div class="border-l-4 border-red-400 pl-4">
-            <p class="font-medium">「NACLのルール評価順序は？」</p>
-            <p class="text-sm mt-1">
-              → <strong>番号の小さい順</strong>に評価、マッチしたら即座に判定
-            </p>
-          </div>
-        </div>
+          <rect
+            x="430"
+            y="110"
+            width="140"
+            height="56"
+            rx="8"
+            fill="#E1F5EE"
+            stroke="#0F6E56"
+            stroke-width="0.5"></rect>
+          <text
+            x="500"
+            y="136"
+            text-anchor="middle"
+            font-size="13"
+            font-weight="500"
+            fill="#085041"
+            dominant-baseline="central">EC2-B</text
+          >
+          <text
+            x="500"
+            y="154"
+            text-anchor="middle"
+            font-size="11"
+            fill="#085041"
+            dominant-baseline="central">10.0.0.20</text
+          >
+
+          <!-- Arrow between EC2s (NACL cannot block) -->
+          <line
+            x1="240"
+            y1="138"
+            x2="428"
+            y2="138"
+            stroke="#1D9E75"
+            stroke-width="2"
+            stroke-dasharray="6 3"></line>
+          <text
+            x="334"
+            y="128"
+            text-anchor="middle"
+            font-size="11"
+            fill="#1D9E75">同一サブネット内はNACLで制限不可</text
+          >
+
+          <!-- Features boxes -->
+          <rect
+            x="30"
+            y="254"
+            width="195"
+            height="108"
+            rx="8"
+            fill="#EEEDFE"
+            stroke="#534AB7"
+            stroke-width="0.5"></rect>
+          <text
+            x="127"
+            y="276"
+            text-anchor="middle"
+            font-size="12"
+            font-weight="500"
+            fill="#3C3489">ステートレス</text
+          >
+          <text
+            x="127"
+            y="298"
+            text-anchor="middle"
+            font-size="11"
+            fill="#534AB7">インバウンド・アウトバウンド</text
+          >
+          <text
+            x="127"
+            y="316"
+            text-anchor="middle"
+            font-size="11"
+            fill="#534AB7">両方を個別に設定が必要</text
+          >
+          <text
+            x="127"
+            y="336"
+            text-anchor="middle"
+            font-size="11"
+            fill="#534AB7">戻り通信も明示的に許可</text
+          >
+
+          <rect
+            x="242"
+            y="254"
+            width="195"
+            height="108"
+            rx="8"
+            fill="#EEEDFE"
+            stroke="#534AB7"
+            stroke-width="0.5"></rect>
+          <text
+            x="339"
+            y="276"
+            text-anchor="middle"
+            font-size="12"
+            font-weight="500"
+            fill="#3C3489">番号順評価</text
+          >
+          <text
+            x="339"
+            y="298"
+            text-anchor="middle"
+            font-size="11"
+            fill="#534AB7">小さい番号が優先</text
+          >
+          <text
+            x="339"
+            y="316"
+            text-anchor="middle"
+            font-size="11"
+            fill="#534AB7">100: HTTP許可</text
+          >
+          <text
+            x="339"
+            y="336"
+            text-anchor="middle"
+            font-size="11"
+            fill="#534AB7">200: 全拒否</text
+          >
+
+          <rect
+            x="454"
+            y="254"
+            width="195"
+            height="108"
+            rx="8"
+            fill="#FAEEDA"
+            stroke="#854F0B"
+            stroke-width="0.5"></rect>
+          <text
+            x="551"
+            y="276"
+            text-anchor="middle"
+            font-size="12"
+            font-weight="500"
+            fill="#633806">SAA頻出</text
+          >
+          <text
+            x="551"
+            y="298"
+            text-anchor="middle"
+            font-size="11"
+            fill="#633806">特定IPをブロック</text
+          >
+          <text
+            x="551"
+            y="316"
+            text-anchor="middle"
+            font-size="11"
+            fill="#633806">→ NACLのDeny</text
+          >
+          <text
+            x="551"
+            y="336"
+            text-anchor="middle"
+            font-size="11"
+            fill="#633806">SGはDeny不可</text
+          >
+        </svg>
       </div>
     </section>
   </div>
 </Layout>
+
+<div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+  <h3 class="text-lg font-bold text-blue-800 mb-4">⚙️ デフォルト設定</h3>
+  <div class="space-y-3 text-blue-700">
+    <div>
+      <p class="font-medium">デフォルト NACL</p>
+      <p class="text-sm">• すべての通信を許可</p>
+      <p class="text-sm">• VPC作成時に自動作成</p>
+    </div>
+    <div>
+      <p class="font-medium">カスタム NACL</p>
+      <p class="text-sm">• デフォルトですべて拒否</p>
+      <p class="text-sm">• 明示的にルールを追加する必要</p>
+    </div>
+  </div>
+</div>
+
+<section class="mb-12">
+  <h2 class="heading-section">ルール번号と評価順序</h2>
+  <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
+    <h3 class="text-lg font-bold text-gray-800 mb-4">📋 評価ルール</h3>
+    <div class="space-y-4">
+      <div class="bg-white border rounded-lg p-4">
+        <h4 class="font-medium text-gray-800 mb-2">評価の流れ</h4>
+        <ol class="space-y-2 text-gray-700 text-sm">
+          <li>
+            <span class="font-medium text-blue-600">1.</span> 最も小さい番号のルールから順番に評価
+          </li>
+          <li>
+            <span class="font-medium text-blue-600">2.</span> マッチしたルールで即座に判定（ALLOW
+            or DENY）
+          </li>
+          <li>
+            <span class="font-medium text-blue-600">3.</span> マッチしない場合は次の番号のルールを評価
+          </li>
+          <li>
+            <span class="font-medium text-blue-600">4.</span> 最後まで一致しなければデフォルトルール（*）が適用（通常はDENY）
+          </li>
+        </ol>
+      </div>
+
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <h4 class="font-medium text-yellow-800 mb-2">⚠️ 注意点</h4>
+        <div class="text-yellow-700 text-sm space-y-1">
+          <p>• ルール番号は 1〜32766 の範囲で設定</p>
+          <p>• 100 番刻みで設定するのが推奨（後から挿入しやすい）</p>
+          <p>• 重複する番号は設定不可</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mb-12">
+  <h2 class="heading-section">実用的な設定例</h2>
+  <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+    <h3 class="text-lg font-bold text-green-800 mb-4">
+      🛡️ よくあるNACL設定パターン
+    </h3>
+
+    <div class="space-y-6">
+      <div>
+        <h4 class="font-medium text-green-800 mb-2">
+          パターン1: Webサーバー用（パブリックサブネット）
+        </h4>
+        <div class="bg-white border rounded-lg overflow-hidden">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="px-3 py-2 text-left">番号</th>
+                <th class="px-3 py-2 text-left">タイプ</th>
+                <th class="px-3 py-2 text-left">プロトコル</th>
+                <th class="px-3 py-2 text-left">ポート範囲</th>
+                <th class="px-3 py-2 text-left">ソース</th>
+                <th class="px-3 py-2 text-left">アクション</th>
+              </tr>
+            </thead>
+            <tbody class="text-gray-700">
+              <tr class="border-t">
+                <td class="px-3 py-2">100</td>
+                <td class="px-3 py-2">HTTP</td>
+                <td class="px-3 py-2">TCP</td>
+                <td class="px-3 py-2">80</td>
+                <td class="px-3 py-2">0.0.0.0/0</td>
+                <td class="px-3 py-2 text-green-600">ALLOW</td>
+              </tr>
+              <tr class="border-t">
+                <td class="px-3 py-2">200</td>
+                <td class="px-3 py-2">HTTPS</td>
+                <td class="px-3 py-2">TCP</td>
+                <td class="px-3 py-2">443</td>
+                <td class="px-3 py-2">0.0.0.0/0</td>
+                <td class="px-3 py-2 text-green-600">ALLOW</td>
+              </tr>
+              <tr class="border-t">
+                <td class="px-3 py-2">300</td>
+                <td class="px-3 py-2">SSH</td>
+                <td class="px-3 py-2">TCP</td>
+                <td class="px-3 py-2">22</td>
+                <td class="px-3 py-2">管理用IP/32</td>
+                <td class="px-3 py-2 text-green-600">ALLOW</td>
+              </tr>
+              <tr class="border-t">
+                <td class="px-3 py-2">*</td>
+                <td class="px-3 py-2">ALL</td>
+                <td class="px-3 py-2">ALL</td>
+                <td class="px-3 py-2">ALL</td>
+                <td class="px-3 py-2">0.0.0.0/0</td>
+                <td class="px-3 py-2 text-red-600">DENY</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="font-medium text-green-800 mb-2">
+          パターン2: 特定IPをブロック
+        </h4>
+        <div class="bg-white border rounded-lg overflow-hidden">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-100">
+              <tr>
+                <th class="px-3 py-2 text-left">番号</th>
+                <th class="px-3 py-2 text-left">プロトコル</th>
+                <th class="px-3 py-2 text-left">ポート範囲</th>
+                <th class="px-3 py-2 text-left">ソース</th>
+                <th class="px-3 py-2 text-left">アクション</th>
+              </tr>
+            </thead>
+            <tbody class="text-gray-700">
+              <tr class="border-t">
+                <td class="px-3 py-2">50</td>
+                <td class="px-3 py-2">ALL</td>
+                <td class="px-3 py-2">ALL</td>
+                <td class="px-3 py-2">悪意のあるIP/32</td>
+                <td class="px-3 py-2 text-red-600">DENY</td>
+              </tr>
+              <tr class="border-t">
+                <td class="px-3 py-2">100</td>
+                <td class="px-3 py-2">TCP</td>
+                <td class="px-3 py-2">80</td>
+                <td class="px-3 py-2">0.0.0.0/0</td>
+                <td class="px-3 py-2 text-green-600">ALLOW</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-sm text-green-700 mt-2">
+          💡
+          セキュリティグループは拒否ルールが書けないため、特定IPのブロックにはNACLを使用
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mb-12">
+  <h2 class="heading-section">SAA試験のポイント</h2>
+  <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+    <h3 class="text-lg font-bold text-red-800 mb-4">📋 頻出問題パターン</h3>
+    <div class="space-y-4 text-red-700">
+      <div class="border-l-4 border-red-400 pl-4">
+        <p class="font-medium">「特定のIPアドレスをブロックしたい」</p>
+        <p class="text-sm mt-1">
+          → <strong>Network ACL</strong> を使用（セキュリティグループは拒否ルール不可）
+        </p>
+      </div>
+      <div class="border-l-4 border-red-400 pl-4">
+        <p class="font-medium">「ステートレスとは何か？」</p>
+        <p class="text-sm mt-1">
+          → <strong>戻り通信も明示的に許可が必要</strong
+          >（セキュリティグループは自動許可）
+        </p>
+      </div>
+      <div class="border-l-4 border-red-400 pl-4">
+        <p class="font-medium">
+          「同一サブネット内のEC2間通信がブロックされる？」
+        </p>
+        <p class="text-sm mt-1">
+          → <strong>No</strong> - NACLはサブネット境界でのみ動作
+        </p>
+      </div>
+      <div class="border-l-4 border-red-400 pl-4">
+        <p class="font-medium">「NACLのルール評価順序は？」</p>
+        <p class="text-sm mt-1">
+          → <strong>番号の小さい順</strong>に評価、マッチしたら即座に判定
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
