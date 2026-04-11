@@ -1,0 +1,768 @@
+---
+/**
+ * プライベートIPアドレス解説
+ * VPCにおけるCIDR設計・RFC 1918・サブネット分割の仕組み
+ */
+---
+
+<style>
+  .pip-subnet-cell {
+    flex: 1;
+    min-width: 120px;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    text-align: center;
+  }
+  .pip-subnet-cell.public {
+    background: rgba(29, 158, 117, 0.1);
+    border: 1px solid #1d9e75;
+    color: #085041;
+  }
+  .dark .pip-subnet-cell.public {
+    background: rgba(29, 158, 117, 0.15);
+    color: #6ee7b7;
+  }
+  .pip-subnet-cell.private {
+    background: rgba(83, 74, 183, 0.08);
+    border: 1px solid #7f77dd;
+    color: #3c3489;
+  }
+  .dark .pip-subnet-cell.private {
+    background: rgba(83, 74, 183, 0.15);
+    color: #c4b5fd;
+  }
+  .pip-subnet-name {
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .pip-subnet-cidr {
+    font-family: monospace;
+    font-size: 11px;
+  }
+  .pip-subnet-hosts {
+    font-size: 11px;
+    color: #6b7280;
+  }
+  .dark .pip-subnet-hosts {
+    color: #9ca3af;
+  }
+</style>
+
+<div>
+  <!-- Tabs -->
+  <div class="tab-btn-group">
+    <button
+      class="tab-btn active"
+      id="pip-tab-overview"
+      onclick="pipSetTab('overview')">概要</button
+    >
+    <button class="tab-btn" id="pip-tab-assign" onclick="pipSetTab('assign')"
+      >自動割り当て vs EIP</button
+    >
+    <button
+      class="tab-btn"
+      id="pip-tab-lifecycle"
+      onclick="pipSetTab('lifecycle')">IPのライフサイクル</button
+    >
+    <button class="tab-btn" id="pip-tab-nat" onclick="pipSetTab('nat')"
+      >IGWとNAT変換</button
+    >
+    <button class="tab-btn" id="pip-tab-cidr" onclick="pipSetTab('cidr')"
+      >CIDRとサブネット設計</button
+    >
+    <button class="tab-btn" id="pip-tab-exam" onclick="pipSetTab('exam')"
+      >試験ポイント</button
+    >
+  </div>
+
+  <!-- ===== Tab 1: 概要 ===== -->
+  <div class="tab-panel active" id="pip-panel-overview">
+    <p class="text-gray-600 dark:text-gray-400 mb-4">
+      プライベートIPアドレスは<strong
+        >VPC内部でのみ使用される非公開のアドレス</strong
+      >です。
+      インターネット上ではルーティングされないため、外部と直接通信することはできません。
+    </p>
+
+    <h3 style="font-size:14px;font-weight:600;margin:0 0 8px;">
+      RFC 1918 で定義される3つの範囲
+    </h3>
+    <table class="dia-table">
+      <thead>
+        <tr>
+          <th>クラス</th>
+          <th>CIDR ブロック</th>
+          <th>アドレス範囲</th>
+          <th>アドレス数</th>
+          <th>用途の目安</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>クラスA</strong></td>
+          <td><code>10.0.0.0/8</code></td>
+          <td><code>10.0.0.0</code> ~ <code>10.255.255.255</code></td>
+          <td>約1,677万</td>
+          <td>大規模VPC・エンタープライズ</td>
+        </tr>
+        <tr>
+          <td><strong>クラスB</strong></td>
+          <td><code>172.16.0.0/12</code></td>
+          <td><code>172.16.0.0</code> ~ <code>172.31.255.255</code></td>
+          <td>約104万</td>
+          <td>中規模VPC</td>
+        </tr>
+        <tr>
+          <td><strong>クラスC</strong></td>
+          <td><code>192.168.0.0/16</code></td>
+          <td><code>192.168.0.0</code> ~ <code>192.168.255.255</code></td>
+          <td>約6.5万</td>
+          <td>小規模VPC・検証環境</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="dia-note info" style="margin-top:12px;">
+      <strong>AWSでのVPC CIDRルール：</strong>
+      VPCのCIDRブロックは <code>/16</code>（65,536 IP）〜 <code>/28</code>（16
+      IP）の範囲で指定可能。 デフォルトVPCは <code>172.31.0.0/16</code> が割り当てられます。
+    </div>
+
+    <h3 style="font-size:14px;font-weight:600;margin:16px 0 8px;">
+      プライベートIPでできること / できないこと
+    </h3>
+    <div class="dia-diagram">
+      <div class="dia-row" style="gap:24px;align-items:start;flex-wrap:wrap;">
+        <div style="flex:1;min-width:260px;">
+          <h3
+            style="font-size:14px;font-weight:600;color:#059669;margin-bottom:8px;"
+          >
+            ✓ できること
+          </h3>
+          <table class="dia-table">
+            <tbody>
+              <tr
+                ><td
+                  >VPC内のEC2同士の通信（同一サブネット / 異なるサブネット）</td
+                ></tr
+              >
+              <tr><td>VPC Peering経由で他VPCのリソースと通信</td></tr>
+              <tr><td>VPN / Direct Connect経由でオンプレミスと通信</td></tr>
+              <tr
+                ><td>VPC Endpoint経由でAWSサービス（S3, DynamoDB等）と通信</td
+                ></tr
+              >
+              <tr
+                ><td>プライベートサブネット内のRDS・ElastiCacheへの接続</td></tr
+              >
+            </tbody>
+          </table>
+        </div>
+        <div style="flex:1;min-width:260px;">
+          <h3
+            style="font-size:14px;font-weight:600;color:#dc2626;margin-bottom:8px;"
+          >
+            ✕ プライベートIPだけではできないこと
+          </h3>
+          <table class="dia-table">
+            <tbody>
+              <tr><td>インターネットへの直接アクセス（アウトバウンド）</td></tr>
+              <tr><td>インターネットからの直接アクセス（インバウンド）</td></tr>
+              <tr><td>外部APIの呼び出し（GitHub, Slack等）</td></tr>
+              <tr><td>OS・パッケージのアップデート（yum, apt等）</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Tab 2: 自動割り当て vs EIP ===== -->
+  <div class="tab-panel" id="pip-panel-assign">
+    <h3 style="font-size:14px;font-weight:600;margin:0 0 8px;">
+      IPアドレスの3つの種類
+    </h3>
+    <table class="dia-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>プライベートIP</th>
+          <th>パブリックIP（自動割当）</th>
+          <th>Elastic IP（EIP）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>割り当て</strong></td>
+          <td>EC2起動時に自動（手動指定も可）</td>
+          <td>サブネット設定で自動割当ON時</td>
+          <td>明示的に確保（Allocate）して関連付け</td>
+        </tr>
+        <tr>
+          <td><strong>固定性</strong></td>
+          <td
+            ><span style="color:#059669;font-weight:600;">固定</span
+            >（EC2停止しても変わらない）</td
+          >
+          <td
+            ><span style="color:#dc2626;font-weight:600;">変動</span
+            >（EC2停止で解放・再起動で変わる）</td
+          >
+          <td
+            ><span style="color:#059669;font-weight:600;">固定</span
+            >（明示的に解放するまで保持）</td
+          >
+        </tr>
+        <tr>
+          <td><strong>スコープ</strong></td>
+          <td>VPC内部のみ</td>
+          <td>インターネット到達可能</td>
+          <td>インターネット到達可能</td>
+        </tr>
+        <tr>
+          <td><strong>課金</strong></td>
+          <td>無料</td>
+          <td>2024年2月〜 全パブリックIPv4に $0.005/時間</td>
+          <td>$0.005/時間（使用中・未使用問わず）</td>
+        </tr>
+        <tr>
+          <td><strong>紐付き先</strong></td>
+          <td>ENI（Elastic Network Interface）</td>
+          <td>ENI</td>
+          <td>ENI（別のENIに付け替え可能）</td>
+        </tr>
+        <tr>
+          <td><strong>用途</strong></td>
+          <td>VPC内通信・DB接続</td>
+          <td>一時的なテスト・開発環境</td>
+          <td>固定IP必須の本番サーバー・DNS登録</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:14px;font-weight:600;margin:16px 0 8px;">
+      プライマリ vs セカンダリ プライベートIP
+    </h3>
+    <table class="dia-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>プライマリプライベートIP</th>
+          <th>セカンダリプライベートIP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>割り当て</strong></td>
+          <td>EC2起動時に自動（サブネットCIDRから）or 手動指定</td>
+          <td>ENIに追加で割り当て可能</td>
+        </tr>
+        <tr>
+          <td><strong>変更</strong></td>
+          <td
+            ><span style="color:#dc2626;font-weight:600;">変更不可</span
+            >（起動後は固定）</td
+          >
+          <td>追加・削除が自由</td>
+        </tr>
+        <tr>
+          <td><strong>削除</strong></td>
+          <td>ENI削除時に解放</td>
+          <td>任意のタイミングで解放可能</td>
+        </tr>
+        <tr>
+          <td><strong>用途</strong></td>
+          <td>メインの通信用アドレス</td>
+          <td>複数サービスのホスト、フェイルオーバー</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="dia-note info" style="margin-top:12px;">
+      <strong>パブリックIPの自動割り当て設定：</strong>
+      サブネット設定の「パブリックIPv4アドレスの自動割り当て」がONだと、そのサブネットで起動したEC2にパブリックIPが自動付与されます。
+      パブリックサブネットではON、プライベートサブネットではOFFにするのが一般的です。
+      EC2起動時にこの設定を個別に上書きすることも可能です。
+    </div>
+  </div>
+
+  <!-- ===== Tab 3: IPのライフサイクル ===== -->
+  <div class="tab-panel" id="pip-panel-lifecycle">
+    <p class="text-gray-600 dark:text-gray-400 mb-4">
+      AWSリソースを削除・停止した際にIPアドレスがどうなるかは、試験でも実務でも重要なポイントです。
+    </p>
+
+    <table class="dia-table">
+      <thead>
+        <tr>
+          <th>操作</th>
+          <th>プライベートIP</th>
+          <th>パブリックIP（自動割当）</th>
+          <th>Elastic IP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>EC2 停止</strong></td>
+          <td>保持される</td>
+          <td
+            ><span style="color:#dc2626;font-weight:600;">解放される</span
+            >（再起動時に新しいIPが割当）</td
+          >
+          <td>保持される（関連付け維持）</td>
+        </tr>
+        <tr>
+          <td><strong>EC2 再起動</strong></td>
+          <td>保持される</td>
+          <td>保持される（停止を伴わない）</td>
+          <td>保持される</td>
+        </tr>
+        <tr>
+          <td><strong>EC2 終了（削除）</strong></td>
+          <td
+            ><span style="color:#dc2626;font-weight:600;">解放される</span
+            >（サブネットのプールに戻る）</td
+          >
+          <td><span style="color:#dc2626;font-weight:600;">解放される</span></td
+          >
+          <td
+            ><span style="color:#dc2626;font-weight:600;">関連付け解除</span
+            >（EIP自体は残る → <strong>課金継続</strong>）</td
+          >
+        </tr>
+        <tr>
+          <td><strong>ENI デタッチ</strong></td>
+          <td>ENIに紐付いたまま保持</td>
+          <td>ENIに紐付いたまま保持</td>
+          <td>ENIに紐付いたまま保持</td>
+        </tr>
+        <tr>
+          <td><strong>ENI 削除</strong></td>
+          <td><span style="color:#dc2626;font-weight:600;">解放される</span></td
+          >
+          <td><span style="color:#dc2626;font-weight:600;">解放される</span></td
+          >
+          <td
+            ><span style="color:#dc2626;font-weight:600;">関連付け解除</span
+            >（EIP自体は残る）</td
+          >
+        </tr>
+        <tr>
+          <td><strong>NAT GW 削除</strong></td>
+          <td>—</td>
+          <td>—</td>
+          <td
+            ><span style="color:#dc2626;font-weight:600;">関連付け解除</span
+            >（EIP自体は残る → <strong>課金継続</strong>）</td
+          >
+        </tr>
+        <tr>
+          <td><strong>EIP 解放（Release）</strong></td>
+          <td>—</td>
+          <td>—</td>
+          <td
+            ><span style="color:#dc2626;font-weight:600;">完全に削除</span
+            >（AWSプールに戻る・課金停止）</td
+          >
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="dia-note warn" style="margin-top:12px;">
+      <strong>ENIとIPの関係：</strong>
+      <ul style="margin:4px 0 0;padding-left:20px;font-size:13px;">
+        <li>
+          IPアドレスは<strong>ENI（Elastic Network Interface）に紐付く</strong
+          >。EC2ではなくENIが保持者。
+        </li>
+        <li>
+          <strong>プライマリENI</strong>はEC2終了時に自動削除 →
+          プライベートIPも解放される。
+        </li>
+        <li>
+          <strong>セカンダリENI</strong>はEC2を終了しても<strong
+            >削除されない</strong
+          >（手動デタッチが必要）。IPも保持される。
+        </li>
+      </ul>
+    </div>
+
+    <div class="dia-note info" style="margin-top:8px;">
+      <strong>EIPの課金に注意：</strong>
+      <ul style="margin:4px 0 0;padding-left:20px;font-size:13px;">
+        <li>
+          EIPは<strong
+            >明示的にRelease（解放）しない限りアカウントに残り続け課金される。</strong
+          >
+        </li>
+        <li>
+          EC2停止中でもEIPが関連付けられていれば<strong>課金対象</strong>。
+        </li>
+        <li>
+          リソース削除後、EIPだけが残って課金され続ける「EIPの放置」は実務でよくあるミス。
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ===== Tab 4: IGWとNAT変換 ===== -->
+  <div class="tab-panel" id="pip-panel-nat">
+    <p class="text-gray-600 dark:text-gray-400 mb-4">
+      プライベートIPだけではインターネットと通信できません。方向に応じて異なる仕組みが必要です。
+    </p>
+
+    <table class="dia-table">
+      <thead>
+        <tr>
+          <th>方向</th>
+          <th>方法</th>
+          <th>仕組み</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>外→内</strong><br />（インバウンド）</td>
+          <td>パブリックIP / EIP + IGW</td>
+          <td
+            >IGWがパブリックIP ↔
+            プライベートIPのNAT変換を行う。パブリックサブネットに配置が必要。</td
+          >
+        </tr>
+        <tr>
+          <td><strong>内→外</strong><br />（アウトバウンド）</td>
+          <td>NAT Gateway + IGW</td>
+          <td
+            >プライベートサブネットのEC2からの通信をNAT GWが中継。送信元IPがNAT
+            GWのEIPに変換される。</td
+          >
+        </tr>
+        <tr>
+          <td><strong>内→AWS</strong><br />（非インターネット）</td>
+          <td>VPC Endpoint</td>
+          <td
+            >インターネットを経由せずにAWSサービスへ接続。プライベートIPのまま通信可能。</td
+          >
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:14px;font-weight:600;margin:16px 0 8px;">
+      IGWのNAT変換の仕組み
+    </h3>
+    <p class="text-gray-600 dark:text-gray-400 mb-4" style="font-size:13px;">
+      IGWは単なるゲートウェイではなく、<strong
+        >パブリックIPとプライベートIPの1対1 NAT変換</strong
+      >を行います。
+    </p>
+    <table class="dia-table">
+      <thead>
+        <tr>
+          <th>方向</th>
+          <th>変換内容</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>送信時（内→外）</strong></td>
+          <td
+            >送信元をプライベートIP → パブリックIP（or
+            EIP）に変換してインターネットへ</td
+          >
+        </tr>
+        <tr>
+          <td><strong>受信時（外→内）</strong></td>
+          <td>宛先をパブリックIP → プライベートIPに変換してEC2へ転送</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="dia-note info" style="margin-top:12px;">
+      <strong>重要：</strong> EC2自身はパブリックIPを「知らない」。<code
+        >ifconfig</code
+      >や<code>ip addr</code>で見えるのはプライベートIPのみ。 IGWがパブリックIP
+      ↔ プライベートIPの変換を透過的に行っています。
+    </div>
+
+    <h3 style="font-size:14px;font-weight:600;margin:16px 0 8px;">
+      NAT GatewayとIGWの違い
+    </h3>
+    <table class="dia-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>IGW</th>
+          <th>NAT Gateway</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>NAT方式</strong></td>
+          <td>1対1 Static NAT（パブリックIP ↔ プライベートIP）</td>
+          <td>多対1 PAT（複数プライベートIP → 1つのEIP）</td>
+        </tr>
+        <tr>
+          <td><strong>双方向性</strong></td>
+          <td>双方向（インバウンド + アウトバウンド）</td>
+          <td>アウトバウンドのみ（インバウンドは不可）</td>
+        </tr>
+        <tr>
+          <td><strong>配置</strong></td>
+          <td>VPCにアタッチ（1つ）</td>
+          <td>パブリックサブネットに配置（AZごと推奨）</td>
+        </tr>
+        <tr>
+          <td><strong>課金</strong></td>
+          <td>無料</td>
+          <td>$0.062/時間 + データ処理料金</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="dia-note warn" style="margin-top:12px;">
+      <strong>よくある誤解：</strong>
+      プライベートサブネットのEC2は「通信できない」のではなく、「インターネットと直接通信できない」だけ。
+      VPC内やVPN経由の通信はプライベートIPだけで問題なく行えます。
+    </div>
+  </div>
+
+  <!-- ===== Tab 5: CIDRとサブネット設計 ===== -->
+  <div class="tab-panel" id="pip-panel-cidr">
+    <p class="text-gray-600 dark:text-gray-400 mb-4">
+      VPC内をサブネットに分割してAZごとにリソースを配置します。以下は典型的な設計例です。
+    </p>
+
+    <div class="dia-diagram">
+      <div class="dia-vpc">
+        <div class="dia-vpc-header">
+          <img src="/icons/Aws-Vpc--Streamline-Svg-Logos.svg" alt="VPC" />
+          <span>VPC: <code>10.0.0.0/16</code>（65,536 IP）</span>
+        </div>
+        <div class="dia-row" style="gap:16px;align-items:stretch;">
+          <div class="dia-az">
+            <div class="dia-az-header">AZ 1 (ap-northeast-1a)</div>
+            <div
+              style="display:flex;flex-direction:column;gap:8px;padding:8px;"
+            >
+              <div class="pip-subnet-cell public">
+                <div class="pip-subnet-name">Public Subnet</div>
+                <div class="pip-subnet-cidr">10.0.1.0/24</div>
+                <div class="pip-subnet-hosts">251 利用可能IP</div>
+              </div>
+              <div class="pip-subnet-cell private">
+                <div class="pip-subnet-name">Private Subnet</div>
+                <div class="pip-subnet-cidr">10.0.10.0/24</div>
+                <div class="pip-subnet-hosts">251 利用可能IP</div>
+              </div>
+              <div class="pip-subnet-cell private">
+                <div class="pip-subnet-name">DB Subnet</div>
+                <div class="pip-subnet-cidr">10.0.20.0/24</div>
+                <div class="pip-subnet-hosts">251 利用可能IP</div>
+              </div>
+            </div>
+          </div>
+          <div class="dia-az">
+            <div class="dia-az-header">AZ 2 (ap-northeast-1c)</div>
+            <div
+              style="display:flex;flex-direction:column;gap:8px;padding:8px;"
+            >
+              <div class="pip-subnet-cell public">
+                <div class="pip-subnet-name">Public Subnet</div>
+                <div class="pip-subnet-cidr">10.0.2.0/24</div>
+                <div class="pip-subnet-hosts">251 利用可能IP</div>
+              </div>
+              <div class="pip-subnet-cell private">
+                <div class="pip-subnet-name">Private Subnet</div>
+                <div class="pip-subnet-cidr">10.0.11.0/24</div>
+                <div class="pip-subnet-hosts">251 利用可能IP</div>
+              </div>
+              <div class="pip-subnet-cell private">
+                <div class="pip-subnet-name">DB Subnet</div>
+                <div class="pip-subnet-cidr">10.0.21.0/24</div>
+                <div class="pip-subnet-hosts">251 利用可能IP</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-note info" style="margin-top:12px;">
+      <strong>設計のベストプラクティス：</strong>
+      サブネットCIDRは用途ごとにオクテットの桁を分ける（例: Public=1,2 / Private=10,11
+      / DB=20,21）と管理しやすい。 将来のAZ追加にも対応できるよう余裕を持たせる。
+    </div>
+
+    <h3 style="font-size:14px;font-weight:600;margin:16px 0 8px;">
+      サブネットの予約アドレス（5つ）
+    </h3>
+    <p class="text-gray-600 dark:text-gray-400 mb-4" style="font-size:13px;">
+      各サブネットでは先頭4つと末尾1つの計<strong>5つのIPアドレス</strong
+      >が予約されており、EC2等に割り当てできません。
+    </p>
+    <table class="dia-table">
+      <thead>
+        <tr>
+          <th>アドレス</th>
+          <th>例（10.0.1.0/24）</th>
+          <th>用途</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>ネットワークアドレス</strong></td>
+          <td><code>10.0.1.0</code></td>
+          <td>サブネットのネットワークアドレス</td>
+        </tr>
+        <tr>
+          <td><strong>+1（VPCルーター）</strong></td>
+          <td><code>10.0.1.1</code></td>
+          <td>VPCルーター用に予約</td>
+        </tr>
+        <tr>
+          <td><strong>+2（DNS）</strong></td>
+          <td><code>10.0.1.2</code></td>
+          <td>Amazon提供のDNSサーバー</td>
+        </tr>
+        <tr>
+          <td><strong>+3（将来用）</strong></td>
+          <td><code>10.0.1.3</code></td>
+          <td>AWSが将来の用途に予約</td>
+        </tr>
+        <tr>
+          <td><strong>ブロードキャスト</strong></td>
+          <td><code>10.0.1.255</code></td>
+          <td>ブロードキャストアドレス（VPCでは未サポートだが予約）</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:14px;font-weight:600;margin:16px 0 8px;">
+      CIDR計算表
+    </h3>
+    <table class="dia-table">
+      <thead>
+        <tr>
+          <th>CIDR</th>
+          <th>サブネットマスク</th>
+          <th>IP総数</th>
+          <th>利用可能IP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          ><td><code>/16</code></td><td><code>255.255.0.0</code></td><td
+            >65,536</td
+          ><td>65,531</td></tr
+        >
+        <tr
+          ><td><code>/20</code></td><td><code>255.255.240.0</code></td><td
+            >4,096</td
+          ><td>4,091</td></tr
+        >
+        <tr
+          ><td><code>/24</code></td><td><code>255.255.255.0</code></td><td
+            >256</td
+          ><td>251</td></tr
+        >
+        <tr
+          ><td><code>/26</code></td><td><code>255.255.255.192</code></td><td
+            >64</td
+          ><td>59</td></tr
+        >
+        <tr
+          ><td><code>/28</code></td><td><code>255.255.255.240</code></td><td
+            >16</td
+          ><td>11</td></tr
+        >
+      </tbody>
+    </table>
+
+    <div class="dia-note warn" style="margin-top:12px;">
+      <strong>計算の覚え方：</strong>
+      IPアドレス総数 = 2<sup>(32 - プレフィックス長)</sup>。利用可能数 = 総数 -
+      5。 /24 → 2<sup>8</sup> = 256 → 256 - 5 = 251。/28 → 2<sup>4</sup> = 16 → 16
+      - 5 = 11。
+    </div>
+  </div>
+
+  <!-- ===== Tab 6: 試験ポイント ===== -->
+  <div class="tab-panel" id="pip-panel-exam">
+    <div class="dia-checklist">
+      <div class="dia-checklist-title">
+        試験で押さえるべきプライベートIP・VPCネットワーキングのポイント
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓ RFC 1918の3範囲（10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16）を暗記
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓ VPC CIDRは /16 〜 /28 の範囲で指定可能
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓ サブネットごとに5つのIPが予約される（先頭4 + 末尾1）
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓ デフォルトVPCのCIDRは 172.31.0.0/16
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓ セカンダリCIDRを追加して拡張可能（最大5つ、申請で増加）
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓ VPC Peering時にCIDRが重複するとピアリング不可
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓ EC2のプライベートIPはENI（Elastic Network Interface）に紐付く
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓ プライマリプライベートIPは起動後に変更不可
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓ EC2停止でパブリックIP（自動割当）は解放される。再起動で別IPになる
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓ EC2終了でプライベートIPはサブネットのプールに戻る
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓ EIPは明示的にRelease（解放）しない限りアカウントに残り課金される
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓ リソース削除後もEIPは残る — 手動で解放が必要
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓ IGWは1対1 Static NAT、NAT GWは多対1 PAT
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓
+        EC2からはプライベートIPしか見えない（ifconfigにパブリックIPは表示されない）
+      </div>
+      <div class="dia-checklist-item ok">
+        ✓ プライベートIPはインターネットからルーティングされない
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  var pipTabs = ["overview", "assign", "lifecycle", "nat", "cidr", "exam"];
+
+  function pipSetTab(tab) {
+    pipTabs.forEach(function (t) {
+      var panel = document.getElementById("pip-panel-" + t);
+      var btn = document.getElementById("pip-tab-" + t);
+      if (panel) {
+        if (t === tab) {
+          panel.classList.add("active");
+        } else {
+          panel.classList.remove("active");
+        }
+      }
+      if (btn) {
+        if (t === tab) {
+          btn.classList.add("active");
+        } else {
+          btn.classList.remove("active");
+        }
+      }
+    });
+  }
+</script>

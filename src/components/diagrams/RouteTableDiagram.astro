@@ -1,0 +1,1050 @@
+---
+/**
+ * ルートテーブル解説
+ * VPCルートテーブルの仕組み・設定パターン・試験対策
+ */
+---
+
+<style>
+  .rt-entry {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-family: "JetBrains Mono", monospace;
+  }
+  .rt-entry.local {
+    background: rgba(29, 158, 117, 0.08);
+    border: 1px solid #1d9e75;
+    color: #085041;
+  }
+  .dark .rt-entry.local {
+    background: rgba(29, 158, 117, 0.15);
+    color: #6ee7b7;
+    border-color: #059669;
+  }
+  .rt-entry.igw {
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid #3b82f6;
+    color: #1e40af;
+  }
+  .dark .rt-entry.igw {
+    background: rgba(59, 130, 246, 0.12);
+    color: #93c5fd;
+    border-color: #3b82f6;
+  }
+  .rt-entry.nat {
+    background: rgba(249, 115, 22, 0.08);
+    border: 1px solid #f97316;
+    color: #9a3412;
+  }
+  .dark .rt-entry.nat {
+    background: rgba(249, 115, 22, 0.12);
+    color: #fdba74;
+    border-color: #f97316;
+  }
+  .rt-entry.vpce {
+    background: rgba(139, 92, 246, 0.08);
+    border: 1px solid #8b5cf6;
+    color: #6d28d9;
+  }
+  .dark .rt-entry.vpce {
+    background: rgba(139, 92, 246, 0.12);
+    color: #c4b5fd;
+    border-color: #8b5cf6;
+  }
+  .rt-entry.pcx {
+    background: rgba(219, 39, 119, 0.08);
+    border: 1px solid #db2777;
+    color: #9d174d;
+  }
+  .dark .rt-entry.pcx {
+    background: rgba(219, 39, 119, 0.12);
+    color: #f9a8d4;
+    border-color: #db2777;
+  }
+  .rt-entry.tgw {
+    background: rgba(20, 184, 166, 0.08);
+    border: 1px solid #14b8a6;
+    color: #0f766e;
+  }
+  .dark .rt-entry.tgw {
+    background: rgba(20, 184, 166, 0.12);
+    color: #5eead4;
+    border-color: #14b8a6;
+  }
+  .rt-dest {
+    font-weight: 600;
+    min-width: 140px;
+  }
+  .rt-arrow {
+    color: #9ca3af;
+  }
+  .rt-target {
+    font-weight: 500;
+  }
+  .rt-badge {
+    font-size: 11px;
+    font-family: "Noto Sans JP", sans-serif;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-left: auto;
+  }
+  .rt-badge.auto {
+    background: #dcfce7;
+    color: #166534;
+  }
+  .dark .rt-badge.auto {
+    background: rgba(22, 163, 74, 0.2);
+    color: #86efac;
+  }
+  .rt-badge.manual {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  .dark .rt-badge.manual {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fcd34d;
+  }
+</style>
+
+<div>
+  <!-- Tabs -->
+  <div class="tab-btn-group">
+    <button
+      class="tab-btn active"
+      id="rt-tab-overview"
+      onclick="rtSetTab('overview')">概要</button
+    >
+    <button class="tab-btn" id="rt-tab-pattern" onclick="rtSetTab('pattern')"
+      >設定パターン</button
+    >
+    <button class="tab-btn" id="rt-tab-priority" onclick="rtSetTab('priority')"
+      >ルート評価順序</button
+    >
+    <button
+      class="tab-btn"
+      id="rt-tab-propagation"
+      onclick="rtSetTab('propagation')">ルート伝播</button
+    >
+    <button class="tab-btn" id="rt-tab-exam" onclick="rtSetTab('exam')"
+      >試験対策</button
+    >
+  </div>
+
+  <!-- Tab: Overview -->
+  <div class="tab-panel active" id="rt-panel-overview">
+    <div class="dia-diagram" id="rt-overview-wrap" style="position:relative;">
+      <p
+        style="font-size:16px;font-weight:600;text-align:center;margin-bottom:16px;color:var(--text);"
+      >
+        ルートテーブルとサブネットの関係
+      </p>
+
+      <!-- Internet -->
+      <div class="dia-row">
+        <div class="dia-box dia-internet">
+          <img
+            class="dia-box-icon"
+            src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Internet_48_Light.svg"
+            alt="Internet"
+          />
+          <div class="dia-box-label">インターネット</div>
+        </div>
+      </div>
+      <div class="dia-row">
+        <div class="dia-arrow"><div class="dia-arrow-v"></div></div>
+      </div>
+
+      <!-- IGW -->
+      <div class="dia-row">
+        <div id="rt-igw-box" class="dia-box dia-igw">
+          <img
+            class="dia-box-icon"
+            src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Internet-Gateway_48.svg"
+            alt="IGW"
+          />
+          <div class="dia-box-label">Internet Gateway</div>
+        </div>
+      </div>
+      <div class="dia-row">
+        <div class="dia-arrow"><div class="dia-arrow-v"></div></div>
+      </div>
+
+      <!-- VPC -->
+      <div class="dia-vpc">
+        <div class="dia-vpc-header">
+          <img src="/icons/Aws-Vpc--Streamline-Svg-Logos.svg" alt="VPC" />
+          <span>VPC（10.0.0.0/16）</span>
+        </div>
+
+        <!-- メインルートテーブル -->
+        <div
+          style="display:flex;align-items:center;gap:12px;margin-bottom:12px;padding:10px 14px;background:rgba(139,92,246,0.06);border:1px dashed #8b5cf6;border-radius:10px;"
+        >
+          <img
+            src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-Route-53_Route-Table_48.svg"
+            alt="Route Table"
+            style="width:32px;height:32px;"
+          />
+          <div>
+            <div style="font-weight:600;color:#6d28d9;font-size:16px;">
+              メインルートテーブル
+            </div>
+            <div style="font-size:14px;color:#6b7280;">
+              VPC作成時に自動生成。明示的な関連付けがないサブネットに適用
+            </div>
+          </div>
+          <span class="rt-badge auto">自動</span>
+        </div>
+
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <!-- Public subnet -->
+          <div class="dia-subnet public" style="flex:1;min-width:200px;">
+            <div class="dia-subnet-header">
+              <img
+                src="/AWS-icons/Architecture-Group-Icons_07312025/Public-subnet_32.svg"
+                alt="public"
+              />
+              <span>パブリックサブネット</span>
+            </div>
+
+            <!-- NAT GW (lives in public subnet) -->
+            <div class="dia-row" style="margin-bottom:8px;">
+              <div id="rt-natgw-box" class="dia-box dia-natgw">
+                <img
+                  class="dia-box-icon"
+                  src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_NAT-Gateway_48.svg"
+                  alt="NAT GW"
+                />
+                <div class="dia-box-label">NAT Gateway</div>
+                <div class="dia-box-sub">パブリックサブネットに配置</div>
+              </div>
+            </div>
+
+            <div
+              style="display:flex;align-items:center;gap:8px;padding:8px;background:rgba(139,92,246,0.06);border:1px solid #8b5cf6;border-radius:8px;"
+            >
+              <img
+                src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-Route-53_Route-Table_48.svg"
+                alt="Route Table"
+                style="width:24px;height:24px;"
+              />
+              <div>
+                <div style="font-weight:600;font-size:14px;color:#6d28d9;">
+                  カスタムルートテーブル
+                </div>
+                <div style="font-size:13px;color:#6b7280;">
+                  明示的に関連付け
+                </div>
+              </div>
+            </div>
+            <div
+              style="margin-top:8px;display:flex;flex-direction:column;gap:4px;"
+            >
+              <div class="rt-entry local">
+                <span class="rt-dest">10.0.0.0/16</span><span class="rt-arrow"
+                  >→</span
+                ><span class="rt-target">local</span>
+              </div>
+              <div id="rt-pub-igw-entry" class="rt-entry igw">
+                <span class="rt-dest">0.0.0.0/0</span><span class="rt-arrow"
+                  >→</span
+                ><span class="rt-target">igw-xxx</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Private subnet -->
+          <div class="dia-subnet private" style="flex:1;min-width:200px;">
+            <div class="dia-subnet-header">
+              <img
+                src="/AWS-icons/Architecture-Group-Icons_07312025/Private-subnet_32.svg"
+                alt="private"
+              />
+              <span>プライベートサブネット</span>
+            </div>
+
+            <!-- EC2 in private -->
+            <div class="dia-row" style="margin-bottom:8px;">
+              <div class="dia-box dia-ec2">
+                <img
+                  class="dia-box-icon"
+                  src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg"
+                  alt="EC2"
+                />
+                <div class="dia-box-label">EC2</div>
+                <div class="dia-box-sub">プライベートIPのみ</div>
+              </div>
+            </div>
+
+            <div
+              style="display:flex;align-items:center;gap:8px;padding:8px;background:rgba(139,92,246,0.06);border:1px solid #8b5cf6;border-radius:8px;"
+            >
+              <img
+                src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-Route-53_Route-Table_48.svg"
+                alt="Route Table"
+                style="width:24px;height:24px;"
+              />
+              <div>
+                <div style="font-weight:600;font-size:14px;color:#6d28d9;">
+                  カスタムルートテーブル
+                </div>
+                <div style="font-size:13px;color:#6b7280;">
+                  明示的に関連付け
+                </div>
+              </div>
+            </div>
+            <div
+              style="margin-top:8px;display:flex;flex-direction:column;gap:4px;"
+            >
+              <div class="rt-entry local">
+                <span class="rt-dest">10.0.0.0/16</span><span class="rt-arrow"
+                  >→</span
+                ><span class="rt-target">local</span>
+              </div>
+              <div id="rt-priv-nat-entry" class="rt-entry nat">
+                <span class="rt-dest">0.0.0.0/0</span><span class="rt-arrow"
+                  >→</span
+                ><span class="rt-target">nat-xxx</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SVG overlay for arrows -->
+      <svg
+        id="rt-overview-svg"
+        style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10;"
+      >
+        <defs>
+          <marker
+            id="rt-ah-blue"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse"
+          >
+            <path
+              d="M2 1L8 5L2 9"
+              fill="none"
+              stroke="#3b82f6"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </marker>
+          <marker
+            id="rt-ah-orange"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse"
+          >
+            <path
+              d="M2 1L8 5L2 9"
+              fill="none"
+              stroke="#f97316"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </marker>
+          <marker
+            id="rt-ah-green"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse"
+          >
+            <path
+              d="M2 1L8 5L2 9"
+              fill="none"
+              stroke="#059669"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"></path>
+          </marker>
+        </defs>
+        <path
+          id="rt-line-igw"
+          fill="none"
+          stroke="#3b82f6"
+          stroke-width="2"
+          stroke-dasharray="6 4"
+          marker-end="url(#rt-ah-blue)"></path>
+        <path
+          id="rt-line-nat"
+          fill="none"
+          stroke="#f97316"
+          stroke-width="2"
+          stroke-dasharray="6 4"
+          marker-end="url(#rt-ah-orange)"></path>
+        <path
+          id="rt-line-nat-igw"
+          fill="none"
+          stroke="#059669"
+          stroke-width="2"
+          stroke-dasharray="6 4"
+          marker-end="url(#rt-ah-green)"></path>
+        <text
+          id="rt-label-nat-igw"
+          font-size="12"
+          fill="#059669"
+          font-weight="500"></text>
+      </svg>
+    </div>
+
+    <div class="dia-note info">
+      <strong>ルートテーブルとは：</strong
+      >サブネット内のリソースが通信する際に、パケットの宛先に基づいて「どこへ転送するか」を決めるルール集。
+      各サブネットは必ず1つのルートテーブルに関連付けられる。明示的に関連付けない場合はメインルートテーブルが使われる。
+    </div>
+
+    <div class="dia-note warn" style="margin-top:8px;">
+      <strong>⚠️ メインルートテーブルに注意：</strong>メインルートテーブルに <code
+        >0.0.0.0/0 → igw</code
+      > を設定すると、 関連付けのないサブネットが意図せずパブリックになる。 本番環境ではメインルートテーブルは
+      local ルートのみにし、各サブネットに個別のカスタムルートテーブルを関連付けるのがベストプラクティス。
+    </div>
+  </div>
+
+  <!-- Tab: Pattern -->
+  <div class="tab-panel" id="rt-panel-pattern">
+    <p
+      style="font-size:16px;font-weight:600;margin-bottom:16px;color:var(--text);"
+    >
+      よくあるルートテーブル設定パターン
+    </p>
+
+    <!-- Pattern 1: Public -->
+    <div style="margin-bottom:20px;">
+      <p
+        style="font-size:15px;font-weight:600;color:#185FA5;margin-bottom:8px;"
+      >
+        📌 パブリックサブネット用
+      </p>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div class="rt-entry local">
+          <span class="rt-dest">10.0.0.0/16</span><span class="rt-arrow">→</span
+          ><span class="rt-target">local</span><span class="rt-badge auto"
+            >自動</span
+          >
+        </div>
+        <div class="rt-entry igw">
+          <span class="rt-dest">0.0.0.0/0</span><span class="rt-arrow">→</span
+          ><span class="rt-target">igw-xxxxxxxx</span><span
+            class="rt-badge manual">手動追加</span
+          >
+        </div>
+      </div>
+      <p style="font-size:14px;color:#6b7280;margin-top:6px;">
+        すべてのインターネット宛通信をIGWへ転送。EC2にパブリックIPがあればインターネットからアクセス可能。
+      </p>
+    </div>
+
+    <!-- Pattern 2: Private with NAT -->
+    <div style="margin-bottom:20px;">
+      <p
+        style="font-size:15px;font-weight:600;color:#9a3412;margin-bottom:8px;"
+      >
+        📌 プライベートサブネット用（NAT経由）
+      </p>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div class="rt-entry local">
+          <span class="rt-dest">10.0.0.0/16</span><span class="rt-arrow">→</span
+          ><span class="rt-target">local</span><span class="rt-badge auto"
+            >自動</span
+          >
+        </div>
+        <div class="rt-entry nat">
+          <span class="rt-dest">0.0.0.0/0</span><span class="rt-arrow">→</span
+          ><span class="rt-target">nat-xxxxxxxx</span><span
+            class="rt-badge manual">手動追加</span
+          >
+        </div>
+      </div>
+      <p style="font-size:14px;color:#6b7280;margin-top:6px;">
+        インターネット宛通信をNAT
+        Gatewayへ転送。外部への通信は可能だが、外部からの直接アクセスは不可。
+      </p>
+    </div>
+
+    <!-- Pattern 3: VPC Endpoint -->
+    <div style="margin-bottom:20px;">
+      <p
+        style="font-size:15px;font-weight:600;color:#6d28d9;margin-bottom:8px;"
+      >
+        📌 Gateway VPC Endpoint 使用時
+      </p>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div class="rt-entry local">
+          <span class="rt-dest">10.0.0.0/16</span><span class="rt-arrow">→</span
+          ><span class="rt-target">local</span><span class="rt-badge auto"
+            >自動</span
+          >
+        </div>
+        <div class="rt-entry nat">
+          <span class="rt-dest">0.0.0.0/0</span><span class="rt-arrow">→</span
+          ><span class="rt-target">nat-xxxxxxxx</span><span
+            class="rt-badge manual">手動追加</span
+          >
+        </div>
+        <div class="rt-entry vpce">
+          <span class="rt-dest">pl-xxxxxxxx</span><span class="rt-arrow">→</span
+          ><span class="rt-target">vpce-xxxxxxxx</span><span
+            class="rt-badge auto">自動追加</span
+          >
+        </div>
+      </div>
+      <p style="font-size:14px;color:#6b7280;margin-top:6px;">
+        <code>pl-xxxxxxxx</code> はプレフィックスリスト（S3/DynamoDBのIPレンジ）。Gateway
+        Endpoint作成時にルートテーブルを指定すると自動追加される。
+      </p>
+    </div>
+
+    <!-- Pattern 4: VPC Peering -->
+    <div style="margin-bottom:20px;">
+      <p
+        style="font-size:15px;font-weight:600;color:#9d174d;margin-bottom:8px;"
+      >
+        📌 VPC Peering 使用時
+      </p>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div class="rt-entry local">
+          <span class="rt-dest">10.0.0.0/16</span><span class="rt-arrow">→</span
+          ><span class="rt-target">local</span><span class="rt-badge auto"
+            >自動</span
+          >
+        </div>
+        <div class="rt-entry igw">
+          <span class="rt-dest">0.0.0.0/0</span><span class="rt-arrow">→</span
+          ><span class="rt-target">igw-xxxxxxxx</span><span
+            class="rt-badge manual">手動追加</span
+          >
+        </div>
+        <div class="rt-entry pcx">
+          <span class="rt-dest">172.16.0.0/16</span><span class="rt-arrow"
+            >→</span
+          ><span class="rt-target">pcx-xxxxxxxx</span><span
+            class="rt-badge manual">手動追加</span
+          >
+        </div>
+      </div>
+      <p style="font-size:14px;color:#6b7280;margin-top:6px;">
+        接続先VPCのCIDRを宛先にし、ターゲットにPeering Connection IDを指定。<strong
+          >両方のVPCのルートテーブルに設定が必要</strong
+        >。
+      </p>
+    </div>
+
+    <!-- Pattern 5: Transit Gateway -->
+    <div style="margin-bottom:20px;">
+      <p
+        style="font-size:15px;font-weight:600;color:#0f766e;margin-bottom:8px;"
+      >
+        📌 Transit Gateway 使用時
+      </p>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <div class="rt-entry local">
+          <span class="rt-dest">10.0.0.0/16</span><span class="rt-arrow">→</span
+          ><span class="rt-target">local</span><span class="rt-badge auto"
+            >自動</span
+          >
+        </div>
+        <div class="rt-entry tgw">
+          <span class="rt-dest">10.1.0.0/16</span><span class="rt-arrow">→</span
+          ><span class="rt-target">tgw-xxxxxxxx</span><span
+            class="rt-badge manual">手動追加</span
+          >
+        </div>
+        <div class="rt-entry tgw">
+          <span class="rt-dest">10.2.0.0/16</span><span class="rt-arrow">→</span
+          ><span class="rt-target">tgw-xxxxxxxx</span><span
+            class="rt-badge manual">手動追加</span
+          >
+        </div>
+      </div>
+      <p style="font-size:14px;color:#6b7280;margin-top:6px;">
+        他VPCやオンプレミスのCIDRをTransit
+        Gatewayへ転送。3つ以上のVPCを接続する場合はPeeringよりTGWが適切。
+      </p>
+    </div>
+  </div>
+
+  <!-- Tab: Priority -->
+  <div class="tab-panel" id="rt-panel-priority">
+    <p
+      style="font-size:16px;font-weight:600;margin-bottom:16px;color:var(--text);"
+    >
+      ルートの評価順序（最長プレフィックスマッチ）
+    </p>
+
+    <div class="dia-diagram">
+      <p
+        style="font-size:15px;color:#6b7280;text-align:center;margin-bottom:12px;"
+      >
+        宛先IPに対して、最も具体的な（プレフィックスが長い）ルートが優先される
+      </p>
+
+      <!-- Example route table -->
+      <div style="max-width:500px;margin:0 auto;">
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div class="rt-entry local" style="opacity:0.6;">
+            <span class="rt-dest">10.0.0.0/16</span><span class="rt-arrow"
+              >→</span
+            ><span class="rt-target">local</span><span
+              style="margin-left:auto;font-size:13px;color:#6b7280;"
+              >優先度: 低（/16）</span
+            >
+          </div>
+          <div class="rt-entry pcx">
+            <span class="rt-dest">10.1.0.0/16</span><span class="rt-arrow"
+              >→</span
+            ><span class="rt-target">pcx-xxx</span><span
+              style="margin-left:auto;font-size:13px;color:#6b7280;"
+              >優先度: 低（/16）</span
+            >
+          </div>
+          <div class="rt-entry tgw">
+            <span class="rt-dest">10.1.1.0/24</span><span class="rt-arrow"
+              >→</span
+            ><span class="rt-target">tgw-xxx</span><span
+              style="margin-left:auto;font-size:13px;color:#6b7280;"
+              >優先度: 高（/24）</span
+            >
+          </div>
+          <div class="rt-entry igw" style="opacity:0.6;">
+            <span class="rt-dest">0.0.0.0/0</span><span class="rt-arrow">→</span
+            ><span class="rt-target">igw-xxx</span><span
+              style="margin-left:auto;font-size:13px;color:#6b7280;"
+              >優先度: 最低（/0）</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <div
+        style="margin-top:20px;max-width:500px;margin-left:auto;margin-right:auto;"
+      >
+        <p
+          style="font-size:15px;font-weight:600;margin-bottom:8px;color:#1e40af;"
+        >
+          例: 宛先が 10.1.1.50 の場合
+        </p>
+        <div class="dia-timeline">
+          <div class="dia-tl-item">
+            <div class="dia-tl-dot"></div>
+            <div class="dia-tl-content">
+              <div class="dia-tl-title">10.0.0.0/16 → local</div>
+              ✅ マッチするが /16（16ビット一致）
+            </div>
+          </div>
+          <div class="dia-tl-item">
+            <div class="dia-tl-dot"></div>
+            <div class="dia-tl-content">
+              <div class="dia-tl-title">10.1.0.0/16 → pcx-xxx</div>
+              ✅ マッチするが /16（16ビット一致）
+            </div>
+          </div>
+          <div class="dia-tl-item">
+            <div class="dia-tl-dot success"></div>
+            <div class="dia-tl-content">
+              <div class="dia-tl-title">10.1.1.0/24 → tgw-xxx ← 採用！</div>
+              ✅ マッチ & /24（24ビット一致）→ <strong
+                >最長プレフィックス</strong
+              >
+            </div>
+          </div>
+          <div class="dia-tl-item">
+            <div class="dia-tl-dot" style="opacity:0.4;"></div>
+            <div class="dia-tl-content">
+              <div class="dia-tl-title">0.0.0.0/0 → igw-xxx</div>
+              ✅ マッチするが /0（最も広い = 最後の砦）
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-note info" style="margin-top:16px;">
+      <strong>local ルートの特別ルール：</strong>
+      <code>10.0.0.0/16 → local</code> は VPC 内通信を示し、<strong
+        >削除・変更不可</strong
+      >。 同じVPC内のサブネット間通信は常に local
+      ルートで直接ルーティングされる。 他のルートが同じ CIDR に一致しても、local
+      ルートが最優先。
+    </div>
+
+    <div class="dia-note warn" style="margin-top:8px;">
+      <strong>⚠️ 0.0.0.0/0 はデフォルトルート：</strong>
+      他のどのルートにもマッチしなかった場合にのみ使われる「最後の砦」。 パブリックサブネットでは
+      IGW、プライベートサブネットでは NAT Gateway を指定するのが一般的。
+    </div>
+  </div>
+
+  <!-- Tab: Propagation -->
+  <div class="tab-panel" id="rt-panel-propagation">
+    <p
+      style="font-size:16px;font-weight:600;margin-bottom:16px;color:var(--text);"
+    >
+      ルート伝播（Route Propagation）
+    </p>
+
+    <div class="dia-diagram">
+      <p
+        style="font-size:15px;color:#6b7280;text-align:center;margin-bottom:16px;"
+      >
+        VPN/Direct Connect のルートを自動的にルートテーブルに追加する仕組み
+      </p>
+
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:stretch;">
+        <!-- Without propagation -->
+        <div
+          style="flex:1;min-width:240px;padding:16px;border:1px solid #e2e8f0;border-radius:10px;"
+        >
+          <p
+            style="font-size:15px;font-weight:600;color:#dc2626;margin-bottom:10px;"
+          >
+            ❌ ルート伝播なし（手動管理）
+          </p>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div class="rt-entry local">
+              <span class="rt-dest">10.0.0.0/16</span><span class="rt-arrow"
+                >→</span
+              ><span class="rt-target">local</span>
+            </div>
+            <div class="rt-entry igw">
+              <span class="rt-dest">0.0.0.0/0</span><span class="rt-arrow"
+                >→</span
+              ><span class="rt-target">igw-xxx</span>
+            </div>
+            <div
+              style="padding:8px 12px;border:2px dashed #dc2626;border-radius:6px;color:#dc2626;font-size:14px;text-align:center;"
+            >
+              192.168.0.0/16 → vgw-xxx<br />
+              <span style="font-size:13px;">（手動で追加が必要）</span>
+            </div>
+          </div>
+          <p style="font-size:14px;color:#6b7280;margin-top:8px;">
+            オンプレCIDRが変更されるたびに手動でルートテーブルを更新
+          </p>
+        </div>
+
+        <!-- With propagation -->
+        <div
+          style="flex:1;min-width:240px;padding:16px;border:1px solid #059669;border-radius:10px;background:rgba(5,150,105,0.03);"
+        >
+          <p
+            style="font-size:15px;font-weight:600;color:#059669;margin-bottom:10px;"
+          >
+            ✅ ルート伝播あり（自動管理）
+          </p>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div class="rt-entry local">
+              <span class="rt-dest">10.0.0.0/16</span><span class="rt-arrow"
+                >→</span
+              ><span class="rt-target">local</span>
+            </div>
+            <div class="rt-entry igw">
+              <span class="rt-dest">0.0.0.0/0</span><span class="rt-arrow"
+                >→</span
+              ><span class="rt-target">igw-xxx</span>
+            </div>
+            <div
+              style="padding:8px 12px;background:#dcfce7;border:1px solid #059669;border-radius:6px;color:#166534;font-size:14px;text-align:center;"
+            >
+              192.168.0.0/16 → vgw-xxx<br />
+              <span style="font-size:13px;">（BGPで自動伝播）</span>
+            </div>
+          </div>
+          <p style="font-size:14px;color:#6b7280;margin-top:8px;">
+            VGW経由でBGPが学習したルートが自動追加される
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <table class="dia-table" style="margin-top:16px;">
+      <thead>
+        <tr>
+          <th>項目</th>
+          <th>静的ルート（手動）</th>
+          <th>伝播ルート（自動）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>追加方法</strong></td>
+          <td>コンソール/CLI で手動追加</td>
+          <td>VGW の「ルート伝播」を有効化</td>
+        </tr>
+        <tr>
+          <td><strong>プロトコル</strong></td>
+          <td>なし（静的設定）</td>
+          <td>BGP（Border Gateway Protocol）</td>
+        </tr>
+        <tr>
+          <td><strong>更新</strong></td>
+          <td>手動で変更が必要</td>
+          <td>オンプレ側の変更を自動反映</td>
+        </tr>
+        <tr>
+          <td><strong>ユースケース</strong></td>
+          <td>シンプルな構成<br />ルートが変わらない場合</td>
+          <td>Site-to-Site VPN<br />Direct Connect</td>
+        </tr>
+        <tr>
+          <td><strong>競合時の優先順位</strong></td>
+          <td colspan="2" style="text-align:center;"
+            ><strong>静的ルートが優先</strong>（同じCIDRの場合）</td
+          >
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="dia-note info" style="margin-top:12px;">
+      <strong>ルート伝播の設定場所：</strong
+      >ルートテーブルの「ルート伝播」タブで、VGW（Virtual Private
+      Gateway）からの伝播を有効化する。 TGW（Transit
+      Gateway）を使う場合は、TGWルートテーブル側でも伝播設定が別途必要。
+    </div>
+  </div>
+
+  <!-- Tab: Exam -->
+  <div class="tab-panel" id="rt-panel-exam">
+    <p
+      style="font-size:16px;font-weight:600;margin-bottom:16px;color:var(--text);"
+    >
+      SAA / SAP 試験ポイント
+    </p>
+
+    <table class="dia-table">
+      <thead>
+        <tr>
+          <th style="min-width:100px;">トピック</th>
+          <th>頻出ポイント</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>local ルート</strong></td>
+          <td>
+            • VPC CIDR → local は<strong>削除・変更不可</strong><br />
+            • VPC内のサブネット間通信は常に直接ルーティング<br />
+            • セカンダリCIDR追加時も自動で local ルートが追加される
+          </td>
+        </tr>
+        <tr>
+          <td><strong>メインRT vs カスタムRT</strong></td>
+          <td>
+            • メインRTはVPC作成時に自動生成される<br />
+            • 明示的に関連付けないサブネットはメインRTを使う<br />
+            • <strong>ベストプラクティス：</strong>メインRTには local のみ →
+            カスタムRTで個別管理
+          </td>
+        </tr>
+        <tr>
+          <td><strong>パブリック vs プライベート</strong></td>
+          <td>
+            • パブリック = <code>0.0.0.0/0 → IGW</code> がある<br />
+            • プライベート = IGWルートがない（NAT GW or VPCEのみ）<br />
+            • <strong
+              >「パブリック」の定義はルートテーブル + パブリックIPの有無</strong
+            >
+          </td>
+        </tr>
+        <tr>
+          <td><strong>最長プレフィックスマッチ</strong></td>
+          <td>
+            • 最も具体的な（CIDRが狭い）ルートが優先される<br />
+            • 例: /24 は /16 より優先、/16 は /0 より優先<br />
+            • <strong>local ルートは同じCIDRの中で常に最優先</strong>
+          </td>
+        </tr>
+        <tr>
+          <td><strong>Gateway Endpoint</strong></td>
+          <td>
+            • S3/DynamoDB用のGateway Endpoint作成時にルートが自動追加<br />
+            • 宛先は<strong>プレフィックスリスト（pl-xxx）</strong
+            >で表示される<br />
+            • Interface Endpointはルートテーブルに影響しない（DNS解決で対応）
+          </td>
+        </tr>
+        <tr>
+          <td><strong>VPC Peering</strong></td>
+          <td>
+            • <strong>両方のVPC</strong>のルートテーブルに設定が必要<br />
+            • 推移的Peering不可（A↔B, B↔C でも A→C は不可）<br />
+            • CIDRが重複するVPC間ではPeeringできない
+          </td>
+        </tr>
+        <tr>
+          <td><strong>ルート伝播</strong></td>
+          <td>
+            • VPN/Direct ConnectでBGPルートを自動追加<br />
+            • 静的ルートと伝播ルートが競合 → <strong>静的が優先</strong><br />
+            • TGWの場合はTGWルートテーブルで別途伝播設定
+          </td>
+        </tr>
+        <tr>
+          <td><strong>トラブルシューティング</strong></td>
+          <td>
+            • 「インターネットに出られない」→ ルートテーブルに IGW/NAT GW
+            ルートがあるか？<br />
+            • 「VPC Peering先に通信できない」→ <strong>両方</strong
+            >のRTにルートがあるか？<br />
+            • 「S3にアクセスできない」→ Gateway Endpoint使用時はRTにルートがあるか？
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="dia-note info" style="margin-top:12px;">
+      <strong>試験のコツ：</strong
+      >通信できない/遅い系の問題では、まずルートテーブルを確認。
+      次にセキュリティグループ → NACL の順に確認するのが定石。
+      ルートテーブルとSG/NACLの切り分けは「ルートテーブル =
+      経路の有無」「SG/NACL = 通信の許可/拒否」。
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  function rtSetTab(tab) {
+    document
+      .querySelectorAll(
+        "#rt-tab-overview, #rt-tab-pattern, #rt-tab-priority, #rt-tab-propagation, #rt-tab-exam",
+      )
+      .forEach(function (el) {
+        el.classList.remove("active");
+      });
+    document.getElementById("rt-tab-" + tab)?.classList.add("active");
+    document
+      .querySelectorAll(
+        "#rt-panel-overview, #rt-panel-pattern, #rt-panel-priority, #rt-panel-propagation, #rt-panel-exam",
+      )
+      .forEach(function (el) {
+        el.classList.remove("active");
+      });
+    document.getElementById("rt-panel-" + tab)?.classList.add("active");
+  }
+  window.rtSetTab = rtSetTab;
+
+  // SVG overlay arrows: route entry → target box
+  function rtDrawArrows() {
+    var wrap = document.getElementById("rt-overview-wrap");
+    var svg = document.getElementById("rt-overview-svg");
+    if (!wrap || !svg) return;
+    var cr = wrap.getBoundingClientRect();
+
+    var pairs = [
+      {
+        entryId: "rt-pub-igw-entry",
+        targetId: "rt-igw-box",
+        lineId: "rt-line-igw",
+      },
+      {
+        entryId: "rt-priv-nat-entry",
+        targetId: "rt-natgw-box",
+        lineId: "rt-line-nat",
+      },
+    ];
+
+    pairs.forEach(function (p) {
+      var entry = document.getElementById(p.entryId);
+      var target = document.getElementById(p.targetId);
+      var line = document.getElementById(p.lineId);
+      if (!entry || !target || !line) return;
+
+      var eR = entry.getBoundingClientRect();
+      var tR = target.getBoundingClientRect();
+
+      // Start: right edge center of entry
+      var sx = eR.right - cr.left;
+      var sy = eR.top + eR.height / 2 - cr.top;
+      // End: bottom center of target box
+      var ex = tR.left + tR.width / 2 - cr.left;
+      var ey = tR.bottom - cr.top;
+
+      // Curved path: go right from entry, then curve up to target
+      var midX = sx + 20;
+      var d =
+        "M" +
+        sx +
+        " " +
+        sy +
+        " C" +
+        midX +
+        " " +
+        sy +
+        " " +
+        ex +
+        " " +
+        (sy + ey) / 2 +
+        " " +
+        ex +
+        " " +
+        ey;
+      line.setAttribute("d", d);
+    });
+
+    // NAT GW → IGW arrow (green)
+    var natBox = document.getElementById("rt-natgw-box");
+    var igwBox = document.getElementById("rt-igw-box");
+    var natIgwLine = document.getElementById("rt-line-nat-igw");
+    var natIgwLabel = document.getElementById("rt-label-nat-igw");
+    if (natBox && igwBox && natIgwLine) {
+      var nR = natBox.getBoundingClientRect();
+      var iR = igwBox.getBoundingClientRect();
+      // Start: top center of NAT GW box
+      var nx = nR.left + nR.width / 2 - cr.left;
+      var ny = nR.top - cr.top;
+      // End: bottom center of IGW box
+      var ix = iR.left + iR.width / 2 - cr.left;
+      var iy = iR.bottom - cr.top;
+      // Curve via right side to avoid overlapping existing arrows
+      var cpx = Math.max(nx, ix) + 40;
+      var d2 =
+        "M" +
+        nx +
+        " " +
+        ny +
+        " C" +
+        cpx +
+        " " +
+        ny +
+        " " +
+        cpx +
+        " " +
+        iy +
+        " " +
+        ix +
+        " " +
+        iy;
+      natIgwLine.setAttribute("d", d2);
+      // Label
+      if (natIgwLabel) {
+        natIgwLabel.setAttribute("x", cpx + 4);
+        natIgwLabel.setAttribute("y", (ny + iy) / 2);
+        natIgwLabel.textContent = "0.0.0.0/0 → IGW";
+      }
+    }
+  }
+
+  // Run on load + resize
+  window.addEventListener("load", function () {
+    setTimeout(rtDrawArrows, 100);
+  });
+  window.addEventListener("resize", rtDrawArrows);
+  new ResizeObserver(rtDrawArrows).observe(
+    document.getElementById("rt-overview-wrap") || document.body,
+  );
+</script>

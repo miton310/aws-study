@@ -1,281 +1,758 @@
 ---
+
 ---
+
 <style>
-#scenario-label{font-size:12px;color:#6b7280;margin-left:8px;}
+  #vpc-scenario-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-left: 8px;
+  }
+  .dark #vpc-scenario-label {
+    color: #9ca3af;
+  }
+
+  /* コンポーネント固有: ナビボタン */
+  .vpc-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 8px 0;
+  }
+  .vpc-nav-btn {
+    cursor: pointer;
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    color: #111827;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .dark .vpc-nav-btn {
+    border-color: #374151;
+    background: #1f2937;
+    color: #f9fafb;
+  }
+  .vpc-nav-btn:hover {
+    background: #f3f4f6;
+  }
+  .dark .vpc-nav-btn:hover {
+    background: #374151;
+  }
+  .vpc-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  #vpc-step-txt {
+    margin: 0;
+    font-size: 14px;
+    color: #534ab7;
+    font-weight: 500;
+  }
+  .dark #vpc-step-txt {
+    color: #a5b4fc;
+  }
+  #vpc-flow-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    overflow: visible;
+  }
+  .vpc-base-line {
+    stroke: #d3d1c7;
+    stroke-width: 1;
+  }
+  .dark .vpc-base-line {
+    stroke: #4b5563;
+  }
+  .vpc-flow-line {
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
 </style>
 
 <!-- 通信フローアニメーション -->
 <div class="tab-btn-group items-center">
-  <button class="tab-btn active" id="btn-inbound"  onclick="setMode('inbound')">インターネット → EC2</button>
-  <button class="tab-btn"        id="btn-nat"      onclick="setMode('nat')">プライベートEC2 → NAT</button>
-  <button class="tab-btn"        id="btn-failover" onclick="setMode('failover')">マルチAZ フェイルオーバー</button>
-  <span id="scenario-label">インターネットからパブリックEC2への通信</span>
+  <button
+    class="tab-btn active"
+    id="vpc-btn-inbound"
+    onclick="vpcSetMode('inbound')">インターネット → EC2</button
+  >
+  <button class="tab-btn" id="vpc-btn-nat" onclick="vpcSetMode('nat')"
+    >プライベートEC2 → NAT</button
+  >
+  <button class="tab-btn" id="vpc-btn-failover" onclick="vpcSetMode('failover')"
+    >マルチAZ フェイルオーバー</button
+  >
+  <span id="vpc-scenario-label">インターネットからパブリックEC2への通信</span>
 </div>
 
-<svg id="vpc-svg" width="100%" viewBox="0 0 680 480">
-  <defs>
-    <marker id="vpc-anim-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </marker>
-  </defs>
+<div id="vpc-step-desc" class="dia-step-desc"></div>
+
+<div class="dia-legend">
+  <span
+    ><div class="dia-legend-box" style="background:#059669;"></div> 通過</span
+  >
+  <span
+    ><div class="dia-legend-box" style="background:#dc2626;"></div> 障害・切替</span
+  >
+  <span
+    ><div class="dia-legend-box" style="background:#d1d5db;"></div> 未到達</span
+  >
+</div>
+
+<div class="dia-diagram" id="vpc-diagram" style="position:relative;">
+  <!-- SVG overlay for flow lines -->
+  <svg id="vpc-flow-svg">
+    <defs>
+      <marker
+        id="vpc-marker"
+        viewBox="0 0 10 10"
+        refX="8"
+        refY="5"
+        markerWidth="6"
+        markerHeight="6"
+        orient="auto-start-reverse"
+      >
+        <path
+          d="M2 1L8 5L2 9"
+          fill="none"
+          stroke="context-stroke"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"></path>
+      </marker>
+    </defs>
+    <line id="b1" class="vpc-base-line"></line>
+    <line id="b2" class="vpc-base-line"></line>
+    <line id="b3" class="vpc-base-line"></line>
+    <line
+      id="f1"
+      class="vpc-flow-line"
+      opacity="0"
+      marker-end="url(#vpc-marker)"></line>
+    <line
+      id="f2"
+      class="vpc-flow-line"
+      opacity="0"
+      marker-end="url(#vpc-marker)"></line>
+    <line
+      id="f3"
+      class="vpc-flow-line"
+      opacity="0"
+      marker-end="url(#vpc-marker)"></line>
+    <line
+      id="f4"
+      class="vpc-flow-line"
+      opacity="0"
+      marker-end="url(#vpc-marker)"></line>
+    <line
+      id="f5"
+      class="vpc-flow-line"
+      opacity="0"
+      marker-end="url(#vpc-marker)"></line>
+    <line
+      id="f6"
+      class="vpc-flow-line"
+      opacity="0"
+      marker-end="url(#vpc-marker)"></line>
+    <path
+      id="f7"
+      class="vpc-flow-line"
+      fill="none"
+      opacity="0"
+      marker-end="url(#vpc-marker)"></path>
+    <line
+      id="f8"
+      class="vpc-flow-line"
+      opacity="0"
+      marker-end="url(#vpc-marker)"></line>
+    <line
+      id="f9"
+      class="vpc-flow-line"
+      opacity="0"
+      marker-end="url(#vpc-marker)"></line>
+  </svg>
 
   <!-- Internet -->
-  <rect x="270" y="10" width="140" height="36" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
-  <text x="340" y="32" text-anchor="middle" font-size="13" font-weight="500" fill="#2C2C2A" dominant-baseline="central">インターネット</text>
-
-  <!-- IGW -->
-  <rect x="255" y="62" width="170" height="36" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5" id="igw-box"/>
-  <text x="340" y="84" text-anchor="middle" font-size="13" font-weight="500" fill="#2C2C2A" dominant-baseline="central">Internet Gateway</text>
-
-  <!-- static base lines -->
-  <line x1="340" y1="46"  x2="340" y2="62"  stroke="#D3D1C7" stroke-width="1"/>
-  <line x1="280" y1="98"  x2="160" y2="148" stroke="#D3D1C7" stroke-width="1"/>
-  <line x1="400" y1="98"  x2="520" y2="148" stroke="#D3D1C7" stroke-width="1"/>
-
-  <!-- VPC border -->
-  <rect x="20" y="110" width="640" height="358" rx="14" fill="none" stroke="#639922" stroke-width="1.5" stroke-dasharray="8 4"/>
-  <text x="34" y="128" font-size="12" fill="#3B6D11">VPC</text>
-
-  <!-- AZ1 -->
-  <rect x="30"  y="134" width="300" height="324" rx="10" fill="none" stroke="#378ADD" stroke-width="1" stroke-dasharray="5 3"/>
-  <text x="42" y="150" font-size="12" fill="#185FA5">AZ 1</text>
-
-  <!-- AZ2 -->
-  <rect x="350" y="134" width="300" height="324" rx="10" fill="none" stroke="#378ADD" stroke-width="1" stroke-dasharray="5 3"/>
-  <text x="362" y="150" font-size="12" fill="#185FA5">AZ 2</text>
-
-  <!-- Public subnet AZ1 -->
-  <rect x="40"  y="156" width="278" height="110" rx="8" fill="none" stroke="#1D9E75" stroke-width="1"/>
-  <text x="52" y="172" font-size="12" fill="#085041">Public Subnet</text>
-
-  <!-- Public EC2 AZ1 -->
-  <g id="pub-ec2-1">
-    <rect x="52"  y="178" width="100" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
-    <text x="102" y="196" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">EC2</text>
-    <text x="102" y="212" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">Webサーバー</text>
-  </g>
-
-  <!-- NAT GW AZ1 -->
-  <g id="nat-1">
-    <rect x="184" y="178" width="120" height="44" rx="6" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
-    <text x="244" y="196" text-anchor="middle" font-size="13" font-weight="500" fill="#633806" dominant-baseline="central">NAT GW</text>
-    <text x="244" y="212" text-anchor="middle" font-size="11" fill="#633806" dominant-baseline="central">アウトバウンド</text>
-  </g>
-
-  <!-- Public subnet AZ2 -->
-  <rect x="362" y="156" width="278" height="110" rx="8" fill="none" stroke="#1D9E75" stroke-width="1"/>
-  <text x="374" y="172" font-size="12" fill="#085041">Public Subnet</text>
-
-  <!-- Public EC2 AZ2 -->
-  <g id="pub-ec2-2">
-    <rect x="374" y="178" width="100" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
-    <text x="424" y="196" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">EC2</text>
-    <text x="424" y="212" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">Webサーバー</text>
-  </g>
-
-  <!-- NAT GW AZ2 -->
-  <g id="nat-2">
-    <rect x="506" y="178" width="120" height="44" rx="6" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
-    <text x="566" y="196" text-anchor="middle" font-size="13" font-weight="500" fill="#633806" dominant-baseline="central">NAT GW</text>
-    <text x="566" y="212" text-anchor="middle" font-size="11" fill="#633806" dominant-baseline="central">アウトバウンド</text>
-  </g>
-
-  <!-- Private subnet AZ1 -->
-  <rect x="40"  y="278" width="278" height="168" rx="8" fill="none" stroke="#7F77DD" stroke-width="1"/>
-  <text x="52" y="294" font-size="12" fill="#534AB7">Private Subnet</text>
-
-  <!-- Private EC2 AZ1 -->
-  <g id="priv-ec2-1">
-    <rect x="52"  y="300" width="100" height="44" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-    <text x="102" y="318" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489" dominant-baseline="central">EC2</text>
-    <text x="102" y="334" text-anchor="middle" font-size="11" fill="#534AB7" dominant-baseline="central">APサーバー</text>
-  </g>
-
-  <!-- RDS AZ1 -->
-  <g id="rds-1">
-    <rect x="52"  y="390" width="100" height="44" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-    <text x="102" y="408" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489" dominant-baseline="central">RDS</text>
-    <text x="102" y="424" text-anchor="middle" font-size="11" fill="#534AB7" dominant-baseline="central">Primary</text>
-  </g>
-
-  <!-- Private subnet AZ2 -->
-  <rect x="362" y="278" width="278" height="168" rx="8" fill="none" stroke="#7F77DD" stroke-width="1"/>
-  <text x="374" y="294" font-size="12" fill="#534AB7">Private Subnet</text>
-
-  <!-- Private EC2 AZ2 -->
-  <g id="priv-ec2-2">
-    <rect x="374" y="300" width="100" height="44" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-    <text x="424" y="318" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489" dominant-baseline="central">EC2</text>
-    <text x="424" y="334" text-anchor="middle" font-size="11" fill="#534AB7" dominant-baseline="central">APサーバー</text>
-  </g>
-
-  <!-- RDS AZ2 -->
-  <g id="rds-2">
-    <rect x="374" y="390" width="100" height="44" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-    <text x="424" y="408" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489" dominant-baseline="central">RDS</text>
-    <text x="424" y="424" text-anchor="middle" font-size="11" fill="#534AB7" dominant-baseline="central">Standby</text>
-  </g>
-
-  <!-- Animated flow lines -->
-  <line id="f1" x1="340" y1="46" x2="340" y2="62" stroke="#534AB7" stroke-width="3" stroke-dasharray="8 6" stroke-dashoffset="40" fill="none" marker-end="url(#vpc-anim-arr)" opacity="0"/>
-  <line id="f2" x1="280" y1="98" x2="155" y2="178" stroke="#1D9E75" stroke-width="3" stroke-dasharray="8 6" stroke-dashoffset="40" fill="none" marker-end="url(#vpc-anim-arr)" opacity="0"/>
-  <line id="f3" x1="102" y1="222" x2="102" y2="300" stroke="#1D9E75" stroke-width="3" stroke-dasharray="8 6" stroke-dashoffset="40" fill="none" marker-end="url(#vpc-anim-arr)" opacity="0"/>
-  <line id="f4" x1="184" y1="322" x2="244" y2="222" stroke="#EF9F27" stroke-width="3" stroke-dasharray="8 6" stroke-dashoffset="60" fill="none" marker-end="url(#vpc-anim-arr)" opacity="0"/>
-  <line id="f5" x1="244" y1="178" x2="310" y2="98" stroke="#EF9F27" stroke-width="3" stroke-dasharray="8 6" stroke-dashoffset="60" fill="none" marker-end="url(#vpc-anim-arr)" opacity="0"/>
-  <line id="f6" x1="340" y1="62" x2="340" y2="46" stroke="#EF9F27" stroke-width="3" stroke-dasharray="8 6" stroke-dashoffset="40" fill="none" marker-end="url(#vpc-anim-arr)" opacity="0"/>
-  <path id="f7" d="M 152 412 Q 260 460 374 412" stroke="#E24B4A" stroke-width="3" stroke-dasharray="8 6" stroke-dashoffset="80" fill="none" marker-end="url(#vpc-anim-arr)" opacity="0"/>
-  <line id="f8" x1="400" y1="98" x2="424" y2="178" stroke="#1D9E75" stroke-width="3" stroke-dasharray="8 6" stroke-dashoffset="40" fill="none" marker-end="url(#vpc-anim-arr)" opacity="0"/>
-  <line id="f9" x1="424" y1="222" x2="424" y2="300" stroke="#1D9E75" stroke-width="3" stroke-dasharray="8 6" stroke-dashoffset="40" fill="none" marker-end="url(#vpc-anim-arr)" opacity="0"/>
-
-  <!-- Failure marks -->
-  <text id="fail-mark-ec2" x="102" y="202" text-anchor="middle" font-size="22" fill="#E24B4A" opacity="0">✕</text>
-  <text id="fail-mark-rds" x="102" y="415" text-anchor="middle" font-size="22" fill="#E24B4A" opacity="0">✕</text>
-
-  <!-- Status text -->
-</svg>
-<div style="display:flex;align-items:center;justify-content:center;gap:12px;margin:8px 0;">
-  <button class="tab-btn" id="btn-prev" onclick="stepPrev()">← 戻る</button>
-  <p id="step-txt" style="margin:0;font-size:14px;color:#534AB7;font-weight:500;"></p>
-  <button class="tab-btn" id="btn-next" onclick="stepNext()">次へ →</button>
-</div>
-
-  <div>
-    インターネット → EC2 はリクエストがIGW→パブリックEC2→プライベートEC2と降りていく流れです。<br>
-    プライベートEC2 → NAT はプライベートEC2がNAT Gatewayを経由してインターネットに出ていく流れで、プライベートIPが外に出ない点がポイントです。<br>
-    マルチAZフェイルオーバー はAZ1が落ちたときにRDS Standbyが昇格してAZ2で通信が継続される流れです。
+  <div class="dia-row">
+    <div id="vpc-internet" class="dia-box dia-internet">
+      <img
+        class="dia-box-icon"
+        src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Internet_48_Light.svg"
+        alt="Internet"
+      />
+      <div class="dia-box-label">インターネット</div>
+    </div>
   </div>
 
-<script is:inline>
-const STEPS = {
-  inbound: [
-    {lines:['f1'], txt:'① インターネットからIGWへ', dur:500},
-    {lines:['f2'], txt:'② IGWからパブリックEC2（Webサーバー）へ', dur:600},
-    {lines:['f3'], txt:'③ WebサーバーからプライベートEC2（APサーバー）へ', dur:600},
-  ],
-  nat: [
-    {lines:['f4'], txt:'① プライベートEC2からNAT Gatewayへ', dur:600},
-    {lines:['f5'], txt:'② NAT GatewayからIGWへ（送信元IPをNATに変換）', dur:600},
-    {lines:['f6'], txt:'③ IGWからインターネットへ（プライベートIPは外に出ない）', dur:500},
-  ],
-  failover: [
-    {lines:[], txt:'① AZ1で障害発生', dur:600, fn:'showFail'},
-    {lines:['f7'], txt:'② RDS Primary → Standby へ自動昇格', dur:700},
-    {lines:['f1'], txt:'③ インターネット → IGW', dur:500},
-    {lines:['f8'], txt:'④ IGW → AZ2のEC2へ切替', dur:600},
-    {lines:['f9'], txt:'⑤ AZ2で通常通り処理継続', dur:600},
-  ],
-};
+  <div style="height:40px;"></div>
 
-const LABELS = {
-  inbound:  'インターネットからパブリックEC2への通信',
-  nat:      'プライベートEC2がNATを経由してインターネットへ',
-  failover: 'AZ1障害時のマルチAZフェイルオーバー',
-};
+  <!-- IGW -->
+  <div class="dia-row">
+    <div id="vpc-igw" class="dia-box dia-igw">
+      <img
+        class="dia-box-icon"
+        src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Internet-Gateway_48.svg"
+        alt="IGW"
+      />
+      <div class="dia-box-label">Internet Gateway</div>
+    </div>
+  </div>
 
-let mode = 'inbound';
-let currentIdx = -1;
-let animating = false;
+  <!-- VPC -->
+  <div class="dia-vpc">
+    <div class="dia-vpc-header">
+      <img src="/icons/Aws-Vpc--Streamline-Svg-Logos.svg" alt="VPC" />
+      <span>VPC</span>
+    </div>
 
-function getEl(id){ return document.getElementById(id); }
+    <!-- AZ row -->
+    <div class="dia-row" style="gap:16px;align-items:stretch;">
+      <!-- AZ1 -->
+      <div class="dia-az" id="vpc-az1">
+        <div class="dia-az-header">AZ 1</div>
 
-function resetAll(){
-  ['f1','f2','f3','f4','f5','f6','f7','f8','f9'].forEach(id=>{
-    const el = getEl(id);
-    el.style.transition='none';
-    el.setAttribute('opacity','0');
-    const orig = id==='f7' ? '80' : (id==='f4'||id==='f5' ? '60' : '40');
-    el.setAttribute('stroke-dashoffset', orig);
-  });
-  getEl('fail-mark-ec2').setAttribute('opacity','0');
-  getEl('fail-mark-rds').setAttribute('opacity','0');
-  getEl('pub-ec2-1').style.opacity='1';
-  getEl('rds-1').style.opacity='1';
-}
+        <!-- Public Subnet AZ1 -->
+        <div class="dia-subnet public">
+          <div class="dia-subnet-header">
+            <img
+              src="/AWS-icons/Architecture-Group-Icons_07312025/Public-subnet_32.svg"
+              alt="public"
+            />
+            <span>Public Subnet</span>
+          </div>
+          <div class="dia-row" style="gap:8px;">
+            <div id="vpc-pub-ec2-1" class="dia-box dia-ec2">
+              <img
+                class="dia-box-icon"
+                src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg"
+                alt="EC2"
+              />
+              <div class="dia-box-label">EC2</div>
+              <div class="dia-box-sub">Webサーバー</div>
+            </div>
+            <div id="vpc-nat-1" class="dia-box dia-natgw">
+              <img
+                class="dia-box-icon"
+                src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_NAT-Gateway_48.svg"
+                alt="NAT"
+              />
+              <div class="dia-box-label">NAT GW</div>
+              <div class="dia-box-sub">アウトバウンド</div>
+            </div>
+          </div>
+        </div>
 
-function animLine(id, dur, cb){
-  const el = getEl(id);
-  const offset = el.getAttribute('stroke-dashoffset');
-  el.style.transition='none';
-  el.setAttribute('stroke-dashoffset', offset);
-  el.setAttribute('opacity','1');
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{
-    el.style.transition=`stroke-dashoffset ${dur}ms linear`;
-    el.setAttribute('stroke-dashoffset','0');
-    setTimeout(()=>{ if(cb)cb(); }, dur+100);
-  }));
-}
+        <div style="height:28px;"></div>
 
-function showFail(cb){
-  getEl('pub-ec2-1').style.opacity='0.3';
-  getEl('rds-1').style.opacity='0.3';
-  getEl('fail-mark-ec2').setAttribute('opacity','1');
-  getEl('fail-mark-rds').setAttribute('opacity','1');
-  setTimeout(cb, 700);
-}
+        <!-- Private Subnet AZ1 -->
+        <div class="dia-subnet private">
+          <div class="dia-subnet-header">
+            <img
+              src="/AWS-icons/Architecture-Group-Icons_07312025/Private-subnet_32.svg"
+              alt="private"
+            />
+            <span>Private Subnet</span>
+          </div>
+          <div id="vpc-priv-ec2-1" class="dia-box dia-ec2">
+            <img
+              class="dia-box-icon"
+              src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg"
+              alt="EC2"
+            />
+            <div class="dia-box-label">EC2</div>
+            <div class="dia-box-sub">APサーバー</div>
+          </div>
+          <div style="height:8px;"></div>
+          <div id="vpc-rds-1" class="dia-box dia-rds">
+            <img
+              class="dia-box-icon"
+              src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Database/48/Arch_Amazon-RDS_48.svg"
+              alt="RDS"
+            />
+            <div class="dia-box-label">RDS</div>
+            <div class="dia-box-sub">Primary</div>
+          </div>
+        </div>
+      </div>
 
-function updateButtons(){
-  const steps = STEPS[mode];
-  getEl('btn-prev').disabled = currentIdx <= 0;
-  getEl('btn-next').disabled = currentIdx >= steps.length - 1;
-}
+      <!-- AZ2 -->
+      <div class="dia-az" id="vpc-az2">
+        <div class="dia-az-header">AZ 2</div>
 
-function showStep(idx){
-  if(animating) return;
-  const steps = STEPS[mode];
-  if(idx < 0 || idx >= steps.length) return;
-  resetAll();
-  // Re-apply all previous steps' persistent effects
-  for(let i = 0; i < idx; i++){
-    const prev = steps[i];
-    if(prev.fn === 'showFail'){
-      getEl('pub-ec2-1').style.opacity='0.3';
-      getEl('rds-1').style.opacity='0.3';
-      getEl('fail-mark-ec2').setAttribute('opacity','1');
-      getEl('fail-mark-rds').setAttribute('opacity','1');
+        <!-- Public Subnet AZ2 -->
+        <div class="dia-subnet public">
+          <div class="dia-subnet-header">
+            <img
+              src="/AWS-icons/Architecture-Group-Icons_07312025/Public-subnet_32.svg"
+              alt="public"
+            />
+            <span>Public Subnet</span>
+          </div>
+          <div class="dia-row" style="gap:8px;">
+            <div id="vpc-pub-ec2-2" class="dia-box dia-ec2">
+              <img
+                class="dia-box-icon"
+                src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg"
+                alt="EC2"
+              />
+              <div class="dia-box-label">EC2</div>
+              <div class="dia-box-sub">Webサーバー</div>
+            </div>
+            <div id="vpc-nat-2" class="dia-box dia-natgw">
+              <img
+                class="dia-box-icon"
+                src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_NAT-Gateway_48.svg"
+                alt="NAT"
+              />
+              <div class="dia-box-label">NAT GW</div>
+              <div class="dia-box-sub">アウトバウンド</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:28px;"></div>
+
+        <!-- Private Subnet AZ2 -->
+        <div class="dia-subnet private">
+          <div class="dia-subnet-header">
+            <img
+              src="/AWS-icons/Architecture-Group-Icons_07312025/Private-subnet_32.svg"
+              alt="private"
+            />
+            <span>Private Subnet</span>
+          </div>
+          <div id="vpc-priv-ec2-2" class="dia-box dia-ec2">
+            <img
+              class="dia-box-icon"
+              src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg"
+              alt="EC2"
+            />
+            <div class="dia-box-label">EC2</div>
+            <div class="dia-box-sub">APサーバー</div>
+          </div>
+          <div style="height:8px;"></div>
+          <div id="vpc-rds-2" class="dia-box dia-rds">
+            <img
+              class="dia-box-icon"
+              src="/AWS-icons/Resource-Icons_07312025/Res_Database/Res_Amazon-RDS_Multi-AZ_48.svg"
+              alt="RDS"
+            />
+            <div class="dia-box-label">RDS</div>
+            <div class="dia-box-sub">Standby</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Step navigation -->
+<div class="vpc-nav">
+  <button class="vpc-nav-btn" id="vpc-btn-prev" onclick="vpcStepPrev()"
+    >← 戻る</button
+  >
+  <p id="vpc-step-txt"></p>
+  <button class="vpc-nav-btn" id="vpc-btn-next" onclick="vpcStepNext()"
+    >次へ →</button
+  >
+</div>
+
+<div>
+  インターネット → EC2
+  はリクエストがIGW→パブリックEC2→プライベートEC2と降りていく流れです。<br />
+  プライベートEC2 → NAT はプライベートEC2がNAT Gatewayを経由してインターネットに出ていく流れで、プライベートIPが外に出ない点がポイントです。<br
+  />
+  マルチAZフェイルオーバー はAZ1が落ちたときにRDS Standbyが昇格してAZ2で通信が継続される流れです。
+</div>
+
+<script>
+  interface VpcStep {
+    highlight: string[];
+    arrows: Record<string, string>;
+    failed: string[];
+    desc: string;
+    txt: string;
+  }
+
+  interface VpcScenario {
+    label: string;
+    steps: VpcStep[];
+  }
+
+  const FLOW_IDS = ["f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9"];
+
+  const ALL_BOXES = [
+    "vpc-internet",
+    "vpc-igw",
+    "vpc-pub-ec2-1",
+    "vpc-nat-1",
+    "vpc-priv-ec2-1",
+    "vpc-rds-1",
+    "vpc-pub-ec2-2",
+    "vpc-nat-2",
+    "vpc-priv-ec2-2",
+    "vpc-rds-2",
+  ];
+
+  const COLOR_MAP: Record<string, string> = {
+    green: "#059669",
+    red: "#dc2626",
+  };
+
+  const SCENARIOS: Record<string, VpcScenario> = {
+    inbound: {
+      label: "インターネットからパブリックEC2への通信",
+      steps: [
+        {
+          highlight: ["vpc-internet"],
+          arrows: { f1: "green" },
+          failed: [],
+          desc: "【STEP 1】インターネットからリクエストが送信され、Internet Gateway（IGW）へ到達します。",
+          txt: "① インターネット → IGW",
+        },
+        {
+          highlight: ["vpc-igw"],
+          arrows: { f1: "green", f2: "green" },
+          failed: [],
+          desc: "【STEP 2】IGWがリクエストを受け取り、パブリックサブネットのEC2（Webサーバー）へ転送します。",
+          txt: "② IGW → パブリックEC2（Webサーバー）",
+        },
+        {
+          highlight: ["vpc-pub-ec2-1"],
+          arrows: { f1: "green", f2: "green", f3: "green" },
+          failed: [],
+          desc: "【STEP 3】WebサーバーがリクエストをプライベートサブネットのEC2（APサーバー）へ転送します。",
+          txt: "③ Webサーバー → APサーバー",
+        },
+      ],
+    },
+    nat: {
+      label: "プライベートEC2がNATを経由してインターネットへ",
+      steps: [
+        {
+          highlight: ["vpc-priv-ec2-1"],
+          arrows: { f4: "green" },
+          failed: [],
+          desc: "【STEP 1】プライベートサブネットのEC2（APサーバー）からインターネット宛のリクエストを送信します。ルートテーブルによりNAT Gatewayへ転送されます。",
+          txt: "① プライベートEC2 → NAT Gateway",
+        },
+        {
+          highlight: ["vpc-nat-1"],
+          arrows: { f4: "green", f5: "green" },
+          failed: [],
+          desc: "【STEP 2】NAT Gatewayが送信元IPをNAT GWのパブリックIPに変換（NAT）し、パケットをIGWへ転送します。",
+          txt: "② NAT Gateway → IGW（送信元IP変換）",
+        },
+        {
+          highlight: ["vpc-igw"],
+          arrows: { f4: "green", f5: "green", f6: "green" },
+          failed: [],
+          desc: "【STEP 3】IGWを経由してインターネットへ。<strong>プライベートIPは外に出ず</strong>、NAT GWのパブリックIPが使用されます。",
+          txt: "③ IGW → インターネット（プライベートIPは外に出ない）",
+        },
+      ],
+    },
+    failover: {
+      label: "AZ1障害時のマルチAZフェイルオーバー",
+      steps: [
+        {
+          highlight: [],
+          arrows: {},
+          failed: ["vpc-pub-ec2-1", "vpc-nat-1", "vpc-priv-ec2-1", "vpc-rds-1"],
+          desc: "【STEP 1】AZ1で障害が発生。AZ1内のEC2・NAT Gateway・RDS Primaryが利用不可になります。",
+          txt: "① AZ1で障害発生",
+        },
+        {
+          highlight: ["vpc-rds-2"],
+          arrows: { f7: "red" },
+          failed: ["vpc-pub-ec2-1", "vpc-nat-1", "vpc-priv-ec2-1", "vpc-rds-1"],
+          desc: "【STEP 2】RDS Multi-AZの自動フェイルオーバーにより、AZ2のStandbyがPrimaryに自動昇格します。",
+          txt: "② RDS Standby → Primary に自動昇格",
+        },
+        {
+          highlight: ["vpc-internet"],
+          arrows: { f7: "red", f1: "green" },
+          failed: ["vpc-pub-ec2-1", "vpc-nat-1", "vpc-priv-ec2-1", "vpc-rds-1"],
+          desc: "【STEP 3】新しいリクエストがインターネットからIGWへ到達します。",
+          txt: "③ インターネット → IGW",
+        },
+        {
+          highlight: ["vpc-igw"],
+          arrows: { f7: "red", f1: "green", f8: "green" },
+          failed: ["vpc-pub-ec2-1", "vpc-nat-1", "vpc-priv-ec2-1", "vpc-rds-1"],
+          desc: "【STEP 4】IGWからAZ2のパブリックEC2（Webサーバー）へルーティングされます。AZ1は利用不可のためAZ2に切り替わります。",
+          txt: "④ IGW → AZ2のEC2へ切替",
+        },
+        {
+          highlight: ["vpc-pub-ec2-2", "vpc-priv-ec2-2"],
+          arrows: { f7: "red", f1: "green", f8: "green", f9: "green" },
+          failed: ["vpc-pub-ec2-1", "vpc-nat-1", "vpc-priv-ec2-1", "vpc-rds-1"],
+          desc: "【STEP 5】AZ2のWeb→APサーバーで通常通り処理が継続。RDSも昇格済みのため、サービスは中断なく動作します。",
+          txt: "⑤ AZ2で通常通り処理継続",
+        },
+      ],
+    },
+  };
+
+  let vpcMode = "inbound";
+  let vpcCurrentIdx = -1;
+  let vpcAnimating = false;
+
+  function vpcGetFlowEl(id: string): SVGLineElement | SVGPathElement | null {
+    return document.getElementById(id) as
+      | SVGLineElement
+      | SVGPathElement
+      | null;
+  }
+
+  function vpcPositionLines(): void {
+    const container = document.getElementById("vpc-diagram")!;
+    const cr = container.getBoundingClientRect();
+    const svg = document.getElementById("vpc-flow-svg")!;
+    svg.setAttribute("viewBox", `0 0 ${cr.width} ${cr.height}`);
+
+    function getBox(elId: string) {
+      const el = document.getElementById(elId);
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return {
+        cx: r.left + r.width / 2 - cr.left,
+        cy: r.top + r.height / 2 - cr.top,
+        top: r.top - cr.top,
+        bottom: r.bottom - cr.top,
+        left: r.left - cr.left,
+        right: r.right - cr.left,
+      };
     }
-    prev.lines.forEach(id=>{
-      const el = getEl(id);
-      el.setAttribute('opacity','1');
-      el.setAttribute('stroke-dashoffset','0');
+
+    function setLine(
+      lineId: string,
+      x1: number,
+      y1: number,
+      x2: number,
+      y2: number,
+    ) {
+      const el = document.getElementById(lineId);
+      if (!el) return;
+      el.setAttribute("x1", String(Math.round(x1)));
+      el.setAttribute("y1", String(Math.round(y1)));
+      el.setAttribute("x2", String(Math.round(x2)));
+      el.setAttribute("y2", String(Math.round(y2)));
+    }
+
+    const inet = getBox("vpc-internet")!;
+    const igw = getBox("vpc-igw")!;
+    const pe1 = getBox("vpc-pub-ec2-1")!;
+    const nat1 = getBox("vpc-nat-1")!;
+    const re1 = getBox("vpc-priv-ec2-1")!;
+    const rds1 = getBox("vpc-rds-1")!;
+    const pe2 = getBox("vpc-pub-ec2-2")!;
+    const re2 = getBox("vpc-priv-ec2-2")!;
+    const rds2 = getBox("vpc-rds-2")!;
+    const az1 = getBox("vpc-az1")!;
+    const az2 = getBox("vpc-az2")!;
+
+    // f1: Internet bottom → IGW top
+    setLine("f1", inet.cx, inet.bottom, igw.cx, igw.top);
+    // f2: IGW bottom → AZ1 Public EC2 top (diagonal)
+    setLine("f2", igw.cx, igw.bottom, pe1.cx, pe1.top);
+    // f3: Public EC2 AZ1 bottom → Private EC2 AZ1 top
+    setLine("f3", pe1.cx, pe1.bottom, re1.cx, re1.top);
+    // f4: Private EC2 AZ1 top → NAT GW bottom (upward)
+    setLine("f4", re1.cx, re1.top, nat1.cx, nat1.bottom);
+    // f5: NAT GW top → IGW bottom (upward)
+    setLine("f5", nat1.cx, nat1.top, igw.cx, igw.bottom);
+    // f6: IGW top → Internet bottom (upward)
+    setLine("f6", igw.cx, igw.top, inet.cx, inet.bottom);
+    // f7: RDS AZ1 → RDS AZ2 (curved)
+    const f7El = document.getElementById("f7")!;
+    const midY = Math.max(rds1.bottom, rds2.bottom) + 30;
+    f7El.setAttribute(
+      "d",
+      `M ${Math.round(rds1.right)} ${Math.round(rds1.cy)} Q ${Math.round((rds1.right + rds2.left) / 2)} ${Math.round(midY)} ${Math.round(rds2.left)} ${Math.round(rds2.cy)}`,
+    );
+    // f8: IGW bottom → AZ2 Public EC2 top (diagonal)
+    setLine("f8", igw.cx, igw.bottom, pe2.cx, pe2.top);
+    // f9: Public EC2 AZ2 bottom → Private EC2 AZ2 top
+    setLine("f9", pe2.cx, pe2.bottom, re2.cx, re2.top);
+
+    // Base lines (static topology)
+    setLine("b1", inet.cx, inet.bottom, igw.cx, igw.top);
+    setLine("b2", igw.cx, igw.bottom, az1.cx, az1.top);
+    setLine("b3", igw.cx, igw.bottom, az2.cx, az2.top);
+  }
+
+  function vpcResetAll(): void {
+    FLOW_IDS.forEach((id) => {
+      const el = vpcGetFlowEl(id);
+      if (!el) return;
+      el.setAttribute("opacity", "0");
+      el.style.strokeDasharray = "";
+      el.style.strokeDashoffset = "";
+      el.style.transition = "none";
+    });
+    ALL_BOXES.forEach((id) => {
+      document.getElementById(id)?.classList.remove("highlight", "failed");
     });
   }
-  currentIdx = idx;
-  const s = steps[idx];
-  getEl('step-txt').textContent = s.txt;
-  animating = true;
-  const done = ()=>{ animating = false; updateButtons(); };
-  if(s.fn === 'showFail'){
-    showFail(done);
-  } else if(s.lines.length === 0){
-    done();
-  } else {
-    let remaining = s.lines.length;
-    s.lines.forEach(id=>animLine(id, s.dur, ()=>{ remaining--; if(remaining===0) done(); }));
+
+  function vpcAnimateLine(
+    id: string,
+    color: string,
+    dur: number,
+    cb?: () => void,
+  ): void {
+    const el = vpcGetFlowEl(id);
+    if (!el) {
+      cb?.();
+      return;
+    }
+    const len = el.getTotalLength();
+    el.setAttribute("stroke", color);
+    el.setAttribute("opacity", "1");
+    el.style.strokeDasharray = `${len}`;
+    el.style.strokeDashoffset = `${len}`;
+    el.style.transition = "none";
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.style.transition = `stroke-dashoffset ${dur}ms ease-out`;
+        el.style.strokeDashoffset = "0";
+        setTimeout(() => cb?.(), dur + 50);
+      });
+    });
   }
-  updateButtons();
-}
 
-function stepNext(){
-  showStep(currentIdx + 1);
-}
+  function vpcSetLineStatic(id: string, color: string): void {
+    const el = vpcGetFlowEl(id);
+    if (!el) return;
+    el.setAttribute("stroke", color);
+    el.setAttribute("opacity", "1");
+    el.style.strokeDasharray = "";
+    el.style.strokeDashoffset = "";
+    el.style.transition = "none";
+  }
 
-function stepPrev(){
-  showStep(currentIdx - 1);
-}
+  function vpcRender(): void {
+    const scenario = SCENARIOS[vpcMode];
+    if (vpcCurrentIdx < 0 || vpcCurrentIdx >= scenario.steps.length) return;
+    const step = scenario.steps[vpcCurrentIdx];
 
-function setMode(m){
-  mode = m;
-  ['inbound','nat','failover'].forEach(id=>{
-    const btn = getEl('btn-'+id);
-    if(btn) btn.classList.toggle('active', id===m);
-  });
-  const label = getEl('scenario-label');
-  if(label) label.textContent = LABELS[m];
-  currentIdx = -1;
-  resetAll();
-  getEl('step-txt').textContent = '';
-  showStep(0);
-}
+    // Collect previously active arrows
+    const prevArrows = new Set<string>();
+    if (vpcCurrentIdx > 0) {
+      Object.keys(scenario.steps[vpcCurrentIdx - 1].arrows).forEach((k) =>
+        prevArrows.add(k),
+      );
+    }
 
-showStep(0);
+    // Step text
+    document.getElementById("vpc-step-txt")!.textContent = step.txt;
+    document.getElementById("vpc-step-desc")!.innerHTML = step.desc;
+
+    // Reset
+    vpcResetAll();
+
+    // Apply failed
+    step.failed.forEach((id) => {
+      document.getElementById(id)?.classList.add("failed");
+    });
+
+    // Apply highlight
+    step.highlight.forEach((id) => {
+      document.getElementById(id)?.classList.add("highlight");
+    });
+
+    // Identify new vs continued arrows
+    const newArrows: [string, string][] = [];
+    for (const [id, color] of Object.entries(step.arrows)) {
+      const strokeColor = COLOR_MAP[color] || color;
+      if (prevArrows.has(id)) {
+        // Already shown – set immediately
+        vpcSetLineStatic(id, strokeColor);
+      } else {
+        newArrows.push([id, strokeColor]);
+      }
+    }
+
+    // Animate new arrows sequentially
+    vpcAnimating = true;
+    let i = 0;
+    function animNext(): void {
+      if (i >= newArrows.length) {
+        vpcAnimating = false;
+        vpcUpdateButtons();
+        return;
+      }
+      const [id, color] = newArrows[i];
+      i++;
+      vpcAnimateLine(id, color, 500, animNext);
+    }
+    animNext();
+
+    vpcUpdateButtons();
+  }
+
+  function vpcUpdateButtons(): void {
+    const scenario = SCENARIOS[vpcMode];
+    document
+      .getElementById("vpc-btn-prev")!
+      .toggleAttribute("disabled", vpcCurrentIdx <= 0);
+    document
+      .getElementById("vpc-btn-next")!
+      .toggleAttribute("disabled", vpcCurrentIdx >= scenario.steps.length - 1);
+  }
+
+  function vpcStepNext(): void {
+    if (vpcAnimating) return;
+    const scenario = SCENARIOS[vpcMode];
+    if (vpcCurrentIdx < scenario.steps.length - 1) {
+      vpcCurrentIdx++;
+      vpcRender();
+    }
+  }
+
+  function vpcStepPrev(): void {
+    if (vpcAnimating) return;
+    if (vpcCurrentIdx > 0) {
+      vpcCurrentIdx--;
+      vpcRender();
+    }
+  }
+
+  function vpcSetMode(m: string): void {
+    vpcMode = m;
+    ["inbound", "nat", "failover"].forEach((id) => {
+      document
+        .getElementById(`vpc-btn-${id}`)
+        ?.classList.toggle("active", id === m);
+    });
+    const label = document.getElementById("vpc-scenario-label");
+    if (label) label.textContent = SCENARIOS[m].label;
+    vpcCurrentIdx = 0;
+    vpcAnimating = false;
+    vpcRender();
+  }
+
+  // Export to window
+  (window as any).vpcSetMode = vpcSetMode;
+  (window as any).vpcStepNext = vpcStepNext;
+  (window as any).vpcStepPrev = vpcStepPrev;
+
+  // Position lines and initialize
+  vpcPositionLines();
+  vpcSetMode("inbound");
+
+  // Re-position on resize
+  new ResizeObserver(() => vpcPositionLines()).observe(
+    document.getElementById("vpc-diagram")!,
+  );
 </script>

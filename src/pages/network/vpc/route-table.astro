@@ -1,0 +1,22 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import RouteTableDiagram from "../../../components/diagrams/RouteTableDiagram.astro";
+---
+
+<Layout title="ルートテーブル - VPC">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2">
+      <a href="/" class="hover:text-orange-500">ホーム</a> /
+      <a href="/network" class="hover:text-orange-500">ネットワーク</a> /
+      <a href="/network/vpc" class="hover:text-orange-500">VPC</a> / ルートテーブル
+    </p>
+    <h1 class="text-3xl font-bold mb-2">ルートテーブル</h1>
+    <p class="text-gray-500 mb-10">
+      サブネットのルーティング設定・評価順序・ルート伝播
+    </p>
+
+    <section class="mb-12">
+      <RouteTableDiagram />
+    </section>
+  </div>
+</Layout>

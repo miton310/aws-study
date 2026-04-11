@@ -3,11 +3,13 @@
 ---
 
 <div class="diagram-wrapper">
-
   <div class="tab-btn-group">
-    <button class="tab-btn active" onclick="vpcSetTab('overview')">VPC全体構造</button>
+    <button class="tab-btn active" onclick="vpcSetTab('overview')"
+      >VPC全体構造</button
+    >
     <button class="tab-btn" onclick="vpcSetTab('sg')">SG vs NACL</button>
-    <button class="tab-btn" onclick="vpcSetTab('endpoint')">VPC Endpoint</button>
+    <button class="tab-btn" onclick="vpcSetTab('endpoint')">VPC Endpoint</button
+    >
     <button class="tab-btn" onclick="vpcSetTab('nat')">NAT Gateway</button>
     <button class="tab-btn" onclick="vpcSetTab('nacl')">NACL詳細</button>
     <button class="tab-btn" onclick="vpcSetTab('eni')">ENI</button>
@@ -16,77 +18,260 @@
   <div id="vpc-tab-overview" class="tab-panel active">
     <svg width="100%" viewBox="0 0 680 400">
       <defs>
-        <marker id="vpc-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-          <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <marker
+          id="vpc-arrow"
+          viewBox="0 0 10 10"
+          refX="8"
+          refY="5"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto-start-reverse"
+        >
+          <path
+            d="M2 1L8 5L2 9"
+            fill="none"
+            stroke="context-stroke"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
         </marker>
       </defs>
 
       <!-- Internet -->
-      <rect x="270" y="20" width="140" height="36" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
-      <text x="340" y="42" text-anchor="middle" font-size="14" font-weight="500" fill="#2C2C2A">インターネット</text>
+      <rect
+        x="270"
+        y="20"
+        width="140"
+        height="36"
+        rx="8"
+        fill="#F1EFE8"
+        stroke="#D3D1C7"
+        stroke-width="0.5"></rect>
+      <text
+        x="340"
+        y="42"
+        text-anchor="middle"
+        font-size="14"
+        font-weight="500"
+        fill="#2C2C2A">インターネット</text
+      >
 
       <!-- IGW -->
-      <rect x="255" y="76" width="170" height="36" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
-      <text x="340" y="98" text-anchor="middle" font-size="13" fill="#085041">Internet Gateway</text>
-      <line x1="340" y1="56" x2="340" y2="76" stroke="#1D9E75" stroke-width="1.5" marker-end="url(#vpc-arrow)"/>
+      <rect
+        x="255"
+        y="76"
+        width="170"
+        height="36"
+        rx="8"
+        fill="#E1F5EE"
+        stroke="#0F6E56"
+        stroke-width="0.5"></rect>
+      <text x="340" y="98" text-anchor="middle" font-size="13" fill="#085041"
+        >Internet Gateway</text
+      >
+      <line
+        x1="340"
+        y1="56"
+        x2="340"
+        y2="76"
+        stroke="#1D9E75"
+        stroke-width="1.5"
+        marker-end="url(#vpc-arrow)"></line>
 
       <!-- VPC border -->
-      <rect x="30" y="130" width="620" height="250" rx="14" fill="none" stroke="#1D9E75" stroke-width="1.5" stroke-dasharray="8 4"/>
-      <text x="46" y="152" font-size="12" fill="#085041">VPC (10.0.0.0/16)</text>
+      <rect
+        x="30"
+        y="130"
+        width="620"
+        height="250"
+        rx="14"
+        fill="none"
+        stroke="#1D9E75"
+        stroke-width="1.5"
+        stroke-dasharray="8 4"></rect>
+      <text x="46" y="152" font-size="12" fill="#085041">VPC (10.0.0.0/16)</text
+      >
 
       <!-- Public Subnet -->
-      <rect x="50" y="162" width="260" height="100" rx="10" fill="#E6F1FB" stroke="#185FA5" stroke-width="1"/>
-      <text x="66" y="182" font-size="12" fill="#185FA5">パブリックサブネット</text>
-      <rect x="70" y="194" width="100" height="44" rx="6" fill="#B5D4F4" stroke="#185FA5" stroke-width="0.5"/>
-      <text x="120" y="214" text-anchor="middle" font-size="13" font-weight="500" fill="#042C53">EC2</text>
-      <text x="120" y="230" text-anchor="middle" font-size="11" fill="#0C447C">パブリックIP</text>
+      <rect
+        x="50"
+        y="162"
+        width="260"
+        height="100"
+        rx="10"
+        fill="#E6F1FB"
+        stroke="#185FA5"
+        stroke-width="1"></rect>
+      <text x="66" y="182" font-size="12" fill="#185FA5"
+        >パブリックサブネット</text
+      >
+      <rect
+        x="70"
+        y="194"
+        width="100"
+        height="44"
+        rx="6"
+        fill="#B5D4F4"
+        stroke="#185FA5"
+        stroke-width="0.5"></rect>
+      <text
+        x="120"
+        y="214"
+        text-anchor="middle"
+        font-size="13"
+        font-weight="500"
+        fill="#042C53">EC2</text
+      >
+      <text x="120" y="230" text-anchor="middle" font-size="11" fill="#0C447C"
+        >パブリックIP</text
+      >
 
       <!-- Private Subnet -->
-      <rect x="370" y="162" width="260" height="100" rx="10" fill="#FAEEDA" stroke="#854F0B" stroke-width="1"/>
-      <text x="386" y="182" font-size="12" fill="#854F0B">プライベートサブネット</text>
-      <rect x="390" y="194" width="100" height="44" rx="6" fill="#FAC775" stroke="#854F0B" stroke-width="0.5"/>
-      <text x="440" y="214" text-anchor="middle" font-size="13" font-weight="500" fill="#412402">EC2</text>
-      <text x="440" y="230" text-anchor="middle" font-size="11" fill="#633806">プライベートIP</text>
+      <rect
+        x="370"
+        y="162"
+        width="260"
+        height="100"
+        rx="10"
+        fill="#FAEEDA"
+        stroke="#854F0B"
+        stroke-width="1"></rect>
+      <text x="386" y="182" font-size="12" fill="#854F0B"
+        >プライベートサブネット</text
+      >
+      <rect
+        x="390"
+        y="194"
+        width="100"
+        height="44"
+        rx="6"
+        fill="#FAC775"
+        stroke="#854F0B"
+        stroke-width="0.5"></rect>
+      <text
+        x="440"
+        y="214"
+        text-anchor="middle"
+        font-size="13"
+        font-weight="500"
+        fill="#412402">EC2</text
+      >
+      <text x="440" y="230" text-anchor="middle" font-size="11" fill="#633806"
+        >プライベートIP</text
+      >
 
       <!-- NAT GW -->
-      <rect x="200" y="194" width="100" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
-      <text x="250" y="214" text-anchor="middle" font-size="12" font-weight="500" fill="#085041">NAT GW</text>
-      <text x="250" y="230" text-anchor="middle" font-size="11" fill="#085041">→インターネット</text>
+      <rect
+        x="200"
+        y="194"
+        width="100"
+        height="44"
+        rx="6"
+        fill="#E1F5EE"
+        stroke="#0F6E56"
+        stroke-width="0.5"></rect>
+      <text
+        x="250"
+        y="214"
+        text-anchor="middle"
+        font-size="12"
+        font-weight="500"
+        fill="#085041">NAT GW</text
+      >
+      <text x="250" y="230" text-anchor="middle" font-size="11" fill="#085041"
+        >→インターネット</text
+      >
 
       <!-- Route Table note -->
-      <rect x="50" y="290" width="570" height="72" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-      <img src="/home/mito/study/aws/aws-study/public/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-Route-53_Route-Table_48.svg" alt="">
-      <text x="340" y="316" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">ルートテーブル</text>
-      <text x="340" y="338" text-anchor="middle" font-size="12" fill="#534AB7">パブリック: 0.0.0.0/0 → IGW</text>
-      <text x="340" y="356" text-anchor="middle" font-size="12" fill="#534AB7">プライベート: 0.0.0.0/0 → NAT GW</text>
+      <rect
+        x="50"
+        y="290"
+        width="570"
+        height="72"
+        rx="8"
+        fill="#EEEDFE"
+        stroke="#534AB7"
+        stroke-width="0.5"></rect>
+      <img
+        src="/home/mito/study/aws/aws-study/public/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-Route-53_Route-Table_48.svg"
+        alt=""
+      />
+      <text
+        x="340"
+        y="316"
+        text-anchor="middle"
+        font-size="13"
+        font-weight="500"
+        fill="#3C3489">ルートテーブル</text
+      >
+      <text x="340" y="338" text-anchor="middle" font-size="12" fill="#534AB7"
+        >パブリック: 0.0.0.0/0 → IGW</text
+      >
+      <text x="340" y="356" text-anchor="middle" font-size="12" fill="#534AB7"
+        >プライベート: 0.0.0.0/0 → NAT GW</text
+      >
 
       <!-- IGW to public arrow -->
-      <line x1="340" y1="112" x2="180" y2="162" stroke="#185FA5" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#vpc-arrow)"/>
+      <line
+        x1="340"
+        y1="112"
+        x2="180"
+        y2="162"
+        stroke="#185FA5"
+        stroke-width="1.5"
+        stroke-dasharray="5 3"
+        marker-end="url(#vpc-arrow)"></line>
     </svg>
   </div>
 
-<!-- セキュリティグループ vs ネットワークACL -->
+  <!-- セキュリティグループ vs ネットワークACL -->
   <div id="vpc-tab-sg" class="tab-panel">
-    <p class="text-center font-medium mb-3">セキュリティグループ vs ネットワークACL</p>
+    <p class="text-center font-medium mb-3">
+      セキュリティグループ vs ネットワークACL
+    </p>
     <div class="grid grid-cols-2 gap-4 mb-3">
       <div class="border border-[#0F6E56] rounded-lg bg-[#E1F5EE] p-4">
-        <p class="text-center font-medium text-[#085041] mb-2">セキュリティグループ（SG）</p>
+        <p class="text-center font-medium text-[#085041] mb-2">
+          セキュリティグループ（SG）
+        </p>
         <ul class="text-sm text-[#04342C] space-y-1.5">
-          <li class="bg-[#9FE1CB] rounded px-3 py-1.5">インスタンスレベルで適用</li>
-          <li class="bg-[#9FE1CB] rounded px-3 py-1.5">ステートフル（戻り通信自動許可）</li>
-          <li class="bg-[#9FE1CB] rounded px-3 py-1.5">許可ルールのみ（拒否は書けない）</li>
-          <li class="bg-[#9FE1CB] rounded px-3 py-1.5">デフォルト: インバウンド全拒否</li>
-          <li class="bg-[#9FE1CB] rounded px-3 py-1.5">デフォルト: アウトバウンド全許可</li>
+          <li class="bg-[#9FE1CB] rounded px-3 py-1.5">
+            インスタンスレベルで適用
+          </li>
+          <li class="bg-[#9FE1CB] rounded px-3 py-1.5">
+            ステートフル（戻り通信自動許可）
+          </li>
+          <li class="bg-[#9FE1CB] rounded px-3 py-1.5">
+            許可ルールのみ（拒否は書けない）
+          </li>
+          <li class="bg-[#9FE1CB] rounded px-3 py-1.5">
+            デフォルト: インバウンド全拒否
+          </li>
+          <li class="bg-[#9FE1CB] rounded px-3 py-1.5">
+            デフォルト: アウトバウンド全許可
+          </li>
         </ul>
       </div>
       <div class="border border-[#534AB7] rounded-lg bg-[#EEEDFE] p-4">
-        <p class="text-center font-medium text-[#3C3489] mb-2">ネットワークACL（NACL）</p>
+        <p class="text-center font-medium text-[#3C3489] mb-2">
+          ネットワークACL（NACL）
+        </p>
         <ul class="text-sm text-[#26215C] space-y-1.5">
-          <li class="bg-[#CECBF6] rounded px-3 py-1.5">サブネットレベルで適用</li>
-          <li class="bg-[#CECBF6] rounded px-3 py-1.5">ステートレス（戻り通信も設定必要）</li>
-          <li class="bg-[#CECBF6] rounded px-3 py-1.5">許可・拒否の両方書ける</li>
-          <li class="bg-[#CECBF6] rounded px-3 py-1.5">番号順に評価（小さい番号が優先）</li>
-          <li class="bg-[#CECBF6] rounded px-3 py-1.5">デフォルト: 全通信許可</li>
+          <li class="bg-[#CECBF6] rounded px-3 py-1.5">
+            サブネットレベルで適用
+          </li>
+          <li class="bg-[#CECBF6] rounded px-3 py-1.5">
+            ステートレス（戻り通信も設定必要）
+          </li>
+          <li class="bg-[#CECBF6] rounded px-3 py-1.5">
+            許可・拒否の両方書ける
+          </li>
+          <li class="bg-[#CECBF6] rounded px-3 py-1.5">
+            番号順に評価（小さい番号が優先）
+          </li>
+          <li class="bg-[#CECBF6] rounded px-3 py-1.5">
+            デフォルト: 全通信許可
+          </li>
         </ul>
       </div>
     </div>
@@ -97,169 +282,617 @@
 
   <div id="vpc-tab-endpoint" class="tab-panel">
     <svg width="100%" viewBox="0 0 680 360">
-      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">VPC Endpoint：インターネットを経由せずAWSサービスへ</text>
+      <text
+        x="340"
+        y="26"
+        text-anchor="middle"
+        font-size="14"
+        font-weight="500"
+        fill="currentColor"
+        >VPC Endpoint：インターネットを経由せずAWSサービスへ</text
+      >
 
       <!-- Gateway type -->
-      <rect x="40" y="50" width="270" height="140" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
-      <text x="175" y="78" text-anchor="middle" font-size="14" font-weight="500" fill="#085041">Gateway型</text>
-      <text x="175" y="102" text-anchor="middle" font-size="12" fill="#085041">対象: S3・DynamoDB</text>
-      <text x="175" y="124" text-anchor="middle" font-size="12" fill="#085041">ルートテーブルに追加</text>
-      <text x="175" y="146" text-anchor="middle" font-size="12" fill="#085041">無料</text>
-      <text x="175" y="168" text-anchor="middle" font-size="12" fill="#085041">同一リージョンのみ</text>
+      <rect
+        x="40"
+        y="50"
+        width="270"
+        height="140"
+        rx="10"
+        fill="#E1F5EE"
+        stroke="#0F6E56"
+        stroke-width="1"></rect>
+      <text
+        x="175"
+        y="78"
+        text-anchor="middle"
+        font-size="14"
+        font-weight="500"
+        fill="#085041">Gateway型</text
+      >
+      <text x="175" y="102" text-anchor="middle" font-size="12" fill="#085041"
+        >対象: S3・DynamoDB</text
+      >
+      <text x="175" y="124" text-anchor="middle" font-size="12" fill="#085041"
+        >ルートテーブルに追加</text
+      >
+      <text x="175" y="146" text-anchor="middle" font-size="12" fill="#085041"
+        >無料</text
+      >
+      <text x="175" y="168" text-anchor="middle" font-size="12" fill="#085041"
+        >同一リージョンのみ</text
+      >
 
       <!-- Interface type -->
-      <rect x="370" y="50" width="270" height="140" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
-      <text x="505" y="78" text-anchor="middle" font-size="14" font-weight="500" fill="#3C3489">Interface型（PrivateLink）</text>
-      <text x="505" y="102" text-anchor="middle" font-size="12" fill="#3C3489">対象: ほぼ全AWSサービス</text>
-      <text x="505" y="124" text-anchor="middle" font-size="12" fill="#3C3489">ENI（プライベートIP）を作成</text>
-      <text x="505" y="146" text-anchor="middle" font-size="12" fill="#3C3489">有料（時間+データ転送）</text>
-      <text x="505" y="168" text-anchor="middle" font-size="12" fill="#3C3489">クロスリージョン対応</text>
+      <rect
+        x="370"
+        y="50"
+        width="270"
+        height="140"
+        rx="10"
+        fill="#EEEDFE"
+        stroke="#534AB7"
+        stroke-width="1"></rect>
+      <text
+        x="505"
+        y="78"
+        text-anchor="middle"
+        font-size="14"
+        font-weight="500"
+        fill="#3C3489">Interface型（PrivateLink）</text
+      >
+      <text x="505" y="102" text-anchor="middle" font-size="12" fill="#3C3489"
+        >対象: ほぼ全AWSサービス</text
+      >
+      <text x="505" y="124" text-anchor="middle" font-size="12" fill="#3C3489"
+        >ENI（プライベートIP）を作成</text
+      >
+      <text x="505" y="146" text-anchor="middle" font-size="12" fill="#3C3489"
+        >有料（時間+データ転送）</text
+      >
+      <text x="505" y="168" text-anchor="middle" font-size="12" fill="#3C3489"
+        >クロスリージョン対応</text
+      >
 
-      <rect x="40" y="210" width="600" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
-      <text x="340" y="234" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">メリット</text>
-      <text x="340" y="254" text-anchor="middle" font-size="12" fill="#633806">インターネットGW・NAT GW不要→セキュア・低コスト</text>
+      <rect
+        x="40"
+        y="210"
+        width="600"
+        height="56"
+        rx="8"
+        fill="#FAEEDA"
+        stroke="#854F0B"
+        stroke-width="0.5"></rect>
+      <text
+        x="340"
+        y="234"
+        text-anchor="middle"
+        font-size="13"
+        font-weight="500"
+        fill="#633806">メリット</text
+      >
+      <text x="340" y="254" text-anchor="middle" font-size="12" fill="#633806"
+        >インターネットGW・NAT GW不要→セキュア・低コスト</text
+      >
 
-      <rect x="40" y="284" width="600" height="56" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
-      <text x="340" y="308" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">SAA頻出</text>
-      <text x="340" y="328" text-anchor="middle" font-size="12" fill="#0C447C">「プライベートサブネットからS3にセキュアにアクセス」→ Gateway型VPC Endpoint</text>
+      <rect
+        x="40"
+        y="284"
+        width="600"
+        height="56"
+        rx="8"
+        fill="#E6F1FB"
+        stroke="#185FA5"
+        stroke-width="0.5"></rect>
+      <text
+        x="340"
+        y="308"
+        text-anchor="middle"
+        font-size="13"
+        font-weight="500"
+        fill="#0C447C">SAA頻出</text
+      >
+      <text x="340" y="328" text-anchor="middle" font-size="12" fill="#0C447C"
+        >「プライベートサブネットからS3にセキュアにアクセス」→ Gateway型VPC
+        Endpoint</text
+      >
     </svg>
   </div>
 
   <!-- NAT Gateway：プライベートサブネット→インターネット -->
   <div id="vpc-tab-nat" class="tab-panel">
-    <p class="text-center font-medium mb-4">NAT Gateway：プライベートサブネット→インターネット</p>
+    <p class="text-center font-medium mb-4">
+      NAT Gateway：プライベートサブネット→インターネット
+    </p>
     <div class="flex flex-col items-center gap-0">
       <!-- インターネット -->
-      <div class="rounded-lg bg-[#F1EFE8] border border-[#D3D1C7] px-8 py-2 text-center text-[#2C2C2A] text-sm">
+      <div
+        class="rounded-lg bg-[#F1EFE8] border border-[#D3D1C7] px-8 py-2 text-center text-[#2C2C2A] text-sm"
+      >
         インターネット
       </div>
       <div class="text-[#1D9E75] text-lg leading-none">↕</div>
       <!-- IGW -->
-      <div class="rounded-lg bg-[#E1F5EE] border border-[#0F6E56] px-8 py-2 text-center text-[#085041] text-sm">
+      <div
+        class="rounded-lg bg-[#E1F5EE] border border-[#0F6E56] px-8 py-2 text-center text-[#085041] text-sm"
+      >
         Internet Gateway
       </div>
       <div class="text-[#1D9E75] text-lg leading-none">↕</div>
       <!-- NAT Gateway -->
-      <div class="rounded-lg bg-[#9FE1CB] border border-[#0F6E56] px-6 py-3 text-center">
+      <div
+        class="rounded-lg bg-[#9FE1CB] border border-[#0F6E56] px-6 py-3 text-center"
+      >
         <p class="font-medium text-[#04342C] text-sm">NAT Gateway</p>
         <p class="text-xs text-[#085041]">パブリックサブネットに配置</p>
       </div>
       <div class="text-[#854F0B] text-lg leading-none">↕</div>
       <!-- プライベートEC2 -->
-      <div class="rounded-lg bg-[#FAEEDA] border border-[#854F0B] px-6 py-3 text-center">
+      <div
+        class="rounded-lg bg-[#FAEEDA] border border-[#854F0B] px-6 py-3 text-center"
+      >
         <p class="font-medium text-[#412402] text-sm">プライベートEC2</p>
-        <p class="text-xs text-[#633806]">インターネットには出られるが入れない</p>
+        <p class="text-xs text-[#633806]">
+          インターネットには出られるが入れない
+        </p>
       </div>
     </div>
     <!-- Egress-Only IGW -->
-    <div class="mt-4 rounded-lg bg-[#EEEDFE] border border-[#534AB7] px-4 py-3 text-center">
-      <p class="font-medium text-[#3C3489] text-sm">Egress-Only Internet Gateway</p>
-      <p class="text-xs text-[#534AB7]">IPv6専用のNAT GW的機能・アウトバウンドのみ許可（インバウンド不可）</p>
+    <div
+      class="mt-4 rounded-lg bg-[#EEEDFE] border border-[#534AB7] px-4 py-3 text-center"
+    >
+      <p class="font-medium text-[#3C3489] text-sm">
+        Egress-Only Internet Gateway
+      </p>
+      <p class="text-xs text-[#534AB7]">
+        IPv6専用のNAT GW的機能・アウトバウンドのみ許可（インバウンド不可）
+      </p>
     </div>
   </div>
 
   <div id="vpc-tab-nacl" class="tab-panel">
     <svg width="100%" viewBox="0 0 680 380">
-      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">ネットワークACL（NACL）の特徴</text>
+      <text
+        x="340"
+        y="26"
+        text-anchor="middle"
+        font-size="14"
+        font-weight="500"
+        fill="currentColor">ネットワークACL（NACL）の特徴</text
+      >
 
       <!-- VPC -->
-      <rect x="30" y="44" width="620" height="190" rx="14" fill="none" stroke="#1D9E75" stroke-width="1.5" stroke-dasharray="8 4"/>
+      <rect
+        x="30"
+        y="44"
+        width="620"
+        height="190"
+        rx="14"
+        fill="none"
+        stroke="#1D9E75"
+        stroke-width="1.5"
+        stroke-dasharray="8 4"></rect>
       <text x="46" y="62" font-size="12" fill="#085041">VPC</text>
 
       <!-- Subnet -->
-      <rect x="50" y="70" width="560" height="154" rx="10" fill="none" stroke="#534AB7" stroke-width="1.5"/>
-      <text x="70" y="90" font-size="12" font-weight="500" fill="#3C3489">サブネット</text>
+      <rect
+        x="50"
+        y="70"
+        width="560"
+        height="154"
+        rx="10"
+        fill="none"
+        stroke="#534AB7"
+        stroke-width="1.5"></rect>
+      <text x="70" y="90" font-size="12" font-weight="500" fill="#3C3489"
+        >サブネット</text
+      >
 
       <!-- NACL border -->
-      <rect x="50" y="70" width="560" height="16" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-      <text x="330" y="81" text-anchor="middle" font-size="11" fill="#534AB7">NACL（サブネット境界に設置）</text>
+      <rect
+        x="50"
+        y="70"
+        width="560"
+        height="16"
+        rx="4"
+        fill="#EEEDFE"
+        stroke="#534AB7"
+        stroke-width="0.5"></rect>
+      <text x="330" y="81" text-anchor="middle" font-size="11" fill="#534AB7"
+        >NACL（サブネット境界に設置）</text
+      >
 
       <!-- EC2 instances -->
-      <rect x="100" y="110" width="140" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
-      <text x="170" y="136" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">EC2-A</text>
-      <text x="170" y="154" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">10.0.0.10</text>
+      <rect
+        x="100"
+        y="110"
+        width="140"
+        height="56"
+        rx="8"
+        fill="#E1F5EE"
+        stroke="#0F6E56"
+        stroke-width="0.5"></rect>
+      <text
+        x="170"
+        y="136"
+        text-anchor="middle"
+        font-size="13"
+        font-weight="500"
+        fill="#085041"
+        dominant-baseline="central">EC2-A</text
+      >
+      <text
+        x="170"
+        y="154"
+        text-anchor="middle"
+        font-size="11"
+        fill="#085041"
+        dominant-baseline="central">10.0.0.10</text
+      >
 
-      <rect x="430" y="110" width="140" height="56" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
-      <text x="500" y="136" text-anchor="middle" font-size="13" font-weight="500" fill="#085041" dominant-baseline="central">EC2-B</text>
-      <text x="500" y="154" text-anchor="middle" font-size="11" fill="#085041" dominant-baseline="central">10.0.0.20</text>
+      <rect
+        x="430"
+        y="110"
+        width="140"
+        height="56"
+        rx="8"
+        fill="#E1F5EE"
+        stroke="#0F6E56"
+        stroke-width="0.5"></rect>
+      <text
+        x="500"
+        y="136"
+        text-anchor="middle"
+        font-size="13"
+        font-weight="500"
+        fill="#085041"
+        dominant-baseline="central">EC2-B</text
+      >
+      <text
+        x="500"
+        y="154"
+        text-anchor="middle"
+        font-size="11"
+        fill="#085041"
+        dominant-baseline="central">10.0.0.20</text
+      >
 
       <!-- Arrow between EC2s (NACL cannot block) -->
-      <line x1="240" y1="138" x2="428" y2="138" stroke="#1D9E75" stroke-width="2" stroke-dasharray="6 3"/>
-      <text x="334" y="128" text-anchor="middle" font-size="11" fill="#1D9E75">同一サブネット内はNACLで制限不可</text>
+      <line
+        x1="240"
+        y1="138"
+        x2="428"
+        y2="138"
+        stroke="#1D9E75"
+        stroke-width="2"
+        stroke-dasharray="6 3"></line>
+      <text x="334" y="128" text-anchor="middle" font-size="11" fill="#1D9E75"
+        >同一サブネット内はNACLで制限不可</text
+      >
 
       <!-- Features boxes -->
-      <rect x="30" y="254" width="195" height="108" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-      <text x="127" y="276" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">ステートレス</text>
-      <text x="127" y="298" text-anchor="middle" font-size="11" fill="#534AB7">インバウンド・アウトバウンド</text>
-      <text x="127" y="316" text-anchor="middle" font-size="11" fill="#534AB7">両方を個別に設定が必要</text>
-      <text x="127" y="336" text-anchor="middle" font-size="11" fill="#534AB7">戻り通信も明示的に許可</text>
+      <rect
+        x="30"
+        y="254"
+        width="195"
+        height="108"
+        rx="8"
+        fill="#EEEDFE"
+        stroke="#534AB7"
+        stroke-width="0.5"></rect>
+      <text
+        x="127"
+        y="276"
+        text-anchor="middle"
+        font-size="12"
+        font-weight="500"
+        fill="#3C3489">ステートレス</text
+      >
+      <text x="127" y="298" text-anchor="middle" font-size="11" fill="#534AB7"
+        >インバウンド・アウトバウンド</text
+      >
+      <text x="127" y="316" text-anchor="middle" font-size="11" fill="#534AB7"
+        >両方を個別に設定が必要</text
+      >
+      <text x="127" y="336" text-anchor="middle" font-size="11" fill="#534AB7"
+        >戻り通信も明示的に許可</text
+      >
 
-      <rect x="242" y="254" width="195" height="108" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-      <text x="339" y="276" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489">番号順評価</text>
-      <text x="339" y="298" text-anchor="middle" font-size="11" fill="#534AB7">小さい番号が優先</text>
-      <text x="339" y="316" text-anchor="middle" font-size="11" fill="#534AB7">100: HTTP許可</text>
-      <text x="339" y="336" text-anchor="middle" font-size="11" fill="#534AB7">200: 全拒否</text>
+      <rect
+        x="242"
+        y="254"
+        width="195"
+        height="108"
+        rx="8"
+        fill="#EEEDFE"
+        stroke="#534AB7"
+        stroke-width="0.5"></rect>
+      <text
+        x="339"
+        y="276"
+        text-anchor="middle"
+        font-size="12"
+        font-weight="500"
+        fill="#3C3489">番号順評価</text
+      >
+      <text x="339" y="298" text-anchor="middle" font-size="11" fill="#534AB7"
+        >小さい番号が優先</text
+      >
+      <text x="339" y="316" text-anchor="middle" font-size="11" fill="#534AB7"
+        >100: HTTP許可</text
+      >
+      <text x="339" y="336" text-anchor="middle" font-size="11" fill="#534AB7"
+        >200: 全拒否</text
+      >
 
-      <rect x="454" y="254" width="195" height="108" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
-      <text x="551" y="276" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">SAA頻出</text>
-      <text x="551" y="298" text-anchor="middle" font-size="11" fill="#633806">特定IPをブロック</text>
-      <text x="551" y="316" text-anchor="middle" font-size="11" fill="#633806">→ NACLのDeny</text>
-      <text x="551" y="336" text-anchor="middle" font-size="11" fill="#633806">SGはDeny不可</text>
+      <rect
+        x="454"
+        y="254"
+        width="195"
+        height="108"
+        rx="8"
+        fill="#FAEEDA"
+        stroke="#854F0B"
+        stroke-width="0.5"></rect>
+      <text
+        x="551"
+        y="276"
+        text-anchor="middle"
+        font-size="12"
+        font-weight="500"
+        fill="#633806">SAA頻出</text
+      >
+      <text x="551" y="298" text-anchor="middle" font-size="11" fill="#633806"
+        >特定IPをブロック</text
+      >
+      <text x="551" y="316" text-anchor="middle" font-size="11" fill="#633806"
+        >→ NACLのDeny</text
+      >
+      <text x="551" y="336" text-anchor="middle" font-size="11" fill="#633806"
+        >SGはDeny不可</text
+      >
     </svg>
   </div>
 
   <div id="vpc-tab-eni" class="tab-panel">
     <svg width="100%" viewBox="0 0 680 360">
-      <defs><marker id="vpc-eni-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
-      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">ENI（Elastic Network Interface）= 仮想NIC</text>
+      <defs
+        ><marker
+          id="vpc-eni-arr"
+          viewBox="0 0 10 10"
+          refX="8"
+          refY="5"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto-start-reverse"
+          ><path
+            d="M2 1L8 5L2 9"
+            fill="none"
+            stroke="context-stroke"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path></marker
+        ></defs
+      >
+      <text
+        x="340"
+        y="26"
+        text-anchor="middle"
+        font-size="14"
+        font-weight="500"
+        fill="currentColor">ENI（Elastic Network Interface）= 仮想NIC</text
+      >
 
       <!-- Physical NIC vs ENI -->
-      <rect x="40" y="50" width="260" height="100" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
-      <text x="170" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">物理サーバーのNIC</text>
-      <text x="170" y="102" text-anchor="middle" font-size="11" fill="#5F5E5A">LANケーブルを挿す差し込み口</text>
-      <text x="170" y="122" text-anchor="middle" font-size="11" fill="#5F5E5A">MACアドレス・IPアドレスを持つ</text>
+      <rect
+        x="40"
+        y="50"
+        width="260"
+        height="100"
+        rx="8"
+        fill="#F1EFE8"
+        stroke="#D3D1C7"
+        stroke-width="0.5"></rect>
+      <text
+        x="170"
+        y="78"
+        text-anchor="middle"
+        font-size="13"
+        font-weight="500"
+        fill="#444441">物理サーバーのNIC</text
+      >
+      <text x="170" y="102" text-anchor="middle" font-size="11" fill="#5F5E5A"
+        >LANケーブルを挿す差し込み口</text
+      >
+      <text x="170" y="122" text-anchor="middle" font-size="11" fill="#5F5E5A"
+        >MACアドレス・IPアドレスを持つ</text
+      >
 
-      <text x="340" y="105" text-anchor="middle" font-size="14" font-weight="500" fill="#534AB7">≒ クラウド版</text>
+      <text
+        x="340"
+        y="105"
+        text-anchor="middle"
+        font-size="14"
+        font-weight="500"
+        fill="#534AB7">≒ クラウド版</text
+      >
 
-      <rect x="380" y="50" width="260" height="100" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-      <text x="510" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">ENI（仮想NIC）</text>
-      <text x="510" y="102" text-anchor="middle" font-size="11" fill="#534AB7">EC2に取り付ける仮想ネットワーク</text>
-      <text x="510" y="122" text-anchor="middle" font-size="11" fill="#534AB7">プライベートIP・EIPを持てる</text>
+      <rect
+        x="380"
+        y="50"
+        width="260"
+        height="100"
+        rx="8"
+        fill="#EEEDFE"
+        stroke="#534AB7"
+        stroke-width="0.5"></rect>
+      <text
+        x="510"
+        y="78"
+        text-anchor="middle"
+        font-size="13"
+        font-weight="500"
+        fill="#3C3489">ENI（仮想NIC）</text
+      >
+      <text x="510" y="102" text-anchor="middle" font-size="11" fill="#534AB7"
+        >EC2に取り付ける仮想ネットワーク</text
+      >
+      <text x="510" y="122" text-anchor="middle" font-size="11" fill="#534AB7"
+        >プライベートIP・EIPを持てる</text
+      >
 
       <!-- EC2 with ENIs -->
-      <rect x="30" y="170" width="620" height="110" rx="14" fill="none" stroke="#1D9E75" stroke-width="1.5" stroke-dasharray="6 3"/>
-      <text x="46" y="190" font-size="12" fill="#085041">VPC内のEC2インスタンス</text>
+      <rect
+        x="30"
+        y="170"
+        width="620"
+        height="110"
+        rx="14"
+        fill="none"
+        stroke="#1D9E75"
+        stroke-width="1.5"
+        stroke-dasharray="6 3"></rect>
+      <text x="46" y="190" font-size="12" fill="#085041"
+        >VPC内のEC2インスタンス</text
+      >
 
-      <rect x="100" y="196" width="460" height="68" rx="10" fill="#E6F1FB" stroke="#185FA5" stroke-width="1"/>
-      <text x="330" y="216" text-anchor="middle" font-size="12" fill="#185FA5">EC2インスタンス</text>
+      <rect
+        x="100"
+        y="196"
+        width="460"
+        height="68"
+        rx="10"
+        fill="#E6F1FB"
+        stroke="#185FA5"
+        stroke-width="1"></rect>
+      <text x="330" y="216" text-anchor="middle" font-size="12" fill="#185FA5"
+        >EC2インスタンス</text
+      >
 
-      <rect x="120" y="226" width="140" height="32" rx="6" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-      <text x="190" y="246" text-anchor="middle" font-size="12" font-weight="500" fill="#3C3489" dominant-baseline="central">ENI（プライマリ）eth0</text>
+      <rect
+        x="120"
+        y="226"
+        width="140"
+        height="32"
+        rx="6"
+        fill="#EEEDFE"
+        stroke="#534AB7"
+        stroke-width="0.5"></rect>
+      <text
+        x="190"
+        y="246"
+        text-anchor="middle"
+        font-size="12"
+        font-weight="500"
+        fill="#3C3489"
+        dominant-baseline="central">ENI（プライマリ）eth0</text
+      >
 
-      <rect x="300" y="226" width="140" height="32" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
-      <text x="370" y="246" text-anchor="middle" font-size="12" font-weight="500" fill="#085041" dominant-baseline="central">ENI（セカンダリ）eth1</text>
+      <rect
+        x="300"
+        y="226"
+        width="140"
+        height="32"
+        rx="6"
+        fill="#E1F5EE"
+        stroke="#0F6E56"
+        stroke-width="0.5"></rect>
+      <text
+        x="370"
+        y="246"
+        text-anchor="middle"
+        font-size="12"
+        font-weight="500"
+        fill="#085041"
+        dominant-baseline="central">ENI（セカンダリ）eth1</text
+      >
 
       <!-- Subnet arrows -->
-      <line x1="190" y1="258" x2="190" y2="290" stroke="#534AB7" stroke-width="1.5" marker-end="url(#vpc-eni-arr)"/>
-      <line x1="370" y1="258" x2="370" y2="290" stroke="#0F6E56" stroke-width="1.5" marker-end="url(#vpc-eni-arr)"/>
-      <rect x="130" y="292" width="120" height="28" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
-      <text x="190" y="310" text-anchor="middle" font-size="11" fill="#5F5E5A" dominant-baseline="central">サブネットA</text>
-      <rect x="310" y="292" width="120" height="28" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
-      <text x="370" y="310" text-anchor="middle" font-size="11" fill="#5F5E5A" dominant-baseline="central">サブネットB</text>
+      <line
+        x1="190"
+        y1="258"
+        x2="190"
+        y2="290"
+        stroke="#534AB7"
+        stroke-width="1.5"
+        marker-end="url(#vpc-eni-arr)"></line>
+      <line
+        x1="370"
+        y1="258"
+        x2="370"
+        y2="290"
+        stroke="#0F6E56"
+        stroke-width="1.5"
+        marker-end="url(#vpc-eni-arr)"></line>
+      <rect
+        x="130"
+        y="292"
+        width="120"
+        height="28"
+        rx="6"
+        fill="#F1EFE8"
+        stroke="#D3D1C7"
+        stroke-width="0.5"></rect>
+      <text
+        x="190"
+        y="310"
+        text-anchor="middle"
+        font-size="11"
+        fill="#5F5E5A"
+        dominant-baseline="central">サブネットA</text
+      >
+      <rect
+        x="310"
+        y="292"
+        width="120"
+        height="28"
+        rx="6"
+        fill="#F1EFE8"
+        stroke="#D3D1C7"
+        stroke-width="0.5"></rect>
+      <text
+        x="370"
+        y="310"
+        text-anchor="middle"
+        font-size="11"
+        fill="#5F5E5A"
+        dominant-baseline="central">サブネットB</text
+      >
 
       <!-- SAA tip -->
-      <rect x="30" y="332" width="620" height="24" rx="6" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
-      <text x="340" y="348" text-anchor="middle" font-size="11" font-weight="500" fill="#633806" dominant-baseline="central">SAA頻出：ENIを別のEC2に付け替えてIPアドレスごと移動できる（フェイルオーバー用途）</text>
+      <rect
+        x="30"
+        y="332"
+        width="620"
+        height="24"
+        rx="6"
+        fill="#FAEEDA"
+        stroke="#854F0B"
+        stroke-width="0.5"></rect>
+      <text
+        x="340"
+        y="348"
+        text-anchor="middle"
+        font-size="11"
+        font-weight="500"
+        fill="#633806"
+        dominant-baseline="central"
+        >SAA頻出：ENIを別のEC2に付け替えてIPアドレスごと移動できる（フェイルオーバー用途）</text
+      >
     </svg>
   </div>
 </div>
 
 <script>
   function vpcSetTab(t: string) {
-    document.querySelectorAll('[id^="vpc-tab-"]').forEach(el => el.classList.remove('active'));
-    document.getElementById('vpc-tab-' + t)?.classList.add('active');
-    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-    event?.target && (event.target as HTMLElement).classList.add('active');
+    document
+      .querySelectorAll('[id^="vpc-tab-"]')
+      .forEach((el) => el.classList.remove("active"));
+    document.getElementById("vpc-tab-" + t)?.classList.add("active");
+    document
+      .querySelectorAll(".tab-btn")
+      .forEach((el) => el.classList.remove("active"));
+    event?.target && (event.target as HTMLElement).classList.add("active");
   }
   (window as any).vpcSetTab = vpcSetTab;
 </script>

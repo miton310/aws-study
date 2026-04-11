@@ -1,0 +1,69 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import VpcDiagram from "../../../components/diagrams/VpcDiagram.astro";
+
+const subPages = [
+  {
+    title: "SG・NACL",
+    description: "セキュリティグループとNetwork ACLの違い・動作アニメーション",
+    href: "/network/vpc/sg-nacl",
+  },
+  {
+    title: "NAT Gateway・NATインスタンス",
+    description: "プライベートサブネットからインターネットへの接続方法",
+    href: "/network/vpc/nat",
+  },
+  {
+    title: "IPアドレス",
+    description: "パブリックIP・EIP・プライベートIP・CIDR設計",
+    href: "/network/vpc/ip-address",
+  },
+  {
+    title: "ルートテーブル",
+    description: "ルーティング設定・評価順序・ルート伝播の仕組み",
+    href: "/network/vpc/route-table",
+  },
+  {
+    title: "通信フロー",
+    description: "VPC内の通信フローをステップごとにアニメーションで確認",
+    href: "/network/vpc/flow",
+  },
+];
+---
+
+<Layout title="VPC">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2">
+      <a href="/" class="hover:text-orange-500">ホーム</a> / <a
+        href="/network"
+        class="hover:text-orange-500">ネットワーク</a
+      > / VPC
+    </p>
+    <h1 class="text-3xl font-bold mb-2">VPC（Virtual Private Cloud）</h1>
+    <p class="text-gray-500 mb-10">
+      サブネット・SG・NACL・NAT Gateway・VPC Endpoint
+    </p>
+
+    <section class="mb-12">
+      <h2 class="heading-section">VPC 図解</h2>
+      <VpcDiagram />
+    </section>
+
+    <section class="mb-12">
+      <h2 class="heading-section">詳細トピック</h2>
+      <div class="grid sm:grid-cols-2 gap-4">
+        {
+          subPages.map(({ title, description, href }) => (
+            <a
+              href={href}
+              class="border border-gray-200 dark:border-gray-700 rounded-xl p-5 hover:border-orange-500 hover:scale-105 transition-all block"
+            >
+              <h3 class="font-bold text-base mb-1">{title}</h3>
+              <p class="text-sm text-gray-500">{description}</p>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</Layout>

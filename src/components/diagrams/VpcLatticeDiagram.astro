@@ -6,55 +6,85 @@
 ---
 
 <!-- scoped CSS不要：全てdia-*共通クラスに移行済み -->
-
 <div>
   <!-- Tabs -->
   <div class="tab-btn-group">
-    <button class="tab-btn active" id="lat-tab-what" onclick="latTab('what')">VPC Latticeとは</button>
-    <button class="tab-btn" id="lat-tab-compare" onclick="latTab('compare')">他サービスとの違い</button>
+    <button class="tab-btn active" id="lat-tab-what" onclick="latTab('what')"
+      >VPC Latticeとは</button
+    >
+    <button class="tab-btn" id="lat-tab-compare" onclick="latTab('compare')"
+      >他サービスとの違い</button
+    >
   </div>
 
   <!-- Tab: VPC Latticeとは -->
   <div class="tab-panel active" id="lat-panel-what">
-    <h3 class="section-title">VPC Lattice：L7（アプリケーション層）でサービス間通信を一元管理</h3>
+    <h3 class="section-title">
+      VPC Lattice：L7（アプリケーション層）でサービス間通信を一元管理
+    </h3>
 
     <div class="dia-diagram">
-      <p style="font-size:14px;font-weight:600;color:#534AB7;margin-bottom:8px;">VPC Latticeを使用した接続の例</p>
+      <p
+        style="font-size:14px;font-weight:600;color:#534AB7;margin-bottom:8px;"
+      >
+        VPC Latticeを使用した接続の例
+      </p>
 
       <!-- AWS Account container -->
       <div class="dia-account">
         <div class="dia-account-header">
-          <img src="/AWS-icons/Architecture-Group-Icons_07312025/AWS-Account_32.svg" alt="Account">
+          <img
+            src="/AWS-icons/Architecture-Group-Icons_07312025/AWS-Account_32.svg"
+            alt="Account"
+          />
           <span>AWSアカウント</span>
         </div>
 
         <!-- Main row: VPC - Lattice - VPC -->
-        <div class="dia-row" style="align-items:stretch;gap:16px;flex-wrap:wrap;">
-
+        <div
+          class="dia-row"
+          style="align-items:stretch;gap:16px;flex-wrap:wrap;"
+        >
           <!-- Left VPC -->
           <div class="dia-vpc" style="flex:1;min-width:130px;">
             <div class="dia-vpc-header">
-              <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Virtual-private-cloud-VPC_48.svg" alt="VPC">
+              <img src="/icons/Aws-Vpc--Streamline-Svg-Logos.svg" alt="VPC" />
               <span>VPC</span>
             </div>
-            <div class="dia-subnet public" style="display:flex;flex-direction:column;align-items:center;">
+            <div
+              class="dia-subnet public"
+              style="display:flex;flex-direction:column;align-items:center;"
+            >
               <div class="dia-subnet-header">
-                <img src="/AWS-icons/Architecture-Group-Icons_07312025/Public-subnet_32.svg" alt="subnet">
+                <img
+                  src="/AWS-icons/Architecture-Group-Icons_07312025/Public-subnet_32.svg"
+                  alt="subnet"
+                />
                 <span>サブネット</span>
               </div>
               <div class="dia-box dia-ec2">
-                <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+                <img
+                  class="dia-box-icon"
+                  src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg"
+                  alt="EC2"
+                />
                 <div class="dia-box-label">EC2</div>
               </div>
             </div>
           </div>
 
           <!-- Center: Arrows + Lattice -->
-          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+          <div
+            style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;"
+          >
             <div style="display:flex;align-items:center;gap:6px;">
               <div class="dia-arrow"><div class="dia-arrow-h green"></div></div>
               <div class="dia-box dia-lattice" style="min-width:110px;">
-                <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Networking-Content-Delivery/48/Arch_Amazon-VPC-Lattice_48.svg" alt="Lattice">
+                <img
+                  class="dia-box-icon"
+                  src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Networking-Content-Delivery/48/Arch_Amazon-VPC-Lattice_48.svg"
+                  alt="Lattice"
+                />
                 <div class="dia-box-label">VPC Lattice</div>
               </div>
               <div class="dia-arrow"><div class="dia-arrow-h green"></div></div>
@@ -64,7 +94,11 @@
               <div class="dia-arrow-v green"></div>
             </div>
             <div class="dia-box dia-ec2">
-              <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_AWS-Lambda_48.svg" alt="Lambda">
+              <img
+                class="dia-box-icon"
+                src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_AWS-Lambda_48.svg"
+                alt="Lambda"
+              />
               <div class="dia-box-label">Lambda</div>
             </div>
           </div>
@@ -72,21 +106,30 @@
           <!-- Right VPC -->
           <div class="dia-vpc" style="flex:1;min-width:130px;">
             <div class="dia-vpc-header">
-              <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Virtual-private-cloud-VPC_48.svg" alt="VPC">
+              <img src="/icons/Aws-Vpc--Streamline-Svg-Logos.svg" alt="VPC" />
               <span>VPC</span>
             </div>
-            <div class="dia-subnet public" style="display:flex;flex-direction:column;align-items:center;">
+            <div
+              class="dia-subnet public"
+              style="display:flex;flex-direction:column;align-items:center;"
+            >
               <div class="dia-subnet-header">
-                <img src="/AWS-icons/Architecture-Group-Icons_07312025/Public-subnet_32.svg" alt="subnet">
+                <img
+                  src="/AWS-icons/Architecture-Group-Icons_07312025/Public-subnet_32.svg"
+                  alt="subnet"
+                />
                 <span>サブネット</span>
               </div>
               <div class="dia-box dia-ec2">
-                <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+                <img
+                  class="dia-box-icon"
+                  src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg"
+                  alt="EC2"
+                />
                 <div class="dia-box-label">EC2</div>
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
@@ -103,12 +146,14 @@
 
     <!-- SAA tip -->
     <div class="dia-note warn" style="margin-top:12px;">
-      <strong>SAA頻出ポイント：</strong>「異なるVPC・アカウント間のサービスをL7で安全に接続」→ VPC Lattice
+      <strong>SAA頻出ポイント：</strong
+      >「異なるVPC・アカウント間のサービスをL7で安全に接続」→ VPC Lattice
     </div>
 
     <!-- PrivateLink comparison note -->
     <div class="dia-note info" style="margin-top:8px;">
-      <strong>PrivateLinkとの違い：</strong>LatticeはL7（HTTP/gRPC）対応・双方向通信・IAM認証統合が特徴
+      <strong>PrivateLinkとの違い：</strong
+      >LatticeはL7（HTTP/gRPC）対応・双方向通信・IAM認証統合が特徴
     </div>
   </div>
 
@@ -126,41 +171,59 @@
         </thead>
         <tbody>
           <tr>
-            <td style="text-align:center;color:#1e40af;font-weight:500;">VPCピアリング</td>
+            <td style="text-align:center;color:#1e40af;font-weight:500;"
+              >VPCピアリング</td
+            >
             <td style="text-align:center;">L3（IPレベル）1対1</td>
             <td style="text-align:center;">VPC間ネットワーク接続</td>
           </tr>
           <tr>
-            <td style="text-align:center;color:#534AB7;font-weight:500;">Transit GW</td>
+            <td style="text-align:center;color:#534AB7;font-weight:500;"
+              >Transit GW</td
+            >
             <td style="text-align:center;">L3・多対多ハブ</td>
             <td style="text-align:center;">複数VPC・オンプレ接続</td>
           </tr>
           <tr>
-            <td style="text-align:center;color:#059669;font-weight:500;">PrivateLink</td>
+            <td style="text-align:center;color:#059669;font-weight:500;"
+              >PrivateLink</td
+            >
             <td style="text-align:center;">L4・プライベート接続</td>
             <td style="text-align:center;">AWSサービスへの閉域接続</td>
           </tr>
           <tr style="background:#EEEDFE;">
-            <td style="text-align:center;color:#534AB7;font-weight:700;">VPC Lattice</td>
-            <td style="text-align:center;color:#3C3489;font-weight:500;">L7・サービスメッシュ</td>
-            <td style="text-align:center;color:#3C3489;font-weight:500;">マイクロサービス間通信</td>
+            <td style="text-align:center;color:#534AB7;font-weight:700;"
+              >VPC Lattice</td
+            >
+            <td style="text-align:center;color:#3C3489;font-weight:500;"
+              >L7・サービスメッシュ</td
+            >
+            <td style="text-align:center;color:#3C3489;font-weight:500;"
+              >マイクロサービス間通信</td
+            >
           </tr>
         </tbody>
       </table>
     </div>
 
     <div class="dia-note warn" style="margin-top:12px;">
-      <strong>「異なるVPC・アカウント間をL7で接続・認証も統合」→ VPC Lattice 一択</strong>
+      <strong
+        >「異なるVPC・アカウント間をL7で接続・認証も統合」→ VPC Lattice 一択</strong
+      >
     </div>
   </div>
 </div>
 
 <script>
   function latTab(t: string) {
-    document.querySelectorAll('[id^="lat-panel-"]').forEach(el => el.classList.remove('active'));
-    document.querySelectorAll('[id^="lat-tab-"]').forEach(el => el.classList.remove('active'));
-    document.getElementById('lat-panel-' + t)?.classList.add('active');
-    document.getElementById('lat-tab-' + t)?.classList.add('active');
+    document
+      .querySelectorAll('[id^="lat-panel-"]')
+      .forEach((el) => el.classList.remove("active"));
+    document
+      .querySelectorAll('[id^="lat-tab-"]')
+      .forEach((el) => el.classList.remove("active"));
+    document.getElementById("lat-panel-" + t)?.classList.add("active");
+    document.getElementById("lat-tab-" + t)?.classList.add("active");
   }
   (window as any).latTab = latTab;
 </script>

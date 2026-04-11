@@ -1,0 +1,27 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import SgNaclAnimation from "../../../components/diagrams/SgNaclAnimation.astro";
+---
+
+<Layout title="SG・NACL - VPC">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2">
+      <a href="/" class="hover:text-orange-500">ホーム</a> / <a
+        href="/network"
+        class="hover:text-orange-500">ネットワーク</a
+      > / <a href="/network/vpc" class="hover:text-orange-500">VPC</a> / SG・NACL
+    </p>
+    <h1 class="text-3xl font-bold mb-2">SG（セキュリティグループ）とNACL</h1>
+    <p class="text-gray-500 mb-10">
+      ステートフル vs ステートレス、許可/拒否ルールの違い
+    </p>
+
+    <section class="mb-12">
+      <h2 class="heading-section">SG vs NACLの動作の違い</h2>
+      <p class="text-gray-600 dark:text-gray-400 mb-4">
+        EC2へのHTTP(80)アクセスを許可する際の、セキュリティグループとNACLの動作の違いをステップごとに確認できます。
+      </p>
+      <SgNaclAnimation />
+    </section>
+  </div>
+</Layout>

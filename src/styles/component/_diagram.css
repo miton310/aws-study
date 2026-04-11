@@ -36,7 +36,7 @@
   margin-bottom: 6px;
 }
 .dia-box-label {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   text-align: center;
 }
@@ -147,7 +147,7 @@
   align-items: center;
   gap: 6px;
   margin-bottom: 8px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: #2563eb;
 }
@@ -255,6 +255,7 @@
 .dia-arrow-v.gray, .dia-arrow-h.gray { background: #d1d5db; }
 .dia-arrow-v.gray::after { border-top-color: #d1d5db; }
 .dia-arrow-h.gray::after { border-left-color: #d1d5db; }
+
 .dia-arrow-v.diagonal {
   transform: rotate(35deg);
   height: 28px;
@@ -305,7 +306,7 @@
   margin-top: 12px;
   padding: 14px 18px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.8;
 }
 .dia-note strong { font-weight: 600; }
@@ -334,7 +335,7 @@
 .dia-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 16px;
   margin-top: 12px;
 }
 .dia-table th {
@@ -401,7 +402,7 @@
 .dia-tl-dot.danger { background: #dc2626; }
 .dia-tl-dot.success { background: #059669; }
 .dia-tl-content {
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.7;
   color: #475569;
 }
@@ -419,11 +420,11 @@
   align-items: center;
   gap: 8px;
   margin: 8px 0;
-  font-size: 14px;
+  font-size: 16px;
   color: #6b7280;
 }
 .dia-step-desc {
-  font-size: 14px;
+  font-size: 16px;
   margin: 12px 0;
   padding: 12px 16px;
   border-radius: 8px;
@@ -465,7 +466,7 @@
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 16px;
 }
 .dark .dia-checklist {
   background: #1e293b;
@@ -504,7 +505,7 @@
   align-items: center;
   gap: 6px;
   margin-bottom: 12px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: #be185d;
 }
@@ -536,7 +537,7 @@
   border: 1px solid #534AB7;
   border-radius: 8px;
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: #3C3489;
 }
@@ -544,4 +545,73 @@
   background: rgba(83, 74, 183, 0.15);
   border-color: #7c73d6;
   color: #c4b5fd;
+}
+
+/* AZ コンテナ */
+.dia-az {
+  border: 1px dashed #378ADD;
+  border-radius: 10px;
+  padding: 10px;
+  flex: 1;
+  min-width: 0;
+  background: rgba(55, 138, 221, 0.03);
+}
+.dark .dia-az {
+  background: rgba(55, 138, 221, 0.08);
+  border-color: #60a5fa;
+}
+.dia-az-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #185FA5;
+}
+.dark .dia-az-header { color: #93c5fd; }
+
+/* テーマ: RDS */
+.dia-rds {
+  background: #EEEDFE;
+  border: 1px solid #534AB7;
+}
+.dia-rds .dia-box-label { color: #3C3489; }
+.dia-rds .dia-box-sub { color: #534AB7; }
+.dark .dia-rds {
+  background: rgba(83, 74, 183, 0.2);
+  border-color: #7c73d6;
+}
+.dark .dia-rds .dia-box-label { color: #c4b5fd; }
+.dark .dia-rds .dia-box-sub { color: #a5b4fc; }
+
+/* 障害状態 */
+.dia-box.failed {
+  opacity: 0.3;
+  position: relative;
+}
+.dia-box.failed::after {
+  content: '✕';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 28px;
+  color: #dc2626;
+  font-weight: 700;
+  opacity: 1;
+}
+
+/* フェイルオーバー矢印 */
+.dia-arrow-h.failover {
+  background: #dc2626;
+  width: 40px;
+}
+.dia-arrow-h.failover::after {
+  border-left-color: #dc2626;
+}
+
+/* 矢印上方向 */
+.dia-arrow-v.up {
+  transform: rotate(180deg);
 }

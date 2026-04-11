@@ -35,9 +35,9 @@
     background: #374151;
   }
   .sgn-btn.active {
-    background: #534AB7;
+    background: #534ab7;
     color: #fff;
-    border-color: #534AB7;
+    border-color: #534ab7;
   }
   .sgn-btn.success {
     background: #059669;
@@ -170,7 +170,7 @@
     transition: background 0.3s;
   }
   .sgn-arrow-line::after {
-    content: '';
+    content: "";
     position: absolute;
     right: -3px;
     top: 50%;
@@ -428,9 +428,15 @@
 <div class="sgn-container">
   <!-- Scenario selection -->
   <div style="margin-bottom:12px;">
-    <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">シナリオを選択：</div>
+    <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">
+      シナリオを選択：
+    </div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;">
-      <button class="sgn-btn success" id="sgn-scenario-1" onclick="sgnSetScenario(1)">
+      <button
+        class="sgn-btn success"
+        id="sgn-scenario-1"
+        onclick="sgnSetScenario(1)"
+      >
         ✓ SGインバウンド許可（正解）
       </button>
       <button class="sgn-btn" id="sgn-scenario-2" onclick="sgnSetScenario(2)">
@@ -444,8 +450,12 @@
 
   <!-- Step navigation -->
   <div class="sgn-step-info">
-    <button class="sgn-btn sgn-btn-nav" id="sgn-prev" onclick="sgnPrev()">◀ 前へ</button>
-    <button class="sgn-btn sgn-btn-nav" id="sgn-next" onclick="sgnNext()">次へ ▶</button>
+    <button class="sgn-btn sgn-btn-nav" id="sgn-prev" onclick="sgnPrev()"
+      >◀ 前へ</button
+    >
+    <button class="sgn-btn sgn-btn-nav" id="sgn-next" onclick="sgnNext()"
+      >次へ ▶</button
+    >
     <span id="sgn-step-num">1 / 5</span>
   </div>
 
@@ -454,9 +464,15 @@
 
   <!-- Legend -->
   <div class="sgn-legend">
-    <span><div class="sgn-legend-box" style="background:#059669;"></div> 通過</span>
-    <span><div class="sgn-legend-box" style="background:#dc2626;"></div> ブロック</span>
-    <span><div class="sgn-legend-box" style="background:#d1d5db;"></div> 未到達</span>
+    <span
+      ><div class="sgn-legend-box" style="background:#059669;"></div> 通過</span
+    >
+    <span
+      ><div class="sgn-legend-box" style="background:#dc2626;"></div> ブロック</span
+    >
+    <span
+      ><div class="sgn-legend-box" style="background:#d1d5db;"></div> 未到達</span
+    >
   </div>
 
   <!-- Diagram -->
@@ -464,7 +480,11 @@
     <!-- Client (sender) -->
     <div class="sgn-col">
       <div id="sgn-client-send" class="sgn-client">
-        <img class="sgn-client-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Internet-alt2_48_Light.svg" alt="client">
+        <img
+          class="sgn-client-icon"
+          src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Internet-alt2_48_Light.svg"
+          alt="client"
+        />
         <div class="sgn-client-label">クライアント</div>
         <div class="sgn-client-port">HTTP :80</div>
       </div>
@@ -482,20 +502,27 @@
     <div class="sgn-col">
       <div class="sgn-vpc">
         <div class="sgn-vpc-header">
-          <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Virtual-private-cloud-VPC_48.svg" alt="VPC">
+          <img src="/icons/Aws-Vpc--Streamline-Svg-Logos.svg" alt="VPC" />
           <span>VPC</span>
         </div>
 
         <div class="sgn-subnet">
           <div class="sgn-subnet-header">
-            <img src="/AWS-icons/Architecture-Group-Icons_07312025/Private-subnet_32.png" alt="subnet">
+            <img
+              src="/AWS-icons/Architecture-Group-Icons_07312025/Private-subnet_32.png"
+              alt="subnet"
+            />
             <span>パブリックサブネット</span>
           </div>
 
           <div class="sgn-flow">
             <!-- NACL IN -->
             <div id="sgn-nacl-in" class="sgn-gate nacl">
-              <img class="sgn-gate-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Firewall_48_Light.svg" alt="NACL">
+              <img
+                class="sgn-gate-icon"
+                src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Firewall_48_Light.svg"
+                alt="NACL"
+              />
               <div class="sgn-gate-label">NACL</div>
               <div class="sgn-gate-dir">IN</div>
               <div id="sgn-nacl-in-status" class="sgn-gate-status pass">✓</div>
@@ -508,7 +535,11 @@
 
             <!-- SG IN -->
             <div id="sgn-sg-in" class="sgn-gate sg">
-              <img class="sgn-gate-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Firewall_48_Light.svg" alt="SG">
+              <img
+                class="sgn-gate-icon"
+                src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Firewall_48_Light.svg"
+                alt="SG"
+              />
               <div class="sgn-gate-label">SG</div>
               <div class="sgn-gate-dir">IN</div>
               <div id="sgn-sg-in-status" class="sgn-gate-status pass">✓</div>
@@ -521,8 +552,12 @@
 
             <!-- EC2 -->
             <div id="sgn-ec2" class="sgn-ec2">
-              <img class="sgn-ec2-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
-              <div class="sgn-ec2-label">Web<br>サーバー</div>
+              <img
+                class="sgn-ec2-icon"
+                src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg"
+                alt="EC2"
+              />
+              <div class="sgn-ec2-label">Web<br />サーバー</div>
             </div>
 
             <div class="sgn-arrow">
@@ -531,7 +566,11 @@
 
             <!-- SG OUT -->
             <div id="sgn-sg-out" class="sgn-gate sg">
-              <img class="sgn-gate-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Firewall_48_Light.svg" alt="SG">
+              <img
+                class="sgn-gate-icon"
+                src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Firewall_48_Light.svg"
+                alt="SG"
+              />
               <div class="sgn-gate-label">SG</div>
               <div class="sgn-gate-dir">OUT</div>
               <div id="sgn-sg-out-status" class="sgn-gate-status pass">✓</div>
@@ -544,7 +583,11 @@
 
             <!-- NACL OUT -->
             <div id="sgn-nacl-out" class="sgn-gate nacl">
-              <img class="sgn-gate-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Network-Access-Control-List_48.svg" alt="NACL">
+              <img
+                class="sgn-gate-icon"
+                src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Network-Access-Control-List_48.svg"
+                alt="NACL"
+              />
               <div class="sgn-gate-label">NACL</div>
               <div class="sgn-gate-dir">OUT</div>
               <div id="sgn-nacl-out-status" class="sgn-gate-status pass">✓</div>
@@ -566,7 +609,11 @@
     <!-- Client (receiver) -->
     <div class="sgn-col">
       <div id="sgn-client-recv" class="sgn-client">
-        <img class="sgn-client-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Internet-alt2_48_Light.svg" alt="client">
+        <img
+          class="sgn-client-icon"
+          src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Internet-alt2_48_Light.svg"
+          alt="client"
+        />
         <div class="sgn-client-label">クライアント</div>
         <div class="sgn-client-port">受信</div>
       </div>
@@ -577,9 +624,13 @@
   <div class="sgn-summary">
     <div class="sgn-summary-title">ポイント</div>
     <div id="sgn-summary-text">
-      <strong>セキュリティグループはステートフル</strong>：インバウンドを許可すれば、戻り通信は自動許可。<br>
-      <strong>NACLはステートレス</strong>：戻り通信（エフェメラルポート1024-65535）も明示的に許可が必要。<br>
-      → デフォルトNACL（全許可）を使う場合、<strong>SGでインバウンド許可するだけでOK</strong>
+      <strong>セキュリティグループはステートフル</strong
+      >：インバウンドを許可すれば、戻り通信は自動許可。<br />
+      <strong>NACLはステートレス</strong
+      >：戻り通信（エフェメラルポート1024-65535）も明示的に許可が必要。<br />
+      → デフォルトNACL（全許可）を使う場合、<strong
+        >SGでインバウンド許可するだけでOK</strong
+      >
     </div>
   </div>
 </div>
@@ -603,110 +654,188 @@
       success: true,
       steps: [
         {
-          highlight: 'sgn-client-send',
-          desc: '【STEP 1】クライアントからHTTP :80 リクエストを送信。',
-          gates: { naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass' },
-          arrows: ['green', 'gray', 'gray', 'gray', 'gray', 'gray']
+          highlight: "sgn-client-send",
+          desc: "【STEP 1】クライアントからHTTP :80 リクエストを送信。",
+          gates: {
+            naclIn: "pass",
+            sgIn: "pass",
+            sgOut: "pass",
+            naclOut: "pass",
+          },
+          arrows: ["green", "gray", "gray", "gray", "gray", "gray"],
         },
         {
-          highlight: 'sgn-nacl-in',
-          desc: '【STEP 2】NACL IN：デフォルトで全許可 → <strong>通過 ✓</strong>',
-          gates: { naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass' },
-          arrows: ['green', 'green', 'gray', 'gray', 'gray', 'gray']
+          highlight: "sgn-nacl-in",
+          desc: "【STEP 2】NACL IN：デフォルトで全許可 → <strong>通過 ✓</strong>",
+          gates: {
+            naclIn: "pass",
+            sgIn: "pass",
+            sgOut: "pass",
+            naclOut: "pass",
+          },
+          arrows: ["green", "green", "gray", "gray", "gray", "gray"],
         },
         {
-          highlight: 'sgn-sg-in',
-          desc: '【STEP 3】SG IN：ポート80を許可設定 → <strong>通過 ✓</strong>',
-          gates: { naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass' },
-          arrows: ['green', 'green', 'green', 'gray', 'gray', 'gray']
+          highlight: "sgn-sg-in",
+          desc: "【STEP 3】SG IN：ポート80を許可設定 → <strong>通過 ✓</strong>",
+          gates: {
+            naclIn: "pass",
+            sgIn: "pass",
+            sgOut: "pass",
+            naclOut: "pass",
+          },
+          arrows: ["green", "green", "green", "gray", "gray", "gray"],
         },
         {
-          highlight: 'sgn-ec2',
-          desc: '【STEP 4】EC2がリクエストを処理し、レスポンスを返す。',
-          gates: { naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass' },
-          arrows: ['green', 'green', 'green', 'green', 'gray', 'gray']
+          highlight: "sgn-ec2",
+          desc: "【STEP 4】EC2がリクエストを処理し、レスポンスを返す。",
+          gates: {
+            naclIn: "pass",
+            sgIn: "pass",
+            sgOut: "pass",
+            naclOut: "pass",
+          },
+          arrows: ["green", "green", "green", "green", "gray", "gray"],
         },
         {
-          highlight: 'sgn-sg-out',
-          desc: '【STEP 5】SG OUT：<strong>ステートフル</strong>なのでインバウンド許可の戻り通信は自動許可 → <strong>通過 ✓</strong>',
-          gates: { naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass' },
-          arrows: ['green', 'green', 'green', 'green', 'green', 'gray']
+          highlight: "sgn-sg-out",
+          desc: "【STEP 5】SG OUT：<strong>ステートフル</strong>なのでインバウンド許可の戻り通信は自動許可 → <strong>通過 ✓</strong>",
+          gates: {
+            naclIn: "pass",
+            sgIn: "pass",
+            sgOut: "pass",
+            naclOut: "pass",
+          },
+          arrows: ["green", "green", "green", "green", "green", "gray"],
         },
         {
-          highlight: 'sgn-nacl-out',
-          desc: '【STEP 6】NACL OUT：デフォルトで全許可 → <strong>通過 ✓</strong>',
-          gates: { naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass' },
-          arrows: ['green', 'green', 'green', 'green', 'green', 'green']
+          highlight: "sgn-nacl-out",
+          desc: "【STEP 6】NACL OUT：デフォルトで全許可 → <strong>通過 ✓</strong>",
+          gates: {
+            naclIn: "pass",
+            sgIn: "pass",
+            sgOut: "pass",
+            naclOut: "pass",
+          },
+          arrows: ["green", "green", "green", "green", "green", "green"],
         },
         {
-          highlight: 'sgn-client-recv',
-          desc: '【完了】クライアントがレスポンスを受信。<strong>通信成功！</strong>',
-          gates: { naclIn: 'pass', sgIn: 'pass', sgOut: 'pass', naclOut: 'pass' },
-          arrows: ['green', 'green', 'green', 'green', 'green', 'green']
-        }
+          highlight: "sgn-client-recv",
+          desc: "【完了】クライアントがレスポンスを受信。<strong>通信成功！</strong>",
+          gates: {
+            naclIn: "pass",
+            sgIn: "pass",
+            sgOut: "pass",
+            naclOut: "pass",
+          },
+          arrows: ["green", "green", "green", "green", "green", "green"],
+        },
       ],
-      summary: '<strong>✅ 正解パターン</strong><br>SGでインバウンド80番を許可するだけでOK。SGはステートフルなので戻り通信は自動許可。NACLはデフォルト全許可なので追加設定不要。'
+      summary:
+        "<strong>✅ 正解パターン</strong><br>SGでインバウンド80番を許可するだけでOK。SGはステートフルなので戻り通信は自動許可。NACLはデフォルト全許可なので追加設定不要。",
     },
     2: {
       success: false,
       steps: [
         {
-          highlight: 'sgn-client-send',
-          desc: '【STEP 1】クライアントからHTTP :80 リクエストを送信。',
-          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'gray', naclOut: 'block' },
-          arrows: ['green', 'gray', 'gray', 'gray', 'gray', 'gray']
+          highlight: "sgn-client-send",
+          desc: "【STEP 1】クライアントからHTTP :80 リクエストを送信。",
+          gates: {
+            naclIn: "pass",
+            sgIn: "block",
+            sgOut: "gray",
+            naclOut: "block",
+          },
+          arrows: ["green", "gray", "gray", "gray", "gray", "gray"],
         },
         {
-          highlight: 'sgn-nacl-in',
-          desc: '【STEP 2】NACL IN：80番インバウンドを許可設定 → <strong>通過 ✓</strong>',
-          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'gray', naclOut: 'block' },
-          arrows: ['green', 'green', 'gray', 'gray', 'gray', 'gray']
+          highlight: "sgn-nacl-in",
+          desc: "【STEP 2】NACL IN：80番インバウンドを許可設定 → <strong>通過 ✓</strong>",
+          gates: {
+            naclIn: "pass",
+            sgIn: "block",
+            sgOut: "gray",
+            naclOut: "block",
+          },
+          arrows: ["green", "green", "gray", "gray", "gray", "gray"],
         },
         {
-          highlight: 'sgn-sg-in',
-          desc: '【STEP 3】SG IN：許可設定がない → <strong>ブロック ✕</strong><br>リクエストはEC2に届かない！',
-          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'gray', naclOut: 'block' },
-          arrows: ['green', 'red', 'gray', 'gray', 'gray', 'gray']
+          highlight: "sgn-sg-in",
+          desc: "【STEP 3】SG IN：許可設定がない → <strong>ブロック ✕</strong><br>リクエストはEC2に届かない！",
+          gates: {
+            naclIn: "pass",
+            sgIn: "block",
+            sgOut: "gray",
+            naclOut: "block",
+          },
+          arrows: ["green", "red", "gray", "gray", "gray", "gray"],
         },
         {
-          highlight: 'sgn-nacl-out',
-          desc: '【問題点】さらに、NACL OUTで「その他拒否」していると、たとえEC2に届いても戻り通信（エフェメラルポート1024-65535）がブロックされる。NACLはステートレスなので両方向の設定が必要。',
-          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'gray', naclOut: 'block' },
-          arrows: ['green', 'red', 'gray', 'gray', 'gray', 'red']
-        }
+          highlight: "sgn-nacl-out",
+          desc: "【問題点】さらに、NACL OUTで「その他拒否」していると、たとえEC2に届いても戻り通信（エフェメラルポート1024-65535）がブロックされる。NACLはステートレスなので両方向の設定が必要。",
+          gates: {
+            naclIn: "pass",
+            sgIn: "block",
+            sgOut: "gray",
+            naclOut: "block",
+          },
+          arrows: ["green", "red", "gray", "gray", "gray", "red"],
+        },
       ],
-      summary: '<strong>❌ 失敗パターン</strong><br>NACLだけ設定してもSGのインバウンド許可がないとEC2に到達できない。また「その他拒否」だと戻り通信もブロックされる。'
+      summary:
+        "<strong>❌ 失敗パターン</strong><br>NACLだけ設定してもSGのインバウンド許可がないとEC2に到達できない。また「その他拒否」だと戻り通信もブロックされる。",
     },
     3: {
       success: false,
       steps: [
         {
-          highlight: 'sgn-client-send',
-          desc: '【STEP 1】クライアントからHTTP :80 リクエストを送信。',
-          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'pass', naclOut: 'pass' },
-          arrows: ['green', 'gray', 'gray', 'gray', 'gray', 'gray']
+          highlight: "sgn-client-send",
+          desc: "【STEP 1】クライアントからHTTP :80 リクエストを送信。",
+          gates: {
+            naclIn: "pass",
+            sgIn: "block",
+            sgOut: "pass",
+            naclOut: "pass",
+          },
+          arrows: ["green", "gray", "gray", "gray", "gray", "gray"],
         },
         {
-          highlight: 'sgn-nacl-in',
-          desc: '【STEP 2】NACL IN：デフォルト全許可 → <strong>通過 ✓</strong>',
-          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'pass', naclOut: 'pass' },
-          arrows: ['green', 'green', 'gray', 'gray', 'gray', 'gray']
+          highlight: "sgn-nacl-in",
+          desc: "【STEP 2】NACL IN：デフォルト全許可 → <strong>通過 ✓</strong>",
+          gates: {
+            naclIn: "pass",
+            sgIn: "block",
+            sgOut: "pass",
+            naclOut: "pass",
+          },
+          arrows: ["green", "green", "gray", "gray", "gray", "gray"],
         },
         {
-          highlight: 'sgn-sg-in',
-          desc: '【STEP 3】SG IN：<strong>インバウンド</strong>の許可がない → <strong>ブロック ✕</strong><br>アウトバウンドを許可しても、インバウンドがないと届かない！',
-          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'pass', naclOut: 'pass' },
-          arrows: ['green', 'red', 'gray', 'gray', 'gray', 'gray']
+          highlight: "sgn-sg-in",
+          desc: "【STEP 3】SG IN：<strong>インバウンド</strong>の許可がない → <strong>ブロック ✕</strong><br>アウトバウンドを許可しても、インバウンドがないと届かない！",
+          gates: {
+            naclIn: "pass",
+            sgIn: "block",
+            sgOut: "pass",
+            naclOut: "pass",
+          },
+          arrows: ["green", "red", "gray", "gray", "gray", "gray"],
         },
         {
-          highlight: 'sgn-sg-out',
-          desc: '【解説】アウトバウンド＝EC2から外部への通信方向。クライアント→EC2は<strong>インバウンド</strong>。方向を間違えると通信できない。',
-          gates: { naclIn: 'pass', sgIn: 'block', sgOut: 'pass', naclOut: 'pass' },
-          arrows: ['green', 'red', 'gray', 'gray', 'gray', 'gray']
-        }
+          highlight: "sgn-sg-out",
+          desc: "【解説】アウトバウンド＝EC2から外部への通信方向。クライアント→EC2は<strong>インバウンド</strong>。方向を間違えると通信できない。",
+          gates: {
+            naclIn: "pass",
+            sgIn: "block",
+            sgOut: "pass",
+            naclOut: "pass",
+          },
+          arrows: ["green", "red", "gray", "gray", "gray", "gray"],
+        },
       ],
-      summary: '<strong>❌ 失敗パターン</strong><br>アウトバウンドはEC2→外部の方向。クライアントからのアクセスはインバウンドなので、SGのインバウンド許可が必要。'
-    }
+      summary:
+        "<strong>❌ 失敗パターン</strong><br>アウトバウンドはEC2→外部の方向。クライアントからのアクセスはインバウンドなので、SGのインバウンド許可が必要。",
+    },
   };
 
   let currentScenario = 1;
@@ -717,12 +846,12 @@
     currentStep = 0;
 
     // Update buttons
-    [1, 2, 3].forEach(i => {
+    [1, 2, 3].forEach((i) => {
       const btn = document.getElementById(`sgn-scenario-${i}`)!;
-      btn.className = 'sgn-btn';
+      btn.className = "sgn-btn";
       if (i === num) {
         const scenario = SGN_SCENARIOS[i];
-        btn.classList.add(scenario.success ? 'success' : 'fail');
+        btn.classList.add(scenario.success ? "success" : "fail");
       }
     });
 
@@ -734,25 +863,34 @@
     const step = scenario.steps[currentStep];
 
     // Update step info
-    document.getElementById('sgn-step-num')!.textContent = `${currentStep + 1} / ${scenario.steps.length}`;
-    document.getElementById('sgn-step-desc')!.innerHTML = step.desc;
+    document.getElementById("sgn-step-num")!.textContent =
+      `${currentStep + 1} / ${scenario.steps.length}`;
+    document.getElementById("sgn-step-desc")!.innerHTML = step.desc;
 
     // Update summary
-    document.getElementById('sgn-summary-text')!.innerHTML = scenario.summary;
+    document.getElementById("sgn-summary-text")!.innerHTML = scenario.summary;
 
     // Remove all highlights
-    ['sgn-client-send', 'sgn-client-recv', 'sgn-nacl-in', 'sgn-sg-in', 'sgn-ec2', 'sgn-sg-out', 'sgn-nacl-out'].forEach(id => {
-      document.getElementById(id)?.classList.remove('highlight');
+    [
+      "sgn-client-send",
+      "sgn-client-recv",
+      "sgn-nacl-in",
+      "sgn-sg-in",
+      "sgn-ec2",
+      "sgn-sg-out",
+      "sgn-nacl-out",
+    ].forEach((id) => {
+      document.getElementById(id)?.classList.remove("highlight");
     });
 
     // Add highlight
-    document.getElementById(step.highlight)?.classList.add('highlight');
+    document.getElementById(step.highlight)?.classList.add("highlight");
 
     // Update gate statuses
-    sgnUpdateGate('sgn-nacl-in-status', step.gates.naclIn);
-    sgnUpdateGate('sgn-sg-in-status', step.gates.sgIn);
-    sgnUpdateGate('sgn-sg-out-status', step.gates.sgOut);
-    sgnUpdateGate('sgn-nacl-out-status', step.gates.naclOut);
+    sgnUpdateGate("sgn-nacl-in-status", step.gates.naclIn);
+    sgnUpdateGate("sgn-sg-in-status", step.gates.sgIn);
+    sgnUpdateGate("sgn-sg-out-status", step.gates.sgOut);
+    sgnUpdateGate("sgn-nacl-out-status", step.gates.naclOut);
 
     // Update arrows
     step.arrows.forEach((color, i) => {
@@ -764,12 +902,12 @@
   function sgnUpdateGate(id: string, status: string) {
     const el = document.getElementById(id)!;
     el.className = `sgn-gate-status ${status}`;
-    if (status === 'pass') {
-      el.textContent = '✓';
-    } else if (status === 'block') {
-      el.textContent = '✕';
+    if (status === "pass") {
+      el.textContent = "✓";
+    } else if (status === "block") {
+      el.textContent = "✕";
     } else {
-      el.textContent = '–';
+      el.textContent = "–";
     }
   }
 

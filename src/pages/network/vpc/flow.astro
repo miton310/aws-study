@@ -1,0 +1,25 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import VpcAnimationDiagram from "../../../components/diagrams/VpcAnimationDiagram.astro";
+---
+
+<Layout title="通信フロー - VPC">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2">
+      <a href="/" class="hover:text-orange-500">ホーム</a> / <a
+        href="/network"
+        class="hover:text-orange-500">ネットワーク</a
+      > / <a href="/network/vpc" class="hover:text-orange-500">VPC</a> / 通信フロー
+    </p>
+    <h1 class="text-3xl font-bold mb-2">VPC 通信フロー</h1>
+    <p class="text-gray-500 mb-10">VPC内の通信経路をアニメーションで確認</p>
+
+    <section class="mb-12">
+      <p class="text-gray-600 dark:text-gray-400 mb-4">
+        インターネット → パブリックサブネット →
+        プライベートサブネットの通信経路を3つのシナリオで確認できます。
+      </p>
+      <VpcAnimationDiagram />
+    </section>
+  </div>
+</Layout>

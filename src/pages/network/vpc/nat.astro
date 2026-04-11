@@ -1,0 +1,39 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import NatGatewayAnimation from "../../../components/diagrams/NatGatewayAnimation.astro";
+import NatInstanceDiagram from "../../../components/diagrams/NatInstanceDiagram.astro";
+---
+
+<Layout title="NAT Gateway・NATインスタンス - VPC">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2">
+      <a href="/" class="hover:text-orange-500">ホーム</a> / <a
+        href="/network"
+        class="hover:text-orange-500">ネットワーク</a
+      > / <a href="/network/vpc" class="hover:text-orange-500">VPC</a> / NAT
+    </p>
+    <h1 class="text-3xl font-bold mb-2">NAT Gateway・NATインスタンス</h1>
+    <p class="text-gray-500 mb-10">
+      プライベートサブネットからインターネットへの接続方法
+    </p>
+
+    <section class="mb-12">
+      <h2 class="heading-section">NAT Gateway</h2>
+      <p class="text-gray-600 dark:text-gray-400 mb-4">
+        プライベートサブネットのEC2がインターネットにアクセスするための設定をステップごとに確認できます。
+      </p>
+      <NatGatewayAnimation />
+    </section>
+
+    <section class="mb-12">
+      <h2 class="heading-section">
+        NATインスタンス：ポート転送と NAT Gateway との違い
+      </h2>
+      <p class="text-gray-600 dark:text-gray-400 mb-4">
+        NATインスタンスの特徴・ポート転送の仕組み・NAT
+        Gatewayとの使い分けを確認できます。
+      </p>
+      <NatInstanceDiagram />
+    </section>
+  </div>
+</Layout>

@@ -23,8 +23,12 @@
     background: #1f2937;
     color: #f9fafb;
   }
-  .nat-btn:hover { background: #f3f4f6; }
-  .dark .nat-btn:hover { background: #374151; }
+  .nat-btn:hover {
+    background: #f3f4f6;
+  }
+  .dark .nat-btn:hover {
+    background: #374151;
+  }
   .nat-btn.success {
     background: #059669;
     color: #fff;
@@ -35,7 +39,9 @@
     color: #fff;
     border-color: #dc2626;
   }
-  .nat-btn-nav { padding: 4px 12px; }
+  .nat-btn-nav {
+    padding: 4px 12px;
+  }
 
   /* コンポーネント固有: サマリー */
   .nat-summary {
@@ -57,7 +63,9 @@
     margin-bottom: 8px;
     color: #854d0e;
   }
-  .dark .nat-summary-title { color: #fde047; }
+  .dark .nat-summary-title {
+    color: #fde047;
+  }
 </style>
 
 <div>
@@ -73,9 +81,15 @@
 
   <!-- Legend -->
   <div class="dia-legend">
-    <span><div class="dia-legend-box" style="background:#059669;"></div> 通過</span>
-    <span><div class="dia-legend-box" style="background:#dc2626;"></div> ブロック</span>
-    <span><div class="dia-legend-box" style="background:#d1d5db;"></div> 未到達</span>
+    <span
+      ><div class="dia-legend-box" style="background:#059669;"></div> 通過</span
+    >
+    <span
+      ><div class="dia-legend-box" style="background:#dc2626;"></div> ブロック</span
+    >
+    <span
+      ><div class="dia-legend-box" style="background:#d1d5db;"></div> 未到達</span
+    >
   </div>
 
   <!-- Diagram -->
@@ -83,7 +97,11 @@
     <!-- Internet -->
     <div class="dia-row">
       <div id="nat-internet" class="dia-box dia-internet">
-        <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Internet_48_Light.svg" alt="Internet">
+        <img
+          class="dia-box-icon"
+          src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Internet_48_Light.svg"
+          alt="Internet"
+        />
         <div class="dia-box-label">インターネット</div>
         <div class="dia-box-sub">Webコンテンツ</div>
       </div>
@@ -99,14 +117,18 @@
     <!-- VPC -->
     <div class="dia-vpc">
       <div class="dia-vpc-header">
-        <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Virtual-private-cloud-VPC_48.svg" alt="VPC">
+        <img src="/icons/Aws-Vpc--Streamline-Svg-Logos.svg" alt="VPC" />
         <span>VPC</span>
       </div>
 
       <!-- IGW row -->
       <div class="dia-row">
         <div id="nat-igw" class="dia-box dia-igw">
-          <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Internet-Gateway_48.svg" alt="IGW">
+          <img
+            class="dia-box-icon"
+            src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_Internet-Gateway_48.svg"
+            alt="IGW"
+          />
           <div class="dia-box-label">Internet Gateway</div>
         </div>
       </div>
@@ -122,19 +144,29 @@
         <!-- Public Subnet -->
         <div class="dia-subnet public">
           <div class="dia-subnet-header">
-            <img src="/AWS-icons/Architecture-Group-Icons_07312025/Public-subnet_32.svg" alt="public">
+            <img
+              src="/AWS-icons/Architecture-Group-Icons_07312025/Public-subnet_32.svg"
+              alt="public"
+            />
             <span>パブリックサブネット</span>
           </div>
           <div class="dia-row">
             <div id="nat-natgw" class="dia-box dia-natgw">
-              <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_NAT-Gateway_48.svg" alt="NAT">
+              <img
+                class="dia-box-icon"
+                src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-VPC_NAT-Gateway_48.svg"
+                alt="NAT"
+              />
               <div class="dia-box-label">NAT Gateway</div>
             </div>
           </div>
           <div class="dia-row" style="margin-top:6px;">
             <div id="nat-rt-public" class="dia-box dia-rt">
               <div class="dia-box-label">ルートテーブル</div>
-              <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-Route-53_Route-Table_48.svg" alt="Route Table">
+              <img
+                src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-Route-53_Route-Table_48.svg"
+                alt="Route Table"
+              />
               <div class="dia-box-sub">0.0.0.0/0 → IGW ✓</div>
             </div>
           </div>
@@ -150,12 +182,19 @@
         <!-- Private Subnet -->
         <div class="dia-subnet private">
           <div class="dia-subnet-header">
-            <img src="/AWS-icons/Architecture-Group-Icons_07312025/Private-subnet_32.svg" alt="private">
+            <img
+              src="/AWS-icons/Architecture-Group-Icons_07312025/Private-subnet_32.svg"
+              alt="private"
+            />
             <span>プライベートサブネット</span>
           </div>
           <div class="dia-row">
             <div id="nat-ec2" class="dia-box dia-ec2">
-              <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2">
+              <img
+                class="dia-box-icon"
+                src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg"
+                alt="EC2"
+              />
               <div class="dia-box-label">EC2</div>
               <div class="dia-box-sub">プライベートIPのみ</div>
             </div>
@@ -163,8 +202,13 @@
           <div class="dia-row" style="margin-top:6px;">
             <div id="nat-rt-private" class="dia-box dia-rt">
               <div class="dia-box-label">ルートテーブル</div>
-              <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-Route-53_Route-Table_48.svg" alt="Route Table">
-              <div id="nat-rt-private-route" class="dia-box-sub">0.0.0.0/0 → ???</div>
+              <img
+                src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Amazon-Route-53_Route-Table_48.svg"
+                alt="Route Table"
+              />
+              <div id="nat-rt-private-route" class="dia-box-sub">
+                0.0.0.0/0 → ???
+              </div>
             </div>
           </div>
         </div>
@@ -206,55 +250,56 @@
   const NAT_SCENARIOS: Record<number, NatScenario> = {
     2: {
       success: true,
-      rtPrivateRoute: '0.0.0.0/0 → NAT GW ✓',
+      rtPrivateRoute: "0.0.0.0/0 → NAT GW ✓",
       steps: [
         {
-          highlight: 'nat-ec2',
-          desc: '【STEP 1】プライベートサブネットのEC2からインターネットへリクエストを送信。',
-          arrows: ['gray', 'gray', 'gray'],
-          rtPrivateError: false
+          highlight: "nat-ec2",
+          desc: "【STEP 1】プライベートサブネットのEC2からインターネットへリクエストを送信。",
+          arrows: ["gray", "gray", "gray"],
+          rtPrivateError: false,
         },
         {
-          highlight: 'nat-rt-private',
-          desc: '【STEP 2】ルートテーブルを参照。<strong>0.0.0.0/0 → NAT Gateway</strong> が設定済み → NAT GWへ転送。',
-          arrows: ['gray', 'gray', 'green'],
-          rtPrivateError: false
+          highlight: "nat-rt-private",
+          desc: "【STEP 2】ルートテーブルを参照。<strong>0.0.0.0/0 → NAT Gateway</strong> が設定済み → NAT GWへ転送。",
+          arrows: ["gray", "gray", "green"],
+          rtPrivateError: false,
         },
         {
-          highlight: 'nat-natgw',
-          desc: '【STEP 3】NAT Gatewayがパケットを受信。送信元IPをNAT GWのパブリックIPに変換（NAT）。',
-          arrows: ['gray', 'gray', 'green'],
-          rtPrivateError: false
+          highlight: "nat-natgw",
+          desc: "【STEP 3】NAT Gatewayがパケットを受信。送信元IPをNAT GWのパブリックIPに変換（NAT）。",
+          arrows: ["gray", "gray", "green"],
+          rtPrivateError: false,
         },
         {
-          highlight: 'nat-rt-public',
-          desc: '【STEP 4】パブリックサブネットのルートテーブル：<strong>0.0.0.0/0 → IGW</strong> → IGWへ転送。',
-          arrows: ['gray', 'green', 'green'],
-          rtPrivateError: false
+          highlight: "nat-rt-public",
+          desc: "【STEP 4】パブリックサブネットのルートテーブル：<strong>0.0.0.0/0 → IGW</strong> → IGWへ転送。",
+          arrows: ["gray", "green", "green"],
+          rtPrivateError: false,
         },
         {
-          highlight: 'nat-igw',
-          desc: '【STEP 5】Internet Gatewayを通過。インターネットへ。',
-          arrows: ['green', 'green', 'green'],
-          rtPrivateError: false
+          highlight: "nat-igw",
+          desc: "【STEP 5】Internet Gatewayを通過。インターネットへ。",
+          arrows: ["green", "green", "green"],
+          rtPrivateError: false,
         },
         {
-          highlight: 'nat-internet',
-          desc: '【成功】インターネットのWebコンテンツにアクセス完了！<br>レスポンスは逆順でNAT Gateway経由でEC2に戻る。',
-          arrows: ['green', 'green', 'green'],
-          rtPrivateError: false
-        }
+          highlight: "nat-internet",
+          desc: "【成功】インターネットのWebコンテンツにアクセス完了！<br>レスポンスは逆順でNAT Gateway経由でEC2に戻る。",
+          arrows: ["green", "green", "green"],
+          rtPrivateError: false,
+        },
       ],
       checklist: [
-        { text: 'EC2にプライベートIPのみ', ok: true },
-        { text: 'VPCにIGW作成済み', ok: true },
-        { text: 'パブリックサブネットのルートテーブル → IGW', ok: true },
-        { text: 'NAT Gatewayをパブリックサブネットに作成', ok: true },
-        { text: 'SG/NACLはデフォルト設定', ok: true },
-        { text: 'プライベートサブネットのルートテーブル → NAT GW', ok: true }
+        { text: "EC2にプライベートIPのみ", ok: true },
+        { text: "VPCにIGW作成済み", ok: true },
+        { text: "パブリックサブネットのルートテーブル → IGW", ok: true },
+        { text: "NAT Gatewayをパブリックサブネットに作成", ok: true },
+        { text: "SG/NACLはデフォルト設定", ok: true },
+        { text: "プライベートサブネットのルートテーブル → NAT GW", ok: true },
       ],
-      summary: '<strong>✅ 正しい設定</strong><br><br>プライベートサブネットのルートテーブルに <code>0.0.0.0/0 → NAT Gateway</code> を設定。<br>NAT Gatewayはパブリックサブネットに配置され、IGW経由でインターネットに出る。<br><br><strong>ポイント：</strong>プライベートEC2はインターネットに「出られる」が「入れない」（セキュリティ確保）。'
-    }
+      summary:
+        "<strong>✅ 正しい設定</strong><br><br>プライベートサブネットのルートテーブルに <code>0.0.0.0/0 → NAT Gateway</code> を設定。<br>NAT Gatewayはパブリックサブネットに配置され、IGW経由でインターネットに出る。<br><br><strong>ポイント：</strong>プライベートEC2はインターネットに「出られる」が「入れない」（セキュリティ確保）。",
+    },
   };
 
   let natCurrentScenario = 2;
@@ -266,15 +311,20 @@
 
     // Update route table text
     const scenario = NAT_SCENARIOS[num];
-    document.getElementById('nat-rt-private-route')!.textContent = scenario.rtPrivateRoute;
+    document.getElementById("nat-rt-private-route")!.textContent =
+      scenario.rtPrivateRoute;
 
     // Update checklist
-    const checklistEl = document.getElementById('nat-checklist-items')!;
-    checklistEl.innerHTML = scenario.checklist.map(item => `
-      <div class="dia-checklist-item ${item.ok ? 'ok' : 'ng'}">
-        ${item.ok ? '✓' : '✕'} ${item.text}
+    const checklistEl = document.getElementById("nat-checklist-items")!;
+    checklistEl.innerHTML = scenario.checklist
+      .map(
+        (item) => `
+      <div class="dia-checklist-item ${item.ok ? "ok" : "ng"}">
+        ${item.ok ? "✓" : "✕"} ${item.text}
       </div>
-    `).join('');
+    `,
+      )
+      .join("");
 
     natRender();
   }
@@ -284,39 +334,49 @@
     const step = scenario.steps[natCurrentStep];
 
     // Update step info
-    document.getElementById('nat-step-num')!.textContent = `${natCurrentStep + 1} / ${scenario.steps.length}`;
-    document.getElementById('nat-step-desc')!.innerHTML = step.desc;
+    document.getElementById("nat-step-num")!.textContent =
+      `${natCurrentStep + 1} / ${scenario.steps.length}`;
+    document.getElementById("nat-step-desc")!.innerHTML = step.desc;
 
     // Update summary
-    document.getElementById('nat-summary-text')!.innerHTML = scenario.summary;
+    document.getElementById("nat-summary-text")!.innerHTML = scenario.summary;
 
     // Remove all highlights
-    ['nat-internet', 'nat-igw', 'nat-natgw', 'nat-rt-public', 'nat-rt-private', 'nat-ec2'].forEach(id => {
-      document.getElementById(id)?.classList.remove('highlight');
+    [
+      "nat-internet",
+      "nat-igw",
+      "nat-natgw",
+      "nat-rt-public",
+      "nat-rt-private",
+      "nat-ec2",
+    ].forEach((id) => {
+      document.getElementById(id)?.classList.remove("highlight");
     });
 
     // Add highlight
-    document.getElementById(step.highlight)?.classList.add('highlight');
+    document.getElementById(step.highlight)?.classList.add("highlight");
 
     // Update route table error state
-    const rtPrivate = document.getElementById('nat-rt-private')!;
+    const rtPrivate = document.getElementById("nat-rt-private")!;
     if (step.rtPrivateError) {
-      rtPrivate.classList.add('error');
+      rtPrivate.classList.add("error");
     } else {
-      rtPrivate.classList.remove('error');
+      rtPrivate.classList.remove("error");
     }
 
     // Update arrows
-    const arrowIds = ['nat-arr-1', 'nat-arr-2', 'nat-arr-3'];
+    const arrowIds = ["nat-arr-1", "nat-arr-2", "nat-arr-3"];
     step.arrows.forEach((color, i) => {
       const el = document.getElementById(arrowIds[i])!;
-      el.className = el.className.includes('-v') ? `dia-arrow-v ${color}` : `dia-arrow-h ${color}`;
+      el.className = el.className.includes("-v")
+        ? `dia-arrow-v ${color}`
+        : `dia-arrow-h ${color}`;
     });
 
     // Preserve diagonal class on arr-2
-    const arr2 = document.getElementById('nat-arr-2')!;
-    if (!arr2.classList.contains('diagonal')) {
-      arr2.classList.add('diagonal');
+    const arr2 = document.getElementById("nat-arr-2")!;
+    if (!arr2.classList.contains("diagonal")) {
+      arr2.classList.add("diagonal");
     }
   }
 

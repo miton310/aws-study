@@ -1,0 +1,325 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+---
+
+<Layout title="ENI (Elastic Network Interface) - VPC">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2">
+      <a href="/" class="hover:text-orange-500">ホーム</a> / <a
+        href="/network"
+        class="hover:text-orange-500">ネットワーク</a
+      > / <a href="/network/vpc" class="hover:text-orange-500">VPC</a> / ENI
+    </p>
+    <h1 class="text-3xl font-bold mb-2">ENI (Elastic Network Interface)</h1>
+    <p class="text-gray-500 mb-10">
+      仮想ネットワークインターフェース - IPアドレスごと移動可能
+    </p>
+
+    <section class="mb-12">
+      <h2 class="heading-section">ENI の基本概念</h2>
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+        <h3 class="text-lg font-bold text-blue-800 mb-3">
+          💡 ENI（イーエヌアイ）とは
+        </h3>
+        <div class="text-blue-700 space-y-2">
+          <p>
+            • <strong>Elastic Network Interface</strong> = 仮想のネットワークインターフェースカード
+          </p>
+          <p>• EC2インスタンスに取り付ける「仮想LANカード」のようなもの</p>
+          <p>
+            • プライベートIP・セキュリティグループ・MACアドレスなどの情報を保持
+          </p>
+          <p>
+            • <strong>インスタンス間で付け替え可能</strong> → フェイルオーバーに活用
+          </p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="border border-gray-200 rounded-lg p-6 bg-gray-50">
+          <h3 class="text-lg font-bold text-gray-800 mb-3">
+            🖥️ 物理サーバーのNIC
+          </h3>
+          <div class="text-gray-700 space-y-2">
+            <p>• LANケーブルを挿す差し込み口</p>
+            <p>• MACアドレスを持つ</p>
+            <p>• IPアドレスを設定</p>
+            <p>• ハードウェアに固定</p>
+          </div>
+        </div>
+
+        <div class="border border-purple-200 rounded-lg p-6 bg-purple-50">
+          <h3 class="text-lg font-bold text-purple-800 mb-3">
+            ☁️ ENI（仮想NIC）
+          </h3>
+          <div class="text-purple-700 space-y-2">
+            <p>• 仮想ネットワークインターフェース</p>
+            <p>• MACアドレスを持つ</p>
+            <p>• プライベートIP・EIPを設定</p>
+            <p>• <strong>インスタンス間で移動可能</strong></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="heading-section">ENI の構成例</h2>
+      <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div class="bg-green-50 border-b border-green-200 p-4">
+          <h3 class="text-lg font-bold text-green-800">
+            EC2インスタンス + 2つのENI
+          </h3>
+        </div>
+
+        <div class="p-6">
+          <div
+            class="border-2 border-dashed border-green-500 rounded-lg p-6 bg-green-50/30"
+          >
+            <div class="text-center mb-4">
+              <div class="text-lg font-bold text-green-700">
+                EC2インスタンス
+              </div>
+              <div class="text-sm text-gray-600">i-1234567890abcdef0</div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4">
+              <div class="border border-purple-300 rounded-lg bg-purple-50 p-4">
+                <div class="text-center mb-3">
+                  <div class="text-base font-bold text-purple-700">
+                    ENI（プライマリ）
+                  </div>
+                  <div class="text-sm text-purple-600">eth0 - 削除不可</div>
+                </div>
+                <div class="text-sm text-purple-700 space-y-1">
+                  <div>• サブネット: subnet-12345</div>
+                  <div>• プライベートIP: 10.0.1.10</div>
+                  <div>• パブリックIP: 自動割り当て</div>
+                  <div>• セキュリティG: sg-webserver</div>
+                </div>
+              </div>
+
+              <div class="border border-blue-300 rounded-lg bg-blue-50 p-4">
+                <div class="text-center mb-3">
+                  <div class="text-base font-bold text-blue-700">
+                    ENI（セカンダリ）
+                  </div>
+                  <div class="text-sm text-blue-600">eth1 - 着脱可能</div>
+                </div>
+                <div class="text-sm text-blue-700 space-y-1">
+                  <div>• サブネット: subnet-67890</div>
+                  <div>• プライベートIP: 10.0.2.20</div>
+                  <div>• Elastic IP: 203.0.113.5</div>
+                  <div>• セキュリティG: sg-database</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 text-center">
+              <div
+                class="inline-block bg-yellow-100 border border-yellow-300 rounded px-3 py-1 text-sm text-yellow-700"
+              >
+                💡 セカンダリENIは他のEC2に付け替え可能
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="heading-section">ENI の特徴と制限</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+          <h3 class="text-lg font-bold text-green-800 mb-4">✅ できること</h3>
+          <div class="space-y-3 text-green-700">
+            <div class="flex items-start gap-2">
+              <span class="text-green-500">•</span>
+              <span>EC2インスタンス間での付け替え</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-green-500">•</span>
+              <span>複数のプライベートIPアドレス割り当て</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-green-500">•</span>
+              <span>Elastic IPの関連付け</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-green-500">•</span>
+              <span>セキュリティグループの個別設定</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-green-500">•</span>
+              <span>異なるサブネットへの接続</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+          <h3 class="text-lg font-bold text-red-800 mb-4">❌ 制限事項</h3>
+          <div class="space-y-3 text-red-700">
+            <div class="flex items-start gap-2">
+              <span class="text-red-500">•</span>
+              <span>同一AZ内でのみ移動可能</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-red-500">•</span>
+              <span>プライマリENI（eth0）は削除不可</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-red-500">•</span>
+              <span>インスタンスタイプによる上限あり</span>
+            </div>
+            <div class="flex items-start gap-2">
+              <span class="text-red-500">•</span>
+              <span>異なるVPC間での移動は不可</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="heading-section">実用的な活用シーン</h2>
+
+      <div class="space-y-6">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <h3 class="text-lg font-bold text-blue-800 mb-3">
+            🔄 フェイルオーバー構成
+          </h3>
+          <div class="text-blue-700">
+            <p class="mb-3">
+              プライマリサーバーが故障した際、ENIをスタンバイサーバーに付け替えて即座に復旧
+            </p>
+            <div class="bg-white border border-blue-300 rounded p-4">
+              <div class="text-sm space-y-2">
+                <div>
+                  <strong>1.</strong> プライマリEC2 + セカンダリENI（固定IP: 10.0.1.100）
+                </div>
+                <div><strong>2.</strong> プライマリが故障</div>
+                <div>
+                  <strong>3.</strong> セカンダリENI を スタンバイEC2 に付け替え
+                </div>
+                <div><strong>4.</strong> 同じIPアドレスでサービス継続</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-purple-50 border border-purple-200 rounded-lg p-6">
+          <h3 class="text-lg font-bold text-purple-800 mb-3">
+            🌐 マルチホーム構成
+          </h3>
+          <div class="text-purple-700">
+            <p class="mb-3">
+              1つのインスタンスを複数のサブネット/セキュリティグループに接続
+            </p>
+            <div class="bg-white border border-purple-300 rounded p-4">
+              <div class="text-sm space-y-2">
+                <div><strong>eth0:</strong> パブリックサブネット（Web用）</div>
+                <div><strong>eth1:</strong> プライベートサブネット（DB用）</div>
+                <div><strong>eth2:</strong> 管理用サブネット（SSH用）</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-green-50 border border-green-200 rounded-lg p-6">
+          <h3 class="text-lg font-bold text-green-800 mb-3">
+            📡 ネットワークアプライアンス
+          </h3>
+          <div class="text-green-700">
+            <p class="mb-3">
+              ファイアウォール・ロードバランサーなどの中継装置として利用
+            </p>
+            <div class="bg-white border border-green-300 rounded p-4">
+              <div class="text-sm space-y-2">
+                <div>
+                  <strong>構成例:</strong> NATインスタンス、WAFアプライアンス
+                </div>
+                <div>
+                  <strong>メリット:</strong> トラフィックフローの柔軟な制御
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="heading-section">SAA試験のポイント</h2>
+      <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+        <h3 class="text-lg font-bold text-red-800 mb-4">📋 頻出問題パターン</h3>
+        <div class="space-y-4 text-red-700">
+          <div class="border-l-4 border-red-400 pl-4">
+            <p class="font-medium">
+              「IPアドレスを保持したまま別インスタンスに移動したい」
+            </p>
+            <p class="text-sm mt-1">
+              → <strong>ENI</strong> を作成して付け替える
+            </p>
+          </div>
+          <div class="border-l-4 border-red-400 pl-4">
+            <p class="font-medium">「高可用性のためのフェイルオーバー構成」</p>
+            <p class="text-sm mt-1">
+              → セカンダリ<strong>ENI</strong>をスタンバイインスタンスに付け替え
+            </p>
+          </div>
+          <div class="border-l-4 border-red-400 pl-4">
+            <p class="font-medium">
+              「1つのインスタンスに複数のネットワーク接続」
+            </p>
+            <p class="text-sm mt-1">
+              → 複数の<strong>ENI</strong>を付けて異なるサブネットに接続
+            </p>
+          </div>
+          <div class="border-l-4 border-red-400 pl-4">
+            <p class="font-medium">「ライセンスがMACアドレスに紐づいている」</p>
+            <p class="text-sm mt-1">
+              → <strong>ENI</strong>のMACアドレスは移動後も保持される
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-12">
+      <h2 class="heading-section">設定・操作方法</h2>
+      <div class="bg-gray-50 border border-gray-200 rounded-lg p-6">
+        <h3 class="text-lg font-bold text-gray-800 mb-4">🔧 基本操作</h3>
+
+        <div class="space-y-4">
+          <div class="bg-white border rounded-lg p-4">
+            <h4 class="font-medium text-gray-800 mb-2">1. ENI作成</h4>
+            <div class="text-sm text-gray-700 space-y-1">
+              <p>
+                • EC2コンソール → ネットワーク & セキュリティ →
+                ネットワークインターフェース
+              </p>
+              <p>• サブネット・セキュリティグループ・プライベートIPを指定</p>
+            </div>
+          </div>
+
+          <div class="bg-white border rounded-lg p-4">
+            <h4 class="font-medium text-gray-800 mb-2">
+              2. インスタンスへのアタッチ
+            </h4>
+            <div class="text-sm text-gray-700 space-y-1">
+              <p>• インスタンス停止中または実行中どちらでも可能</p>
+              <p>• ホットプラグ対応（実行中でもアタッチ・デタッチ可能）</p>
+            </div>
+          </div>
+
+          <div class="bg-white border rounded-lg p-4">
+            <h4 class="font-medium text-gray-800 mb-2">3. OS側での認識</h4>
+            <div class="text-sm text-gray-700 space-y-1">
+              <p>• Linux: eth0, eth1, eth2... として認識</p>
+              <p>• 追加したENIはOS側でIP設定が必要な場合あり</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>
