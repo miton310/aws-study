@@ -13,6 +13,7 @@
     <button class="as-btn active" onclick="asTab('overview')">Auto Scalingとは</button>
     <button class="as-btn" onclick="asTab('policy')">スケーリングポリシー</button>
     <button class="as-btn" onclick="asTab('elb')">ELBとの連携</button>
+    <button class="as-btn" onclick="asTab('lifecycle')">ライフサイクルフック</button>
     <button class="as-btn" onclick="asTab('pattern')">頻出パターン</button>
   </div>
 
@@ -45,29 +46,553 @@
   </div>
 
   <div id="as-policy" class="as-panel">
-    <svg width="100%" viewBox="0 0 680 360">
-      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">スケーリングポリシーの種類</text>
-      <rect x="40"  y="50" width="270" height="100" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
-      <text x="175" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">ターゲット追跡スケーリング</text>
-      <text x="175" y="102" text-anchor="middle" font-size="12" fill="#085041">「CPU使用率を50%に保つ」</text>
-      <text x="175" y="124" text-anchor="middle" font-size="11" fill="#085041">自動で台数を調整・最もシンプル・推奨</text>
-      <rect x="370" y="50" width="270" height="100" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-      <text x="505" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">ステップスケーリング</text>
-      <text x="505" y="102" text-anchor="middle" font-size="12" fill="#534AB7">「CPU70%超→2台追加、90%超→5台追加」</text>
-      <text x="505" y="124" text-anchor="middle" font-size="11" fill="#534AB7">段階的に細かく制御</text>
-      <rect x="40"  y="168" width="270" height="100" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
-      <text x="175" y="196" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">シンプルスケーリング</text>
-      <text x="175" y="220" text-anchor="middle" font-size="12" fill="#993C1D">アラーム発火で固定台数を追加/削除</text>
-      <text x="175" y="242" text-anchor="middle" font-size="11" fill="#993C1D">クールダウン期間後に再評価</text>
-      <rect x="370" y="168" width="270" height="100" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
-      <text x="505" y="196" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">スケジュールスケーリング</text>
-      <text x="505" y="220" text-anchor="middle" font-size="12" fill="#185FA5">「毎朝9時に5台、夜22時に2台」</text>
-      <text x="505" y="242" text-anchor="middle" font-size="11" fill="#185FA5">予測できる負荷パターン向け</text>
-      <rect x="40" y="286" width="600" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
-      <text x="340" y="310" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">SAA頻出の使い分け</text>
-      <text x="60" y="334" font-size="12" fill="#633806">「シンプルに特定メトリクスを維持」→ ターゲット追跡　「夜間は台数を減らす」→ スケジュール</text>
-    </svg>
+    <div class="as-policy-grid">
+      <div class="as-policy-card as-policy-target">
+        <div class="as-policy-title">ターゲット追跡スケーリング</div>
+        <div class="as-policy-desc">「CPU使用率を50%に保つ」</div>
+        <div class="as-policy-note">自動で台数を調整・最もシンプル・推奨</div>
+      </div>
+      <div class="as-policy-card as-policy-step">
+        <div class="as-policy-title">ステップスケーリング</div>
+        <div class="as-policy-desc">「CPU70%超→2台追加、90%超→5台追加」</div>
+        <div class="as-policy-note">段階的に細かく制御</div>
+      </div>
+      <div class="as-policy-card as-policy-simple">
+        <div class="as-policy-title">シンプルスケーリング</div>
+        <div class="as-policy-desc">アラーム発火で固定台数を追加/削除</div>
+        <div class="as-policy-note">クールダウン期間後に再評価</div>
+      </div>
+      <div class="as-policy-card as-policy-schedule">
+        <div class="as-policy-title">スケジュールスケーリング</div>
+        <div class="as-policy-desc">「毎朝9時に5台、夜22時に2台」</div>
+        <div class="as-policy-note">予測できる負荷パターン向け</div>
+      </div>
+      <div class="as-policy-card as-policy-predictive">
+        <div class="as-policy-title">予測スケーリング</div>
+        <div class="as-policy-desc">過去のトラフィックから将来の負荷を予測</div>
+        <div class="as-policy-note">機械学習で事前にスケールアウト・スケジュールの自動版</div>
+      </div>
+    </div>
+    <div class="as-policy-summary">
+      <div class="as-policy-summary-title">SAA頻出の使い分け</div>
+      <div class="as-policy-summary-desc">「メトリクスを維持」→ ターゲット追跡　「夜間は台数削減」→ スケジュール　「過去パターンから予測」→ 予測スケーリング</div>
+    </div>
+
+    <!-- スケールアウト時の起動順序 -->
+    <div class="as-launch">
+      <div class="as-launch-title">スケールアウト時の起動順序</div>
+      <div class="as-launch-steps">
+        <div class="as-launch-step">
+          <div class="as-launch-step-num">1</div>
+          <div class="as-launch-step-content">
+            <div class="as-launch-step-title">AZ間のバランス調整</div>
+            <div class="as-launch-step-desc">インスタンス数が最も少ないAZを選択</div>
+          </div>
+        </div>
+        <div class="as-launch-arrow">↓</div>
+        <div class="as-launch-step">
+          <div class="as-launch-step-num">2</div>
+          <div class="as-launch-step-content">
+            <div class="as-launch-step-title">サブネットの選択</div>
+            <div class="as-launch-step-desc">そのAZ内で設定されたサブネットから選択</div>
+          </div>
+        </div>
+        <div class="as-launch-arrow">↓</div>
+        <div class="as-launch-step">
+          <div class="as-launch-step-num">3</div>
+          <div class="as-launch-step-content">
+            <div class="as-launch-step-title">起動テンプレートに基づき起動</div>
+            <div class="as-launch-step-desc">AMI・インスタンスタイプ・SG等の設定を適用</div>
+          </div>
+        </div>
+      </div>
+      <div class="as-launch-note">
+        <strong>ポイント：</strong>複数AZに分散配置することで高可用性を確保
+      </div>
+    </div>
+
+    <!-- 終了ポリシー -->
+    <div class="as-termination">
+      <div class="as-termination-title">デフォルト終了ポリシー：スケールイン時の削除順序</div>
+      <div class="as-termination-steps">
+        <div class="as-termination-step">
+          <div class="as-termination-step-num">1</div>
+          <div class="as-termination-step-content">
+            <div class="as-termination-step-title">AZ間のバランス調整</div>
+            <div class="as-termination-step-desc">インスタンス数が最も多いAZから選択</div>
+          </div>
+        </div>
+        <div class="as-termination-arrow">↓</div>
+        <div class="as-termination-step">
+          <div class="as-termination-step-num">2</div>
+          <div class="as-termination-step-content">
+            <div class="as-termination-step-title">最も古い起動設定/テンプレート</div>
+            <div class="as-termination-step-desc">古いバージョンの設定を使用しているインスタンスを優先</div>
+          </div>
+        </div>
+        <div class="as-termination-arrow">↓</div>
+        <div class="as-termination-step">
+          <div class="as-termination-step-num">3</div>
+          <div class="as-termination-step-content">
+            <div class="as-termination-step-title">次の課金時間に最も近い</div>
+            <div class="as-termination-step-desc">課金サイクルの終わりに近いインスタンスを優先（コスト最適化）</div>
+          </div>
+        </div>
+        <div class="as-termination-arrow">↓</div>
+        <div class="as-termination-step">
+          <div class="as-termination-step-num">4</div>
+          <div class="as-termination-step-content">
+            <div class="as-termination-step-title">ランダム</div>
+            <div class="as-termination-step-desc">上記で絞り込めない場合はランダムに選択</div>
+          </div>
+        </div>
+      </div>
+      <div class="as-termination-note">
+        <strong>カスタム終了ポリシー：</strong>OldestInstance / NewestInstance / OldestLaunchConfiguration / ClosestToNextInstanceHour / Default
+      </div>
+    </div>
   </div>
+  <style>
+    .as-policy-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      max-width: 680px;
+      margin: 0 auto 24px auto;
+    }
+    .as-policy-card {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+      padding: 18px 16px 14px 16px;
+      min-height: 110px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .as-policy-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .as-policy-desc {
+      font-size: 13px;
+      color: #555;
+    }
+    .as-policy-note {
+      font-size: 12px;
+      color: #888;
+    }
+    .as-policy-target { border-left: 5px solid #0F6E56; }
+    .as-policy-step { border-left: 5px solid #534AB7; }
+    .as-policy-simple { border-left: 5px solid #993C1D; }
+    .as-policy-schedule { border-left: 5px solid #185FA5; }
+    .as-policy-predictive { border-left: 5px solid #854F0B; background: #fffbeb; }
+    .dark .as-policy-predictive { background: rgba(133, 79, 11, 0.15); }
+    /* スケールアウト起動順序 */
+    .as-launch {
+      max-width: 680px;
+      margin: 20px auto 0;
+      padding: 16px;
+      background: #ecfdf5;
+      border: 1px solid #10b981;
+      border-radius: 8px;
+    }
+    .dark .as-launch {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: #34d399;
+    }
+    .as-launch-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 16px;
+      color: #065f46;
+    }
+    .dark .as-launch-title {
+      color: #6ee7b7;
+    }
+    .as-launch-steps {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .as-launch-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 420px;
+      padding: 10px 14px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+    }
+    .dark .as-launch-step {
+      background: #1f2937;
+      border-color: #374151;
+    }
+    .as-launch-step-num {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #10b981;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .as-launch-step-content {
+      flex: 1;
+    }
+    .as-launch-step-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+    .dark .as-launch-step-title {
+      color: #f3f4f6;
+    }
+    .as-launch-step-desc {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+    .as-launch-arrow {
+      color: #10b981;
+      font-size: 16px;
+    }
+    .as-launch-note {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: #d1fae5;
+      border: 1px solid #10b981;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #065f46;
+      text-align: center;
+    }
+    .dark .as-launch-note {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #34d399;
+      color: #6ee7b7;
+    }
+    .as-policy-summary {
+      background: #FAEEDA;
+      border: 1px solid #854F0B;
+      border-radius: 8px;
+      padding: 14px 16px;
+      max-width: 680px;
+      margin: 0 auto;
+      margin-bottom: 8px;
+    }
+    .as-policy-summary-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #633806;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+    .as-policy-summary-desc {
+      font-size: 13px;
+      color: #633806;
+      text-align: center;
+    }
+    @media (max-width: 700px) {
+      .as-policy-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    /* 終了ポリシー */
+    .as-termination {
+      max-width: 680px;
+      margin: 20px auto 0;
+      padding: 16px;
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      border-radius: 8px;
+    }
+    .dark .as-termination {
+      background: rgba(252, 165, 165, 0.1);
+      border-color: #f87171;
+    }
+    .as-termination-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 16px;
+      color: #991b1b;
+    }
+    .dark .as-termination-title {
+      color: #fca5a5;
+    }
+    .as-termination-steps {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .as-termination-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 420px;
+      padding: 10px 14px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+    }
+    .dark .as-termination-step {
+      background: #1f2937;
+      border-color: #374151;
+    }
+    .as-termination-step-num {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #dc2626;
+      color: #fff;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .as-termination-step-content {
+      flex: 1;
+    }
+    .as-termination-step-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+    .dark .as-termination-step-title {
+      color: #f3f4f6;
+    }
+    .as-termination-step-desc {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 2px;
+    }
+    .as-termination-arrow {
+      color: #dc2626;
+      font-size: 16px;
+    }
+    .as-termination-note {
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #92400e;
+      text-align: center;
+    }
+    .dark .as-termination-note {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: #fbbf24;
+      color: #fcd34d;
+    }
+    /* ヘルスチェック */
+    .as-health {
+      max-width: 680px;
+      margin: 20px auto 0;
+    }
+    .as-health-title {
+      font-size: 15px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+    .as-health-types {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 500px) {
+      .as-health-types {
+        grid-template-columns: 1fr;
+      }
+    }
+    .as-health-type {
+      padding: 14px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+    }
+    .dark .as-health-type {
+      background: #1e293b;
+      border-color: #475569;
+    }
+    .as-health-type.as-health-type-elb {
+      background: #ecfdf5;
+      border-color: #10b981;
+    }
+    .dark .as-health-type.as-health-type-elb {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: #34d399;
+    }
+    .as-health-type-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #334155;
+    }
+    .dark .as-health-type-title {
+      color: #e2e8f0;
+    }
+    .as-health-type-elb .as-health-type-title {
+      color: #065f46;
+    }
+    .dark .as-health-type-elb .as-health-type-title {
+      color: #6ee7b7;
+    }
+    .as-health-type-desc {
+      font-size: 12px;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+    .dark .as-health-type-desc {
+      color: #94a3b8;
+    }
+    .as-health-type-note {
+      font-size: 11px;
+      color: #64748b;
+      font-style: italic;
+    }
+    .as-health-grace {
+      padding: 16px;
+      background: #eff6ff;
+      border: 1px solid #3b82f6;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .dark .as-health-grace {
+      background: rgba(59, 130, 246, 0.1);
+      border-color: #60a5fa;
+    }
+    .as-health-grace-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 12px;
+      color: #1d4ed8;
+    }
+    .dark .as-health-grace-title {
+      color: #93c5fd;
+    }
+    .as-health-grace-flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .as-health-grace-step {
+      padding: 8px 14px;
+      background: #fff;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 12px;
+      text-align: center;
+      color: #374151;
+    }
+    .dark .as-health-grace-step {
+      background: #1f2937;
+      border-color: #4b5563;
+      color: #e5e7eb;
+    }
+    .as-health-grace-step.as-health-grace-wait {
+      background: #fef3c7;
+      border-color: #f59e0b;
+      color: #92400e;
+      font-weight: 600;
+    }
+    .dark .as-health-grace-step.as-health-grace-wait {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: #fbbf24;
+      color: #fcd34d;
+    }
+    .as-health-grace-arrow {
+      color: #9ca3af;
+      font-size: 16px;
+    }
+    .as-health-grace-desc {
+      font-size: 12px;
+      color: #1e40af;
+      line-height: 1.6;
+    }
+    .dark .as-health-grace-desc {
+      color: #bfdbfe;
+    }
+    .as-health-summary {
+      padding: 14px 16px;
+      background: #faeeda;
+      border: 1px solid #854f0b;
+      border-radius: 8px;
+    }
+    .dark .as-health-summary {
+      background: rgba(133, 79, 11, 0.15);
+      border-color: #b45309;
+    }
+    .as-health-summary-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #633806;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .dark .as-health-summary-title {
+      color: #fcd34d;
+    }
+    .as-health-summary-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .as-health-summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(133, 79, 11, 0.2);
+    }
+    .as-health-summary-row:last-child {
+      border-bottom: none;
+    }
+    .as-health-q {
+      color: #633806;
+    }
+    .dark .as-health-q {
+      color: #fef3c7;
+    }
+    .as-health-a {
+      color: #412402;
+      font-weight: 500;
+    }
+    .dark .as-health-a {
+      color: #fcd34d;
+    }
+    @media (max-width: 600px) {
+      .as-health-summary-row {
+        flex-direction: column;
+        gap: 2px;
+      }
+      .as-health-a {
+        text-align: right;
+      }
+    }
+  </style>
 
   <div id="as-elb" class="as-panel">
     <svg width="100%" viewBox="0 0 680 360">
@@ -95,27 +620,513 @@
       <rect x="40" y="286" width="600" height="44" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
       <text x="340" y="312" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">ALB + Auto Scaling + マルチAZ = SAA で最頻出の高可用性構成</text>
     </svg>
+
+    <!-- ヘルスチェック -->
+    <div class="as-health">
+      <div class="as-health-title">ヘルスチェック：異常インスタンスを自動置換</div>
+
+      <div class="as-health-types">
+        <div class="as-health-type">
+          <div class="as-health-type-title">EC2ヘルスチェック（デフォルト）</div>
+          <div class="as-health-type-desc">EC2のステータスチェック（running/stopped等）のみ確認</div>
+          <div class="as-health-type-note">アプリがダウンしていても検知できない</div>
+        </div>
+        <div class="as-health-type as-health-type-elb">
+          <div class="as-health-type-title">ELBヘルスチェック</div>
+          <div class="as-health-type-desc">ELBのターゲットグループのヘルスチェック結果を使用</div>
+          <div class="as-health-type-note">HTTP応答でアプリの正常性も確認できる</div>
+        </div>
+      </div>
+
+      <div class="as-health-grace">
+        <div class="as-health-grace-title">ヘルスチェック猶予期間（Health Check Grace Period）</div>
+        <div class="as-health-grace-flow">
+          <div class="as-health-grace-step">インスタンス起動</div>
+          <div class="as-health-grace-arrow">→</div>
+          <div class="as-health-grace-step as-health-grace-wait">猶予期間<br><small>（デフォルト300秒）</small></div>
+          <div class="as-health-grace-arrow">→</div>
+          <div class="as-health-grace-step">ヘルスチェック開始</div>
+        </div>
+        <div class="as-health-grace-desc">
+          <strong>目的：</strong>アプリの起動完了を待ってからヘルスチェックを開始。<br>
+          短すぎると起動中のインスタンスがUnhealthyと判定され、無限に置換が繰り返される。
+        </div>
+      </div>
+
+      <div class="as-health-summary">
+        <div class="as-health-summary-title">SAA頻出パターン</div>
+        <div class="as-health-summary-list">
+          <div class="as-health-summary-row">
+            <span class="as-health-q">「アプリがダウンしたEC2を自動で置き換えたい」</span>
+            <span class="as-health-a">→ ELBヘルスチェックを設定</span>
+          </div>
+          <div class="as-health-summary-row">
+            <span class="as-health-q">「起動直後にインスタンスがUnhealthyになる」</span>
+            <span class="as-health-a">→ ヘルスチェック猶予期間を延長</span>
+          </div>
+          <div class="as-health-summary-row">
+            <span class="as-health-q">「ウォームアップが必要なアプリで誤置換を防ぐ」</span>
+            <span class="as-health-a">→ 猶予期間 &gt; アプリ起動時間</span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div id="as-pattern" class="as-panel">
-    <svg width="100%" viewBox="0 0 680 320">
-      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">SAA頻出パターン</text>
-      <rect x="40" y="44" width="600" height="256" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
-      <text x="60" y="74"  font-size="12" fill="#633806">「負荷に応じてEC2台数を自動調整したい」</text><text x="500" y="74"  font-size="12" font-weight="500" fill="#412402">→ Auto Scaling + ターゲット追跡</text>
-      <line x1="40" y1="86" x2="640" y2="86" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
-      <text x="60" y="108" font-size="12" fill="#633806">「EC2が1台落ちても自動で復旧させたい」</text><text x="500" y="108" font-size="12" font-weight="500" fill="#412402">→ Auto Scaling（最小台数=1）</text>
-      <line x1="40" y1="120" x2="640" y2="120" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
-      <text x="60" y="142" font-size="12" fill="#633806">「夜間のトラフィックが少ない時間帯にコスト削減」</text><text x="500" y="142" font-size="12" font-weight="500" fill="#412402">→ スケジュールスケーリング</text>
-      <line x1="40" y1="154" x2="640" y2="154" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
-      <text x="60" y="176" font-size="12" fill="#633806">「スケールアウト後すぐスケールインが起きてしまう」</text><text x="500" y="176" font-size="12" font-weight="500" fill="#412402">→ クールダウン期間を延長</text>
-      <line x1="40" y1="188" x2="640" y2="188" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
-      <text x="60" y="210" font-size="12" fill="#633806">「本番はオンデマンド・バッチはスポットで混在」</text><text x="500" y="210" font-size="12" font-weight="500" fill="#412402">→ 混合インスタンスポリシー</text>
-      <line x1="40" y1="222" x2="640" y2="222" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
-      <text x="60" y="244" font-size="12" fill="#633806">「ALB + Auto Scaling + マルチAZ」</text><text x="500" y="244" font-size="12" font-weight="500" fill="#412402">→ 高可用性の鉄板構成</text>
-      <line x1="40" y1="256" x2="640" y2="256" stroke="#854F0B" stroke-width="0.5" opacity="0.4"/>
-      <text x="60" y="282" font-size="12" fill="#633806">「ウォームアップが必要なアプリで誤スケールを防ぐ」</text><text x="500" y="282" font-size="12" font-weight="500" fill="#412402">→ ウォームアップ期間を設定</text>
-    </svg>
+  <div id="as-lifecycle" class="as-panel">
+    <div class="as-lifecycle-title">ライフサイクルフック：起動・終了時にカスタムアクションを実行</div>
+
+    <!-- フロー図 -->
+    <div class="as-lifecycle-flow">
+      <div class="as-lifecycle-stage as-lifecycle-pending">
+        <div class="as-lifecycle-stage-title">起動フェーズ</div>
+        <div class="as-lifecycle-steps">
+          <div class="as-lifecycle-step">Pending</div>
+          <div class="as-lifecycle-arrow">→</div>
+          <div class="as-lifecycle-step as-lifecycle-hook">Pending:Wait</div>
+          <div class="as-lifecycle-arrow">→</div>
+          <div class="as-lifecycle-step">Pending:Proceed</div>
+          <div class="as-lifecycle-arrow">→</div>
+          <div class="as-lifecycle-step as-lifecycle-final">InService</div>
+        </div>
+        <div class="as-lifecycle-hook-desc">
+          <strong>起動時フック</strong>でできること：
+          <ul>
+            <li><strong>初期化スクリプトの実行完了を待機</strong></li>
+            <li>アプリケーション設定の完了を待機</li>
+            <li>ソフトウェアのインストール</li>
+            <li>CodeDeployでアプリをデプロイ</li>
+            <li>ヘルスチェック準備完了まで待機</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="as-lifecycle-stage as-lifecycle-terminating">
+        <div class="as-lifecycle-stage-title">終了フェーズ</div>
+        <div class="as-lifecycle-steps">
+          <div class="as-lifecycle-step as-lifecycle-final">InService</div>
+          <div class="as-lifecycle-arrow">→</div>
+          <div class="as-lifecycle-step">Terminating</div>
+          <div class="as-lifecycle-arrow">→</div>
+          <div class="as-lifecycle-step as-lifecycle-hook">Terminating:Wait</div>
+          <div class="as-lifecycle-arrow">→</div>
+          <div class="as-lifecycle-step">Terminated</div>
+        </div>
+        <div class="as-lifecycle-hook-desc">
+          <strong>終了時フック</strong>でできること：
+          <ul>
+            <li>ログをS3にアップロード</li>
+            <li>データのバックアップ</li>
+            <li>セッションのドレイン（接続の排出）</li>
+            <li>監視ツールからの登録解除</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 連携サービス -->
+    <div class="as-lifecycle-services">
+      <div class="as-lifecycle-services-title">フックイベントの処理に使えるサービス</div>
+      <div class="as-lifecycle-services-list">
+        <span class="as-lifecycle-service">Lambda</span>
+        <span class="as-lifecycle-service">SNS</span>
+        <span class="as-lifecycle-service">SQS</span>
+        <span class="as-lifecycle-service">EventBridge</span>
+      </div>
+    </div>
+
+    <!-- ユーザーデータとの使い分け -->
+    <div class="as-lifecycle-compare">
+      <div class="as-lifecycle-compare-title">ユーザーデータ vs ライフサイクルフック</div>
+      <div class="as-lifecycle-compare-grid">
+        <div class="as-lifecycle-compare-card">
+          <div class="as-lifecycle-compare-card-title">ユーザーデータ</div>
+          <ul>
+            <li>起動テンプレートに設定</li>
+            <li>EC2起動時に自動実行</li>
+            <li><strong>完了を待たずにInService</strong></li>
+          </ul>
+          <div class="as-lifecycle-compare-use">単純なスクリプト実行向け</div>
+        </div>
+        <div class="as-lifecycle-compare-card">
+          <div class="as-lifecycle-compare-card-title">ライフサイクルフック</div>
+          <ul>
+            <li>Pending:Waitで待機</li>
+            <li>Lambda/SNS等で処理</li>
+            <li><strong>完了後にInService</strong></li>
+          </ul>
+          <div class="as-lifecycle-compare-use">完了を待ってからトラフィック受付</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAA頻出 -->
+    <div class="as-lifecycle-summary">
+      <div class="as-lifecycle-summary-title">SAA頻出パターン</div>
+      <div class="as-lifecycle-summary-list">
+        <div class="as-lifecycle-summary-row">
+          <span class="as-lifecycle-q">「スケールアウトで追加したインスタンスに初期化スクリプト実行」</span>
+          <span class="as-lifecycle-a">→ ユーザーデータ or 起動時フック</span>
+        </div>
+        <div class="as-lifecycle-summary-row">
+          <span class="as-lifecycle-q">「インスタンス起動時にアプリ設定完了まで待機」</span>
+          <span class="as-lifecycle-a">→ 起動時ライフサイクルフック</span>
+        </div>
+        <div class="as-lifecycle-summary-row">
+          <span class="as-lifecycle-q">「終了前にログを収集してS3に保存」</span>
+          <span class="as-lifecycle-a">→ 終了時フック + Lambda</span>
+        </div>
+        <div class="as-lifecycle-summary-row">
+          <span class="as-lifecycle-q">「CodeDeployと連携してデプロイ完了後にトラフィック受付」</span>
+          <span class="as-lifecycle-a">→ 起動時フック</span>
+        </div>
+      </div>
+    </div>
   </div>
+  <style>
+    .as-lifecycle-title {
+      text-align: center;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+    .as-lifecycle-flow {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .as-lifecycle-stage {
+      padding: 16px;
+      border-radius: 10px;
+    }
+    .as-lifecycle-pending {
+      background: #ecfdf5;
+      border: 1px solid #10b981;
+    }
+    .dark .as-lifecycle-pending {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: #34d399;
+    }
+    .as-lifecycle-terminating {
+      background: #fef2f2;
+      border: 1px solid #f87171;
+    }
+    .dark .as-lifecycle-terminating {
+      background: rgba(248, 113, 113, 0.1);
+      border-color: #f87171;
+    }
+    .as-lifecycle-stage-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .as-lifecycle-pending .as-lifecycle-stage-title { color: #065f46; }
+    .dark .as-lifecycle-pending .as-lifecycle-stage-title { color: #6ee7b7; }
+    .as-lifecycle-terminating .as-lifecycle-stage-title { color: #991b1b; }
+    .dark .as-lifecycle-terminating .as-lifecycle-stage-title { color: #fca5a5; }
+    .as-lifecycle-steps {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .as-lifecycle-step {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      background: #fff;
+      border: 1px solid #d1d5db;
+      color: #374151;
+    }
+    .dark .as-lifecycle-step {
+      background: #1f2937;
+      border-color: #4b5563;
+      color: #e5e7eb;
+    }
+    .as-lifecycle-step.as-lifecycle-hook {
+      background: #fef3c7;
+      border-color: #f59e0b;
+      color: #92400e;
+      font-weight: 600;
+    }
+    .dark .as-lifecycle-step.as-lifecycle-hook {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: #fbbf24;
+      color: #fcd34d;
+    }
+    .as-lifecycle-step.as-lifecycle-final {
+      background: #dbeafe;
+      border-color: #3b82f6;
+      color: #1d4ed8;
+    }
+    .dark .as-lifecycle-step.as-lifecycle-final {
+      background: rgba(59, 130, 246, 0.2);
+      border-color: #60a5fa;
+      color: #93c5fd;
+    }
+    .as-lifecycle-arrow {
+      color: #9ca3af;
+      font-size: 14px;
+    }
+    .as-lifecycle-hook-desc {
+      font-size: 13px;
+      color: #374151;
+      line-height: 1.6;
+    }
+    .dark .as-lifecycle-hook-desc {
+      color: #d1d5db;
+    }
+    .as-lifecycle-hook-desc ul {
+      margin: 4px 0 0 18px;
+      padding: 0;
+    }
+    .as-lifecycle-hook-desc li {
+      margin: 2px 0;
+    }
+    .as-lifecycle-services {
+      max-width: 680px;
+      margin: 20px auto 0;
+      padding: 12px 16px;
+      background: #f5f3ff;
+      border: 1px solid #8b5cf6;
+      border-radius: 8px;
+    }
+    .dark .as-lifecycle-services {
+      background: rgba(139, 92, 246, 0.1);
+      border-color: #a78bfa;
+    }
+    .as-lifecycle-services-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #5b21b6;
+      margin-bottom: 8px;
+    }
+    .dark .as-lifecycle-services-title {
+      color: #c4b5fd;
+    }
+    .as-lifecycle-services-list {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .as-lifecycle-service {
+      padding: 4px 12px;
+      background: #fff;
+      border: 1px solid #c4b5fd;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #5b21b6;
+    }
+    .dark .as-lifecycle-service {
+      background: #1f2937;
+      border-color: #7c3aed;
+      color: #c4b5fd;
+    }
+    .as-lifecycle-compare {
+      max-width: 680px;
+      margin: 20px auto 0;
+    }
+    .as-lifecycle-compare-title {
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    .as-lifecycle-compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 500px) {
+      .as-lifecycle-compare-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .as-lifecycle-compare-card {
+      padding: 14px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+    }
+    .dark .as-lifecycle-compare-card {
+      background: #1f2937;
+      border-color: #374151;
+    }
+    .as-lifecycle-compare-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #1d4ed8;
+    }
+    .dark .as-lifecycle-compare-card-title {
+      color: #93c5fd;
+    }
+    .as-lifecycle-compare-card ul {
+      margin: 0 0 8px 16px;
+      padding: 0;
+      font-size: 12px;
+      line-height: 1.8;
+      color: #374151;
+    }
+    .dark .as-lifecycle-compare-card ul {
+      color: #d1d5db;
+    }
+    .as-lifecycle-compare-use {
+      font-size: 11px;
+      padding: 4px 8px;
+      background: #dbeafe;
+      border-radius: 4px;
+      color: #1d4ed8;
+      text-align: center;
+    }
+    .dark .as-lifecycle-compare-use {
+      background: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+    }
+    .as-lifecycle-summary {
+      max-width: 680px;
+      margin: 20px auto 0;
+      padding: 14px 16px;
+      background: #faeeda;
+      border: 1px solid #854f0b;
+      border-radius: 8px;
+    }
+    .dark .as-lifecycle-summary {
+      background: rgba(133, 79, 11, 0.15);
+      border-color: #b45309;
+    }
+    .as-lifecycle-summary-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #633806;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .dark .as-lifecycle-summary-title {
+      color: #fcd34d;
+    }
+    .as-lifecycle-summary-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .as-lifecycle-summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(133, 79, 11, 0.2);
+    }
+    .as-lifecycle-summary-row:last-child {
+      border-bottom: none;
+    }
+    .as-lifecycle-q {
+      color: #633806;
+    }
+    .dark .as-lifecycle-q {
+      color: #fef3c7;
+    }
+    .as-lifecycle-a {
+      color: #412402;
+      font-weight: 500;
+    }
+    .dark .as-lifecycle-a {
+      color: #fcd34d;
+    }
+    @media (max-width: 600px) {
+      .as-lifecycle-summary-row {
+        flex-direction: column;
+        gap: 2px;
+      }
+      .as-lifecycle-a {
+        text-align: right;
+      }
+    }
+  </style>
+
+  <div id="as-pattern" class="as-panel">
+    <div class="as-pattern-box">
+      <div class="as-pattern-title">SAA頻出パターン</div>
+      <div class="as-pattern-list">
+        <div class="as-pattern-row">
+          <div class="as-pattern-q">「負荷に応じてEC2台数を自動調整したい」</div>
+          <div class="as-pattern-a">→ Auto Scaling + ターゲット追跡</div>
+        </div>
+        <div class="as-pattern-row">
+          <div class="as-pattern-q">「EC2が1台落ちても自動で復旧させたい」</div>
+          <div class="as-pattern-a">→ Auto Scaling（最小台数=1）</div>
+        </div>
+        <div class="as-pattern-row">
+          <div class="as-pattern-q">「夜間のトラフィックが少ない時間帯にコスト削減」</div>
+          <div class="as-pattern-a">→ スケジュールスケーリング</div>
+        </div>
+        <div class="as-pattern-row">
+          <div class="as-pattern-q">「スケールアウト後すぐスケールインが起きてしまう」</div>
+          <div class="as-pattern-a">→ クールダウン期間を延長</div>
+        </div>
+        <div class="as-pattern-row">
+          <div class="as-pattern-q">「本番はオンデマンド・バッチはスポットで混在」</div>
+          <div class="as-pattern-a">→ 混合インスタンスポリシー</div>
+        </div>
+        <div class="as-pattern-row">
+          <div class="as-pattern-q">「ALB + Auto Scaling + マルチAZ」</div>
+          <div class="as-pattern-a">→ 高可用性の鉄板構成</div>
+        </div>
+        <div class="as-pattern-row">
+          <div class="as-pattern-q">「過去のトラフィックパターンから事前にスケール」</div>
+          <div class="as-pattern-a">→ 予測スケーリング（ML活用）</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <style>
+    .as-pattern-box {
+      background: #FAEEDA;
+      border: 1px solid #854F0B;
+      border-radius: 8px;
+      padding: 24px 18px 18px 18px;
+      max-width: 680px;
+      margin: 0 auto 0 auto;
+    }
+    .as-pattern-title {
+      text-align: center;
+      font-size: 15px;
+      font-weight: 500;
+      color: #633806;
+      margin-bottom: 12px;
+    }
+    .as-pattern-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .as-pattern-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid #854F0B22;
+      padding: 6px 0;
+      font-size: 13px;
+    }
+    .as-pattern-q {
+      color: #633806;
+      flex: 1 1 60%;
+    }
+    .as-pattern-a {
+      color: #412402;
+      font-weight: 500;
+      flex: 1 1 40%;
+      text-align: right;
+    }
+    .as-pattern-row:last-child {
+      border-bottom: none;
+    }
+  </style>
 </div>
 
 <script>

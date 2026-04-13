@@ -1,18 +1,5 @@
-@import "tailwindcss";
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 @variant dark (&:where(.dark, .dark *));
-
-/* Foundation */
-@import "./foundation/_variables.css" layer(base);
-@import "./foundation/_base.css" layer(base);
-
-/* Component */
-@import "./component/_button.css" layer(components);
-@import "./component/_card.css" layer(components);
-@import "./component/_tab.css" layer(components);
-@import "./component/_heading.css" layer(components);
-@import "./component/_animation.css" layer(components);
-@import "./component/_diagram.css" layer(components);
+@import "tailwindcss";

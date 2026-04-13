@@ -1,5 +1,1247 @@
 ---
+/**
+ * ELB（Elastic Load Balancing）解説ダイアグラム
+ * トラフィック分散の仕組みと ALB / NLB / GWLB の比較
+ */
 ---
+
+<style>
+  /* コンポーネント固有: ELB diagram */
+  .elb-section-title {
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+
+  /* Overview: fan-out grid */
+  .elb-overview-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 16px;
+  }
+  .elb-overview-wrap .dia-row { width: 100%; }
+  .elb-targets { display: flex; justify-content: center; gap: 24px; }
+
+  /* SVG overlay */
+  .elb-svg-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 10;
+    overflow: visible;
+  }
+
+  /* ALB target groups */
+  .elb-alb-targets {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .elb-alb-tg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    border-radius: 8px;
+    min-width: 160px;
+    flex: 1;
+  }
+  .elb-alb-tg-label { font-size: 13px; font-weight: 600; }
+  .elb-alb-tg-sub { font-size: 12px; margin-top: 4px; }
+  .elb-alb-tg-icons { display: flex; gap: 6px; margin-top: 8px; }
+  .elb-alb-tg-icons img { width: 28px; height: 28px; }
+
+  /* NLB split */
+  .elb-nlb-split { display: flex; gap: 16px; margin-top: 8px; }
+  .elb-nlb-col {
+    flex: 1;
+    padding: 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .elb-nlb-col-title { font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+  .elb-nlb-good { background: #ecfdf5; border: 1px solid #10b981; }
+  .elb-nlb-good .elb-nlb-col-title { color: #065f46; }
+  .elb-nlb-good li { color: #065f46; }
+  .dark .elb-nlb-good { background: rgba(5,150,105,.15); border-color: #34d399; }
+  .dark .elb-nlb-good .elb-nlb-col-title { color: #6ee7b7; }
+  .dark .elb-nlb-good li { color: #6ee7b7; }
+  .elb-nlb-bad { background: #fef2f2; border: 1px solid #f87171; }
+  .elb-nlb-bad .elb-nlb-col-title { color: #991b1b; }
+  .elb-nlb-bad li { color: #991b1b; }
+  .dark .elb-nlb-bad { background: rgba(220,38,38,.15); border-color: #f87171; }
+  .dark .elb-nlb-bad .elb-nlb-col-title { color: #fca5a5; }
+  .dark .elb-nlb-bad li { color: #fca5a5; }
+  .elb-nlb-col ul { padding-left: 18px; margin: 0; }
+
+  /* Terms: hierarchical flow */
+  .elb-terms-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 16px;
+  }
+  .elb-terms-cols {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+  }
+  .elb-terms-branch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    flex: 1;
+    max-width: 280px;
+  }
+  .elb-tg-group {
+    border: 1px dashed #d1d5db;
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+  .dark .elb-tg-group { border-color: #4b5563; }
+  .elb-tg-group-title { font-size: 12px; color: #6b7280; font-weight: 500; }
+  .dark .elb-tg-group-title { color: #9ca3af; }
+  .elb-tg-icons { display: flex; gap: 8px; }
+  .elb-healthcheck {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: #eaf3de;
+    border: 1px solid #3b6d11;
+    color: #27500a;
+  }
+  .dark .elb-healthcheck {
+    background: rgba(59,109,17,.2);
+    border-color: #65a30d;
+    color: #bef264;
+  }
+
+  /* Terms: legend bar */
+  .elb-terms-legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    margin-top: 10px;
+    border-radius: 8px;
+    background: #fefce8;
+    border: 1px solid #fde047;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .dark .elb-terms-legend {
+    background: rgba(250,204,21,.08);
+    border-color: #ca8a04;
+  }
+  .elb-terms-legend-item { display: flex; align-items: center; gap: 4px; }
+  .elb-terms-legend-dot {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .elb-terms-legend-name { font-weight: 600; }
+  .elb-terms-legend-desc { color: #854d0e; }
+  .dark .elb-terms-legend-desc { color: #fef9c3; }
+
+  /* Redirect box */
+  .elb-redirect {
+    padding: 10px 16px;
+    border-radius: 8px;
+    background: #fefce8;
+    border: 1px solid #fde047;
+    text-align: center;
+    font-size: 13px;
+  }
+  .dark .elb-redirect {
+    background: rgba(250,204,21,.1);
+    border-color: #ca8a04;
+  }
+  .elb-redirect-title { font-weight: 600; color: #854d0e; }
+  .dark .elb-redirect-title { color: #fde047; }
+  .elb-redirect-sub { font-size: 12px; color: #a16207; margin-top: 2px; }
+  .dark .elb-redirect-sub { color: #fef9c3; }
+
+  /* Routing: 3-column layout */
+  .elb-routing-wrap {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    padding: 16px;
+  }
+  .elb-routing-left,
+  .elb-routing-right {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    max-width: 220px;
+  }
+  .elb-routing-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    min-width: 100px;
+  }
+  .elb-routing-item {
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .elb-routing-item-label { font-size: 13px; font-weight: 600; }
+  .elb-routing-item-sub { font-size: 11px; margin-top: 2px; }
+
+  /* ALB feature list */
+  .elb-feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 13px;
+    line-height: 2;
+  }
+  .elb-feature-list li::before { content: "・"; }
+
+  /* SSL/TLS diagram */
+  .elb-ssl-btn {
+    cursor: pointer;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    color: #111827;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .dark .elb-ssl-btn {
+    border-color: #374151;
+    background: #1f2937;
+    color: #f9fafb;
+  }
+  .elb-ssl-btn:hover {
+    background: #f3f4f6;
+  }
+  .dark .elb-ssl-btn:hover {
+    background: #374151;
+  }
+  .elb-ssl-btn.active {
+    background: #534ab7;
+    color: #fff;
+    border-color: #534ab7;
+  }
+
+  .elb-ssl-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 24px 16px;
+    overflow-x: auto;
+  }
+  .elb-ssl-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .elb-ssl-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 8px;
+    min-width: 80px;
+  }
+  .elb-ssl-proto {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+  }
+  .elb-ssl-proto.https {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  .dark .elb-ssl-proto.https {
+    background: rgba(5, 150, 105, 0.3);
+    color: #6ee7b7;
+  }
+  .elb-ssl-proto.http {
+    background: #fef2f2;
+    color: #991b1b;
+  }
+  .dark .elb-ssl-proto.http {
+    background: rgba(220, 38, 38, 0.2);
+    color: #fca5a5;
+  }
+  .elb-ssl-arrow-line {
+    width: 60px;
+    height: 3px;
+    background: #9ca3af;
+    position: relative;
+    border-radius: 2px;
+  }
+  .elb-ssl-arrow-line::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-left-color: #9ca3af;
+  }
+  .elb-ssl-lock {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+  }
+  .elb-ssl-lock.hidden {
+    display: none;
+  }
+  .elb-ssl-cert {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    padding: 4px 8px;
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 4px;
+    font-size: 10px;
+    color: #92400e;
+  }
+  .dark .elb-ssl-cert {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: #fbbf24;
+    color: #fcd34d;
+  }
+  .elb-ssl-cert.hidden {
+    visibility: hidden;
+  }
+  .elb-ssl-ec2-group {
+    display: flex;
+    gap: 8px;
+  }
+  .elb-ssl-compare {
+    margin-top: 16px;
+    overflow-x: auto;
+  }
+
+  /* SNI Section */
+  .elb-sni-section {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 16px;
+    margin-top: 16px;
+  }
+  .dark .elb-sni-section {
+    border-color: #374151;
+  }
+  .elb-sni-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px;
+    flex-wrap: wrap;
+  }
+  .elb-sni-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .elb-sni-domains {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .elb-sni-domain {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #eff6ff;
+    border: 1px solid #3b82f6;
+    border-radius: 6px;
+  }
+  .dark .elb-sni-domain {
+    background: rgba(59, 130, 246, 0.2);
+    border-color: #60a5fa;
+  }
+  .elb-sni-domain-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #1d4ed8;
+  }
+  .dark .elb-sni-domain-name {
+    color: #93c5fd;
+  }
+  .elb-sni-lock {
+    font-size: 12px;
+  }
+  .elb-sni-arrow {
+    font-size: 24px;
+    color: #9ca3af;
+  }
+  .elb-sni-certs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 200px;
+  }
+  .elb-sni-targets {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .elb-sni-compare {
+    overflow-x: auto;
+  }
+</style>
+
+<div>
+  <!-- Tabs -->
+  <div class="tab-btn-group">
+     <button class="tab-btn active" onclick="elbTab('overview', event)">ELB概要</button>
+     <button class="tab-btn" onclick="elbTab('alb', event)">ALB</button>
+     <button class="tab-btn" onclick="elbTab('nlb', event)">NLB</button>
+     <button class="tab-btn" onclick="elbTab('terms', event)">基本用語</button>
+     <button class="tab-btn" onclick="elbTab('routing', event)">ALBルーティング詳細</button>
+     <button class="tab-btn" onclick="elbTab('compare', event)">使い分け</button>
+     <button class="tab-btn" onclick="elbTab('ssl', event)">SSL/TLS暗号化</button>
+  </div>
+
+  <!-- ========== Tab 1: ELB Overview ========== -->
+  <div id="elb-overview" class="tab-panel active">
+    <div class="elb-section-title">ELB：トラフィックを複数のターゲットに自動分散</div>
+    <div class="elb-overview-wrap" id="elb-ov-wrap">
+      <!-- SVG overlay -->
+      <svg id="elb-ov-svg" class="elb-svg-overlay">
+        <defs>
+          <marker id="elb-ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <line id="elb-ov-a0" stroke="#888780" stroke-width="1.5" marker-end="url(#elb-ah)"/>
+        <path id="elb-ov-a1" fill="none" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-ah)"/>
+        <path id="elb-ov-a2" fill="none" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-ah)"/>
+        <path id="elb-ov-a3" fill="none" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-ah)"/>
+      </svg>
+
+      <!-- User -->
+      <div class="dia-row">
+        <div id="elb-ov-user" class="dia-box dia-internet">
+          <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_Users_48_Light.svg" alt="Users"/>
+          <div class="dia-box-label">ユーザー</div>
+        </div>
+      </div>
+
+      <div class="dia-row" style="height:40px;"></div>
+
+      <!-- ELB -->
+      <div class="dia-row">
+        <div id="elb-ov-elb" class="dia-box dia-elb">
+          <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Networking-Content-Delivery/48/Arch_Elastic-Load-Balancing_48.svg" alt="ELB"/>
+          <div class="dia-box-label">ELB</div>
+          <div class="dia-box-sub">ヘルスチェックで異常インスタンスを自動除外</div>
+        </div>
+      </div>
+
+      <div class="dia-row" style="height:40px;"></div>
+
+      <!-- EC2 targets -->
+      <div class="dia-row">
+        <div class="elb-targets">
+          <div id="elb-ov-ec2a" class="dia-box dia-ec2">
+            <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2"/>
+            <div class="dia-box-label">EC2-1</div>
+          </div>
+          <div id="elb-ov-ec2b" class="dia-box dia-ec2">
+            <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2"/>
+            <div class="dia-box-label">EC2-2</div>
+          </div>
+          <div id="elb-ov-ec2c" class="dia-box dia-ec2">
+            <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2"/>
+            <div class="dia-box-label">EC2-3</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-note warn" style="margin-top:12px;">
+      <strong>ELBの3種類：</strong>ALB（L7・HTTP）/ NLB（L4・TCP/UDP・固定IP）/ GWLB（L3-4・FW統合）
+    </div>
+  </div>
+
+  <!-- ========== Tab 2: ALB ========== -->
+  <div id="elb-alb" class="tab-panel">
+    <div class="elb-section-title">ALB：L7でパスやホストヘッダーによるルーティング</div>
+
+    <div class="dia-diagram">
+      <!-- ALB box -->
+      <div class="dia-row">
+        <div class="dia-box dia-elb" style="min-width:280px;">
+          <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Elastic-Load-Balancing_Application-Load-Balancer_48.svg" alt="ALB"/>
+          <div class="dia-box-label">ALB（Application Load Balancer）</div>
+          <div class="dia-box-sub">リスナー → ルール → ターゲットグループ → ヘルスチェック</div>
+        </div>
+      </div>
+
+      <div class="dia-row">
+        <div class="dia-arrow"><div class="dia-arrow-v green"></div></div>
+      </div>
+
+      <!-- Target groups -->
+      <div class="elb-alb-targets">
+        <div class="elb-alb-tg dia-igw">
+          <div class="elb-alb-tg-label" style="color:#065f46;">/api/* → APIサーバー</div>
+          <div class="elb-alb-tg-icons">
+            <img src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2" title="EC2"/>
+            <img src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_AWS-Lambda_48.svg" alt="Lambda" title="Lambda"/>
+            <img src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Containers/48/Arch_Amazon-Elastic-Container-Service_48.svg" alt="ECS" title="ECS"/>
+          </div>
+        </div>
+        <div class="elb-alb-tg dia-igw">
+          <div class="elb-alb-tg-label" style="color:#065f46;">/web/* → Webサーバー</div>
+          <div class="elb-alb-tg-icons">
+            <img src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2" title="EC2"/>
+            <img src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Containers/48/Arch_Amazon-Elastic-Container-Service_48.svg" alt="ECS" title="ECS"/>
+          </div>
+        </div>
+        <div class="elb-alb-tg" style="background:#fefce8;border:1px solid #fde047;">
+          <div class="elb-alb-tg-label" style="color:#854d0e;">デフォルト → 固定レスポンス</div>
+          <div class="elb-alb-tg-sub" style="color:#a16207;">404など</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="dia-note info" style="margin-top:12px;">
+      <strong>ALBの特徴</strong>
+      <ul class="elb-feature-list">
+        <li>パスベース / ホストベース / ヘッダー / クエリ文字列でルーティング</li>
+        <li>Lambda をターゲットにできる（NLBはできない）</li>
+        <li>WebSocket対応 / スティッキーセッション / SSL終端</li>
+        <li>ACMで証明書管理（HTTPS対応）</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ========== Tab 3: NLB ========== -->
+  <div id="elb-nlb" class="tab-panel">
+    <div class="elb-section-title">NLB：L4・固定IP・超低レイテンシー</div>
+
+    <div class="dia-diagram">
+          <!-- ▼▼▼ ここからNLB説明追加（枠付き詳細） ▼▼▼ -->
+    <div class="dia-note" style="margin-bottom:16px;">
+    <!-- Features -->
+    <div class="dia-note info" style="margin-top:12px;">
+      <strong>NLBの特徴</strong>
+      <ul class="elb-feature-list">
+        <li>OSI第4層（L4）でTCP/UDP/TLSトラフィックを超低レイテンシーで分散</b>するロードバランサ。</li>
+        <li>各AZごとに固定IP（静的IP/EIP）</b>を持ち、<b>1秒あたり数百万リクエスト</b>の高スループットに対応。</li>
+        <li>ヘルスチェック</b>や<b>スティッキーセッション（ソースIP）</b>もサポート。</li>
+        <li>HTTP/HTTPSの高度なルーティングやLambda連携は不可</b>だが、<b>ゲーム・金融・IoT・VoIPなど低遅延・固定IPが必要な用途</b>に最適。</li>
+      </ul>
+    </div>
+    </div>
+    <!-- ▲▲▲ ここまでNLB説明追加 ▲▲▲ -->
+      <div class="dia-row">
+        <div class="dia-box dia-elb" style="min-width:280px;">
+          <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Elastic-Load-Balancing_Network-Load-Balancer_48.svg" alt="NLB"/>
+          <div class="dia-box-label">NLB（Network Load Balancer）</div>
+          <div class="dia-box-sub">TCP/UDP/TLSをL4で処理・AZごとに静的IP（EIPも可）</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="elb-nlb-split">
+      <div class="elb-nlb-col elb-nlb-good">
+        <div class="elb-nlb-col-title">✅ 向いている用途</div>
+        <ul>
+          <li>ゲーム・金融・IoT・VoIP</li>
+          <li>固定IPが必要なケース</li>
+          <li>超低レイテンシーが必要</li>
+        </ul>
+      </div>
+      <div class="elb-nlb-col elb-nlb-bad">
+        <div class="elb-nlb-col-title">✕ 向いていない用途</div>
+        <ul>
+          <li>パスルーティングが必要</li>
+          <li>Lambdaをターゲットにしたい</li>
+          <li>HTTPヘッダーでの振り分け</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="dia-note warn" style="margin-top:12px;">
+      <strong>SAA頻出：</strong>「固定IPが必要」→ NLB　「パスで振り分け・Lambda」→ ALB
+    </div>
+  </div>
+
+  <!-- ========== Tab 4: Terms ========== -->
+  <div id="elb-terms" class="tab-panel">
+    <div class="elb-section-title">ELB の基本用語：ELB → リスナー → ルール → ターゲットグループ</div>
+
+    <div class="elb-terms-wrap" id="elb-terms-wrap">
+      <!-- SVG overlay -->
+      <svg id="elb-terms-svg" class="elb-svg-overlay">
+        <defs>
+          <marker id="elb-t-ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <!-- ELB → Listener 1 -->
+        <path id="elb-t-a1" fill="none" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-t-ah)"/>
+        <!-- ELB → Listener 2 -->
+        <path id="elb-t-a2" fill="none" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-t-ah)"/>
+        <!-- Listener 1 → Rule 1 -->
+        <line id="elb-t-a3" stroke="#993C1D" stroke-width="1.5" marker-end="url(#elb-t-ah)"/>
+        <!-- Listener 2 → Rule 2 -->
+        <line id="elb-t-a4" stroke="#993C1D" stroke-width="1.5" marker-end="url(#elb-t-ah)"/>
+        <!-- Rule 1 → TG-A -->
+        <path id="elb-t-a5" fill="none" stroke="#993C1D" stroke-width="1.5" marker-end="url(#elb-t-ah)"/>
+        <!-- Rule 1 → TG-B -->
+        <path id="elb-t-a6" fill="none" stroke="#993C1D" stroke-width="1.5" marker-end="url(#elb-t-ah)"/>
+        <!-- Rule 2 → Redirect -->
+        <line id="elb-t-a7" stroke="#993C1D" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#elb-t-ah)"/>
+      </svg>
+
+      <!-- ELB -->
+      <div class="dia-row">
+        <div id="elb-t-elb" class="dia-box dia-elb">
+          <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Networking-Content-Delivery/48/Arch_Elastic-Load-Balancing_48.svg" alt="ELB"/>
+          <div class="dia-box-label">ELB</div>
+          <div class="dia-box-sub">トラフィックの入口全体</div>
+        </div>
+      </div>
+
+      <div class="dia-row" style="height:36px;"></div>
+
+      <!-- Listeners -->
+      <div class="elb-terms-cols">
+        <div class="elb-terms-branch">
+          <div id="elb-t-l1" class="dia-box dia-listener">
+            <div class="dia-box-label">リスナー 1</div>
+            <div class="dia-box-sub">HTTPS:443 を待ち受け</div>
+          </div>
+          <div class="dia-row" style="height:12px;"></div>
+          <div id="elb-t-r1" class="dia-box dia-rule">
+            <div class="dia-box-label">ルール</div>
+            <div class="dia-box-sub">/api/* → TG-A / default → TG-B</div>
+          </div>
+          <div class="dia-row" style="height:12px;"></div>
+          <!-- TG-A & TG-B -->
+          <div class="elb-terms-cols" style="width:100%;gap:10px;">
+            <div id="elb-t-tga" class="elb-tg-group">
+              <div class="elb-tg-group-title">ターゲットグループ A</div>
+              <div class="elb-tg-icons">
+                <div class="dia-box dia-ec2" style="padding:6px 8px;min-width:auto;">
+                  <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2" style="width:28px;height:28px;margin-bottom:2px;"/>
+                  <div class="dia-box-label" style="font-size:11px;">EC2</div>
+                </div>
+                <div class="dia-box dia-ec2" style="padding:6px 8px;min-width:auto;">
+                  <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2" style="width:28px;height:28px;margin-bottom:2px;"/>
+                  <div class="dia-box-label" style="font-size:11px;">EC2</div>
+                </div>
+              </div>
+              <div class="elb-healthcheck">ヘルスチェック</div>
+            </div>
+            <div id="elb-t-tgb" class="elb-tg-group">
+              <div class="elb-tg-group-title">ターゲットグループ B</div>
+              <div class="elb-tg-icons">
+                <div class="dia-box dia-lambda" style="padding:6px 8px;min-width:auto;">
+                  <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_AWS-Lambda_48.svg" alt="Lambda" style="width:28px;height:28px;margin-bottom:2px;"/>
+                  <div class="dia-box-label" style="font-size:11px;">Lambda</div>
+                </div>
+                <div class="dia-box dia-lambda" style="padding:6px 8px;min-width:auto;">
+                  <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_AWS-Lambda_48.svg" alt="Lambda" style="width:28px;height:28px;margin-bottom:2px;"/>
+                  <div class="dia-box-label" style="font-size:11px;">Lambda</div>
+                </div>
+              </div>
+              <div class="elb-healthcheck">ヘルスチェック</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="elb-terms-branch">
+          <div id="elb-t-l2" class="dia-box dia-listener">
+            <div class="dia-box-label">リスナー 2</div>
+            <div class="dia-box-sub">HTTP:80 を待ち受け</div>
+          </div>
+          <div class="dia-row" style="height:12px;"></div>
+          <div id="elb-t-r2" class="dia-box dia-rule">
+            <div class="dia-box-label">ルール</div>
+            <div class="dia-box-sub">すべて HTTPS にリダイレクト</div>
+          </div>
+          <div class="dia-row" style="height:12px;"></div>
+          <div id="elb-t-redirect" class="elb-redirect">
+            <div class="elb-redirect-title">301 リダイレクト</div>
+            <div class="elb-redirect-sub">HTTPS:443 へ転送</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="elb-terms-legend">
+      <div class="elb-terms-legend-item">
+        <span class="elb-terms-legend-dot" style="background:#534AB7;"></span>
+        <span class="elb-terms-legend-name" style="color:#534AB7;">ELB</span>
+        <span class="elb-terms-legend-desc">受け口全体</span>
+      </div>
+      <div class="elb-terms-legend-item">
+        <span class="elb-terms-legend-dot" style="background:#185FA5;"></span>
+        <span class="elb-terms-legend-name" style="color:#185FA5;">リスナー</span>
+        <span class="elb-terms-legend-desc">ポート・プロトコル</span>
+      </div>
+      <div class="elb-terms-legend-item">
+        <span class="elb-terms-legend-dot" style="background:#993C1D;"></span>
+        <span class="elb-terms-legend-name" style="color:#993C1D;">ルール</span>
+        <span class="elb-terms-legend-desc">振り分け条件</span>
+      </div>
+      <div class="elb-terms-legend-item">
+        <span class="elb-terms-legend-dot" style="background:#059669;"></span>
+        <span class="elb-terms-legend-name" style="color:#059669;">ターゲットグループ</span>
+        <span class="elb-terms-legend-desc">振り先のまとまり</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== Tab 5: Routing ========== -->
+  <div id="elb-routing" class="tab-panel">
+    <div class="elb-section-title">ALBルーティングルール：何を見て振り分けるか</div>
+
+    <div class="elb-routing-wrap" id="elb-rt-wrap">
+      <!-- SVG overlay -->
+      <svg id="elb-rt-svg" class="elb-svg-overlay">
+        <defs>
+          <marker id="elb-rt-ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <!-- conditions → ALB (5 lines) -->
+        <path id="elb-rt-l1" fill="none" stroke="#0F6E56" stroke-width="1.5" marker-end="url(#elb-rt-ah)"/>
+        <path id="elb-rt-l2" fill="none" stroke="#0F6E56" stroke-width="1.5" marker-end="url(#elb-rt-ah)"/>
+        <path id="elb-rt-l3" fill="none" stroke="#0F6E56" stroke-width="1.5" marker-end="url(#elb-rt-ah)"/>
+        <path id="elb-rt-l4" fill="none" stroke="#0F6E56" stroke-width="1.5" marker-end="url(#elb-rt-ah)"/>
+        <path id="elb-rt-l5" fill="none" stroke="#0F6E56" stroke-width="1.5" marker-end="url(#elb-rt-ah)"/>
+        <!-- ALB → targets (3 lines) -->
+        <path id="elb-rt-r1" fill="none" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-rt-ah)"/>
+        <path id="elb-rt-r2" fill="none" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-rt-ah)"/>
+        <path id="elb-rt-r3" fill="none" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-rt-ah)"/>
+      </svg>
+
+      <!-- Left: routing conditions -->
+      <div class="elb-routing-left">
+        <div id="elb-rt-c1" class="elb-routing-item dia-igw">
+          <div class="elb-routing-item-label" style="color:#065f46;">パスベース</div>
+          <div class="elb-routing-item-sub" style="color:#065f46;">/api/* /web/*</div>
+        </div>
+        <div id="elb-rt-c2" class="elb-routing-item dia-igw">
+          <div class="elb-routing-item-label" style="color:#065f46;">ホストベース</div>
+          <div class="elb-routing-item-sub" style="color:#065f46;">api.example.com</div>
+        </div>
+        <div id="elb-rt-c3" class="elb-routing-item dia-igw">
+          <div class="elb-routing-item-label" style="color:#065f46;">HTTP メソッド</div>
+          <div class="elb-routing-item-sub" style="color:#065f46;">GET / POST</div>
+        </div>
+        <div id="elb-rt-c4" class="elb-routing-item dia-igw">
+          <div class="elb-routing-item-label" style="color:#065f46;">HTTP ヘッダー</div>
+          <div class="elb-routing-item-sub" style="color:#065f46;">User-Agent など</div>
+        </div>
+        <div id="elb-rt-c5" class="elb-routing-item dia-igw">
+          <div class="elb-routing-item-label" style="color:#065f46;">クエリ文字列</div>
+          <div class="elb-routing-item-sub" style="color:#065f46;">?version=2</div>
+        </div>
+      </div>
+
+      <!-- Center: ALB -->
+      <div class="elb-routing-center">
+        <div id="elb-rt-alb" class="dia-box dia-elb" style="min-width:100px;">
+          <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Elastic-Load-Balancing_Application-Load-Balancer_48.svg" alt="ALB"/>
+          <div class="dia-box-label">ALB</div>
+          <div class="dia-box-sub">何を見て振り分けるか？</div>
+        </div>
+      </div>
+
+      <!-- Right: targets -->
+      <div class="elb-routing-right">
+        <div id="elb-rt-ta" class="elb-routing-item dia-elb">
+          <div class="elb-routing-item-label">ターゲット A</div>
+          <div class="elb-routing-item-sub">EC2 / ECS / Lambda</div>
+        </div>
+        <div id="elb-rt-tb" class="elb-routing-item dia-elb">
+          <div class="elb-routing-item-label">ターゲット B</div>
+          <div class="elb-routing-item-sub">EC2 × 3台</div>
+        </div>
+        <div id="elb-rt-tc" class="elb-routing-item dia-elb">
+          <div class="elb-routing-item-label">ターゲット C</div>
+          <div class="elb-routing-item-sub">スティッキーセッション</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-note warn" style="margin-top:12px;">
+      <strong>SAA頻出：</strong>「パスで振り分け」「Lambda対応」→ 必ずALB
+    </div>
+  </div>
+
+  <!-- ========== Tab 6: Compare ========== -->
+  <div id="elb-compare" class="tab-panel">
+    <div class="elb-section-title">ALB vs NLB vs GWLB 比較</div>
+
+    <div style="overflow-x:auto;">
+      <table class="dia-table">
+        <thead>
+          <tr>
+            <th>比較項目</th>
+            <th>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Elastic-Load-Balancing_Application-Load-Balancer_48.svg" alt="ALB" style="width:24px;height:24px;"/>
+                ALB
+              </div>
+            </th>
+            <th>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Elastic-Load-Balancing_Network-Load-Balancer_48.svg" alt="NLB" style="width:24px;height:24px;"/>
+                NLB
+              </div>
+            </th>
+            <th>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <img src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Elastic-Load-Balancing_Gateway-Load-Balancer_48.svg" alt="GWLB" style="width:24px;height:24px;"/>
+                GWLB
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>レイヤー</td><td>L7</td><td>L4</td><td>L3-4</td></tr>
+          <tr><td>プロトコル</td><td>HTTP/HTTPS</td><td>TCP/UDP/TLS</td><td>全プロトコル</td></tr>
+          <tr><td>固定IP</td><td style="color:#dc2626;">✕</td><td style="color:#059669;">✅</td><td style="color:#dc2626;">✕</td></tr>
+          <tr><td>Lambda対応</td><td style="color:#059669;">✅</td><td style="color:#dc2626;">✕</td><td style="color:#dc2626;">✕</td></tr>
+          <tr><td>主な用途</td><td>WebAPI・マイクロサービス</td><td>ゲーム・金融・IoT</td><td>FW・IDS/IPS統合</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="dia-note warn" style="margin-top:12px;">
+      <strong>SAA頻出：</strong>問題文に「パスルーティング」「Lambda」→ ALB / 「固定IP」「超低レイテンシー」→ NLB
+    </div>
+  </div>
+
+  <!-- ========== Tab 7: SSL/TLS ========== -->
+  <div id="elb-ssl" class="tab-panel">
+    <div class="elb-section-title">SSL/TLS暗号化：SSL終端 vs End-to-End暗号化</div>
+
+    <!-- Scenario selection -->
+    <div style="margin-bottom:12px;">
+      <div style="font-size:13px;color:#6b7280;margin-bottom:8px;">パターンを選択：</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        <button class="elb-ssl-btn active" id="elb-ssl-btn-1" onclick="elbSslScenario(1)">
+          SSL終端（一般的）
+        </button>
+        <button class="elb-ssl-btn" id="elb-ssl-btn-2" onclick="elbSslScenario(2)">
+          End-to-End暗号化
+        </button>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div id="elb-ssl-desc" class="dia-step-desc"></div>
+
+    <!-- Diagram -->
+    <div class="elb-ssl-diagram">
+      <!-- Client -->
+      <div class="elb-ssl-col">
+        <div class="dia-box dia-client">
+          <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_General-Icons/Res_48_Light/Res_User_48_Light.svg" alt="Client"/>
+          <div class="dia-box-label">クライアント</div>
+        </div>
+      </div>
+
+      <!-- Arrow 1 -->
+      <div class="elb-ssl-col">
+        <div class="elb-ssl-arrow">
+          <div id="elb-ssl-proto1" class="elb-ssl-proto https">HTTPS</div>
+          <div class="elb-ssl-arrow-line">
+            <div id="elb-ssl-lock1" class="elb-ssl-lock">🔒</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ELB -->
+      <div class="elb-ssl-col">
+        <div id="elb-ssl-elb" class="dia-box dia-elb">
+          <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Elastic-Load-Balancing_Application-Load-Balancer_48.svg" alt="ALB"/>
+          <div class="dia-box-label">ALB</div>
+          <div id="elb-ssl-elb-sub" class="dia-box-sub">SSL終端</div>
+        </div>
+        <div id="elb-ssl-cert" class="elb-ssl-cert">
+          <img src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Security-Identity-Compliance/48/Arch_AWS-Certificate-Manager_48.svg" alt="ACM" style="width:20px;height:20px;"/>
+          <span>ACM証明書</span>
+        </div>
+      </div>
+
+      <!-- Arrow 2 -->
+      <div class="elb-ssl-col">
+        <div class="elb-ssl-arrow">
+          <div id="elb-ssl-proto2" class="elb-ssl-proto http">HTTP</div>
+          <div class="elb-ssl-arrow-line">
+            <div id="elb-ssl-lock2" class="elb-ssl-lock hidden">🔒</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EC2 -->
+      <div class="elb-ssl-col">
+        <div class="elb-ssl-ec2-group">
+          <div class="dia-box dia-ec2">
+            <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2"/>
+            <div class="dia-box-label">EC2</div>
+          </div>
+          <div class="dia-box dia-ec2">
+            <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2"/>
+            <div class="dia-box-label">EC2</div>
+          </div>
+        </div>
+        <div id="elb-ssl-ec2-cert" class="elb-ssl-cert hidden">
+          <span>自己署名証明書 or ACM PCA</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison table -->
+    <div class="elb-ssl-compare">
+      <table class="elb-compare-tbl">
+        <thead>
+          <tr>
+            <th></th>
+            <th>SSL終端</th>
+            <th>End-to-End暗号化</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>クライアント→ELB</td>
+            <td style="color:#059669;">HTTPS（暗号化）</td>
+            <td style="color:#059669;">HTTPS（暗号化）</td>
+          </tr>
+          <tr>
+            <td>ELB→EC2</td>
+            <td style="color:#dc2626;">HTTP（平文）</td>
+            <td style="color:#059669;">HTTPS（暗号化）</td>
+          </tr>
+          <tr>
+            <td>EC2の証明書</td>
+            <td>不要</td>
+            <td>必要（自己署名 or ACM PCA）</td>
+          </tr>
+          <tr>
+            <td>EC2のSSL処理負荷</td>
+            <td style="color:#059669;">なし</td>
+            <td style="color:#dc2626;">あり</td>
+          </tr>
+          <tr>
+            <td>用途</td>
+            <td>一般的なWebアプリ</td>
+            <td>金融・医療など規制要件</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SNI Section -->
+    <div class="elb-sni-section">
+      <div class="elb-section-title" style="margin-top:20px;">SNI（Server Name Indication）：1つのELBで複数ドメイン</div>
+
+      <div class="elb-sni-diagram">
+        <div class="elb-sni-col">
+          <div class="elb-sni-domains">
+            <div class="elb-sni-domain">
+              <span class="elb-sni-domain-name">example.com</span>
+              <span class="elb-sni-lock">🔒</span>
+            </div>
+            <div class="elb-sni-domain">
+              <span class="elb-sni-domain-name">api.example.com</span>
+              <span class="elb-sni-lock">🔒</span>
+            </div>
+            <div class="elb-sni-domain">
+              <span class="elb-sni-domain-name">shop.example.jp</span>
+              <span class="elb-sni-lock">🔒</span>
+            </div>
+          </div>
+        </div>
+        <div class="elb-sni-arrow">→</div>
+        <div class="elb-sni-col">
+          <div class="dia-box dia-elb" style="min-width:180px;">
+            <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Networking-Content-Delivery/Res_Elastic-Load-Balancing_Application-Load-Balancer_48.svg" alt="ALB"/>
+            <div class="dia-box-label">ALB / NLB</div>
+            <div class="dia-box-sub">SNI対応</div>
+          </div>
+          <div class="elb-sni-certs">
+            <div class="elb-ssl-cert" style="margin:4px;">証明書A</div>
+            <div class="elb-ssl-cert" style="margin:4px;">証明書B</div>
+            <div class="elb-ssl-cert" style="margin:4px;">証明書C</div>
+          </div>
+        </div>
+        <div class="elb-sni-arrow">→</div>
+        <div class="elb-sni-col">
+          <div class="elb-sni-targets">
+            <div class="dia-box dia-ec2" style="padding:8px;">
+              <div class="dia-box-label">TG-A</div>
+            </div>
+            <div class="dia-box dia-ec2" style="padding:8px;">
+              <div class="dia-box-label">TG-B</div>
+            </div>
+            <div class="dia-box dia-ec2" style="padding:8px;">
+              <div class="dia-box-label">TG-C</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dia-note" style="margin-top:12px;background:#f0fdf4;border:1px solid #22c55e;">
+        <strong style="color:#166534;">SNI（Server Name Indication）とは</strong>
+        <ul class="elb-feature-list" style="color:#166534;">
+          <li>TLSハンドシェイク時にクライアントが接続先ホスト名を通知する拡張機能</li>
+          <li><strong>1つのELB（1つのIP）で複数のSSL証明書を使い分けられる</strong></li>
+          <li>ALB・NLBはSNI対応、CLB（Classic）は非対応</li>
+          <li>ワイルドカード証明書（*.example.com）やSAN証明書と組み合わせ可能</li>
+        </ul>
+      </div>
+
+      <div class="elb-sni-compare" style="margin-top:12px;">
+        <table class="elb-compare-tbl">
+          <thead>
+            <tr>
+              <th></th>
+              <th>SNIなし（従来）</th>
+              <th>SNIあり</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1つのELBで</td>
+              <td style="color:#dc2626;">1つの証明書のみ</td>
+              <td style="color:#059669;">複数の証明書をアタッチ可能</td>
+            </tr>
+            <tr>
+              <td>複数ドメイン対応</td>
+              <td>ELBを複数作成</td>
+              <td style="color:#059669;">1つのELBで対応</td>
+            </tr>
+            <tr>
+              <td>コスト</td>
+              <td style="color:#dc2626;">ELB数分の料金</td>
+              <td style="color:#059669;">1つのELB料金</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="dia-note info" style="margin-top:12px;">
+      <strong>SAA頻出ポイント</strong>
+      <ul class="elb-feature-list">
+        <li>「クライアントからWebサーバーまで全ての通信を暗号化」→ <strong>End-to-End暗号化</strong></li>
+        <li>ELB→EC2間もHTTPSにするには、EC2に証明書をインストールする必要がある</li>
+        <li>ACMの証明書はELBに直接アタッチできるが、EC2にはエクスポートできない</li>
+        <li>EC2用の証明書は<strong>ACM Private CA</strong>または自己署名証明書を使用</li>
+        <li>「1つのELBで複数ドメインのHTTPS」→ <strong>SNI</strong>（ALB/NLBで対応）</li>
+      </ul>
+    </div>
+
+    <div class="dia-note warn" style="margin-top:8px;">
+      <strong>問題パターン：</strong><br>
+      ・「規制要件で全経路の暗号化が必要」→ End-to-End暗号化<br>
+      ・「1つのALBで複数ドメインのSSL証明書を使いたい」→ SNI
+    </div>
+  </div>
+</div>
+
+<script>
+  /* Tab switching */
+  // タブ切り替え関数（event明示・一元化）
+  function elbTab(tab, ev) {
+    // すべてのタブパネルを非表示
+    document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+    // 対象パネルのみ表示
+    const panel = document.getElementById('elb-' + tab);
+    if (panel) panel.classList.add('active');
+    // すべてのタブボタンのactive解除
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    // クリックされたボタンのみactive
+    if (ev && ev.currentTarget) ev.currentTarget.classList.add('active');
+    // 矢印など再描画
+    requestAnimationFrame(() => {
+      if (typeof elbDrawOverview === 'function') elbDrawOverview();
+      if (typeof elbDrawTerms === 'function') elbDrawTerms();
+      if (typeof elbDrawRouting === 'function') elbDrawRouting();
+    });
+  }
+  window.elbTab = elbTab;
+
+  /* ---- Helpers ---- */
+  function elbRect(id: string, cr: DOMRect) {
+    const el = document.getElementById(id);
+    if (!el) return { cx: 0, cy: 0, top: 0, bottom: 0, left: 0, right: 0, w: 0, h: 0 };
+    const r = el.getBoundingClientRect();
+    return {
+      cx: r.left + r.width / 2 - cr.left,
+      cy: r.top + r.height / 2 - cr.top,
+      top: r.top - cr.top,
+      bottom: r.bottom - cr.top,
+      left: r.left - cr.left,
+      right: r.right - cr.left,
+      w: r.width,
+      h: r.height,
+    };
+  }
+  function elbSetLine(id: string, x1: number, y1: number, x2: number, y2: number) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('x1', String(Math.round(x1)));
+    el.setAttribute('y1', String(Math.round(y1)));
+    el.setAttribute('x2', String(Math.round(x2)));
+    el.setAttribute('y2', String(Math.round(y2)));
+  }
+  function elbSetPath(id: string, d: string) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('d', d);
+  }
+
+  /* ---- Overview arrows ---- */
+  function elbDrawOverview() {
+    const wrap = document.getElementById('elb-ov-wrap');
+    const svg = document.getElementById('elb-ov-svg');
+    if (!wrap || !svg) return;
+    const cr = wrap.getBoundingClientRect();
+    svg.setAttribute('viewBox', `0 0 ${cr.width} ${cr.height}`);
+
+    const user = elbRect('elb-ov-user', cr);
+    const elb = elbRect('elb-ov-elb', cr);
+    const ec2a = elbRect('elb-ov-ec2a', cr);
+    const ec2b = elbRect('elb-ov-ec2b', cr);
+    const ec2c = elbRect('elb-ov-ec2c', cr);
+
+    // user → elb (straight down)
+    elbSetLine('elb-ov-a0', user.cx, user.bottom, elb.cx, elb.top);
+
+    // elb → ec2a (diagonal left)
+    const ey = elb.bottom;
+    elbSetPath('elb-ov-a1', `M${elb.cx} ${ey} C${elb.cx} ${ey + 20} ${ec2a.cx} ${ec2a.top - 20} ${ec2a.cx} ${ec2a.top}`);
+    // elb → ec2b (straight)
+    elbSetPath('elb-ov-a2', `M${elb.cx} ${ey} L${ec2b.cx} ${ec2b.top}`);
+    // elb → ec2c (diagonal right)
+    elbSetPath('elb-ov-a3', `M${elb.cx} ${ey} C${elb.cx} ${ey + 20} ${ec2c.cx} ${ec2c.top - 20} ${ec2c.cx} ${ec2c.top}`);
+  }
+
+  /* ---- Terms arrows ---- */
+  function elbDrawTerms() {
+    const wrap = document.getElementById('elb-terms-wrap');
+    const svg = document.getElementById('elb-terms-svg');
+    if (!wrap || !svg) return;
+    const cr = wrap.getBoundingClientRect();
+    svg.setAttribute('viewBox', `0 0 ${cr.width} ${cr.height}`);
+
+    const elb = elbRect('elb-t-elb', cr);
+    const l1 = elbRect('elb-t-l1', cr);
+    const l2 = elbRect('elb-t-l2', cr);
+    const r1 = elbRect('elb-t-r1', cr);
+    const r2 = elbRect('elb-t-r2', cr);
+    const tga = elbRect('elb-t-tga', cr);
+    const tgb = elbRect('elb-t-tgb', cr);
+    const redir = elbRect('elb-t-redirect', cr);
+
+    // ELB → Listener 1 (diagonal)
+    elbSetPath('elb-t-a1', `M${elb.cx} ${elb.bottom} C${elb.cx} ${elb.bottom + 16} ${l1.cx} ${l1.top - 16} ${l1.cx} ${l1.top}`);
+    // ELB → Listener 2 (diagonal)
+    elbSetPath('elb-t-a2', `M${elb.cx} ${elb.bottom} C${elb.cx} ${elb.bottom + 16} ${l2.cx} ${l2.top - 16} ${l2.cx} ${l2.top}`);
+    // Listener1 → Rule1
+    elbSetLine('elb-t-a3', l1.cx, l1.bottom, r1.cx, r1.top);
+    // Listener2 → Rule2
+    elbSetLine('elb-t-a4', l2.cx, l2.bottom, r2.cx, r2.top);
+    // Rule1 → TG-A
+    elbSetPath('elb-t-a5', `M${r1.cx - 20} ${r1.bottom} C${r1.cx - 20} ${r1.bottom + 10} ${tga.cx} ${tga.top - 10} ${tga.cx} ${tga.top}`);
+    // Rule1 → TG-B
+    elbSetPath('elb-t-a6', `M${r1.cx + 20} ${r1.bottom} C${r1.cx + 20} ${r1.bottom + 10} ${tgb.cx} ${tgb.top - 10} ${tgb.cx} ${tgb.top}`);
+    // Rule2 → Redirect
+    elbSetLine('elb-t-a7', r2.cx, r2.bottom, redir.cx, redir.top);
+  }
+
+  /* ---- Routing arrows ---- */
+  function elbDrawRouting() {
+    const wrap = document.getElementById('elb-rt-wrap');
+    const svg = document.getElementById('elb-rt-svg');
+    if (!wrap || !svg) return;
+    const cr = wrap.getBoundingClientRect();
+    svg.setAttribute('viewBox', `0 0 ${cr.width} ${cr.height}`);
+
+    const alb = elbRect('elb-rt-alb', cr);
+    const conds = ['elb-rt-c1','elb-rt-c2','elb-rt-c3','elb-rt-c4','elb-rt-c5'].map(id => elbRect(id, cr));
+    const targets = ['elb-rt-ta','elb-rt-tb','elb-rt-tc'].map(id => elbRect(id, cr));
+
+    // conditions → ALB
+    conds.forEach((c, i) => {
+      const sx = c.right;
+      const sy = c.cy;
+      const ex = alb.left;
+      const ey = alb.cy;
+      const mx = (sx + ex) / 2;
+      elbSetPath(`elb-rt-l${i + 1}`, `M${sx} ${sy} C${mx} ${sy} ${mx} ${ey} ${ex} ${ey}`);
+    });
+
+    // ALB → targets
+    targets.forEach((t, i) => {
+      const sx = alb.right;
+      const sy = alb.cy;
+      const ex = t.left;
+      const ey = t.cy;
+      const mx = (sx + ex) / 2;
+      elbSetPath(`elb-rt-r${i + 1}`, `M${sx} ${sy} C${mx} ${sy} ${mx} ${ey} ${ex} ${ey}`);
+    });
+  }
+
+  /* ---- Init ---- */
+  function elbInitAll() {
+    elbDrawOverview();
+    elbDrawTerms();
+    elbDrawRouting();
+  }
+
+  window.addEventListener('load', () => setTimeout(elbInitAll, 120));
+  window.addEventListener('resize', elbInitAll);
+
+  const ovWrap = document.getElementById('elb-ov-wrap');
+  if (ovWrap) new ResizeObserver(elbInitAll).observe(ovWrap);
+  const tWrap = document.getElementById('elb-terms-wrap');
+  if (tWrap) new ResizeObserver(elbInitAll).observe(tWrap);
+  const rtWrap = document.getElementById('elb-rt-wrap');
+  if (rtWrap) new ResizeObserver(elbInitAll).observe(rtWrap);
+</script>
+
+
 <div>
   <style>
     .diag-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
@@ -8,37 +1250,6 @@
     .diag-panel{display:none;}
     .diag-panel.active{display:block;}
   </style>
-
-  <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
-    <button class="diag-btn active" onclick="elbTab('overview')">ELB概要</button>
-    <button class="diag-btn" onclick="elbTab('alb')">ALB</button>
-    <button class="diag-btn" onclick="elbTab('nlb')">NLB</button>
-    <button class="diag-btn" onclick="elbTab('terms')">基本用語</button>
-    <button class="diag-btn" onclick="elbTab('routing')">ALBルーティング詳細</button>
-    <button class="diag-btn" onclick="elbTab('compare')">使い分け</button>
-  </div>
-
-  <div id="elb-overview" class="diag-panel active">
-    <svg width="100%" viewBox="0 0 680 360">
-      <defs><marker id="elb-arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
-      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">ELB：トラフィックを複数のターゲットに自動分散</text>
-      <rect x="270" y="44" width="140" height="44" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
-      <text x="340" y="70" text-anchor="middle" font-size="13" fill="#2C2C2A">ユーザー</text>
-      <line x1="340" y1="88" x2="340" y2="116" stroke="#888780" stroke-width="1.5" marker-end="url(#elb-arr)"/>
-      <rect x="210" y="118" width="260" height="44" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-      <text x="340" y="138" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">ELB（ロードバランサー）</text>
-      <text x="340" y="154" text-anchor="middle" font-size="11" fill="#534AB7">ヘルスチェックで異常インスタンスを自動除外</text>
-      <line x1="260" y1="162" x2="160" y2="210" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-arr)"/>
-      <line x1="340" y1="162" x2="340" y2="210" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-arr)"/>
-      <line x1="420" y1="162" x2="520" y2="210" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-arr)"/>
-      <rect x="90"  y="212" width="120" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="150" y="238" text-anchor="middle" font-size="13" fill="#085041">EC2-1</text>
-      <rect x="280" y="212" width="120" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="340" y="238" text-anchor="middle" font-size="13" fill="#085041">EC2-2</text>
-      <rect x="470" y="212" width="120" height="44" rx="6" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text x="530" y="238" text-anchor="middle" font-size="13" fill="#085041">EC2-3</text>
-      <rect x="40" y="280" width="600" height="56" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
-      <text x="340" y="302" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">ELBの3種類</text>
-      <text x="340" y="324" text-anchor="middle" font-size="12" fill="#633806">ALB（L7・HTTP）/ NLB（L4・TCP/UDP・固定IP）/ GWLB（L3-4・FW統合）</text>
-    </svg>
-  </div>
 
   <div id="elb-alb" class="diag-panel">
     <svg width="100%" viewBox="0 0 680 360">
@@ -210,11 +1421,73 @@
 </div>
 
 <script>
-  function elbTab(t: string) {
-    document.querySelectorAll('[id^="elb-"]').forEach(el => el.classList.remove('active'));
-    document.getElementById('elb-' + t)?.classList.add('active');
-    document.querySelectorAll('.diag-btn').forEach(el => el.classList.remove('active'));
-    (event?.target as HTMLElement)?.classList.add('active');
+
+
+  /* ---- SSL/TLS Scenario ---- */
+  const ELB_SSL_SCENARIOS = {
+    1: {
+      name: 'SSL終端',
+      desc: '<strong>SSL終端（SSL Termination）</strong>：ELBでSSL/TLSを復号化し、バックエンドへはHTTPで通信。<br>ELBがSSL処理を担当するため、EC2の負荷が軽減される。一般的なWebアプリで使用。',
+      proto1: 'HTTPS',
+      proto2: 'HTTP',
+      lock1: true,
+      lock2: false,
+      elbSub: 'SSL終端',
+      ec2Cert: false
+    },
+    2: {
+      name: 'End-to-End暗号化',
+      desc: '<strong>End-to-End暗号化</strong>：クライアント→ELB→EC2の全経路でHTTPS。<br>金融・医療など規制要件で「全経路の暗号化」が必要な場合に使用。EC2にも証明書が必要。',
+      proto1: 'HTTPS',
+      proto2: 'HTTPS',
+      lock1: true,
+      lock2: true,
+      elbSub: 'TLS Pass-through or 再暗号化',
+      ec2Cert: true
+    }
+  };
+
+  function elbSslScenario(n: number) {
+    const s = ELB_SSL_SCENARIOS[n as keyof typeof ELB_SSL_SCENARIOS];
+    if (!s) return;
+
+    // Update buttons
+    document.getElementById('elb-ssl-btn-1')?.classList.toggle('active', n === 1);
+    document.getElementById('elb-ssl-btn-2')?.classList.toggle('active', n === 2);
+
+    // Update description
+    const descEl = document.getElementById('elb-ssl-desc');
+    if (descEl) descEl.innerHTML = s.desc;
+
+    // Update protocol labels
+    const proto1 = document.getElementById('elb-ssl-proto1');
+    const proto2 = document.getElementById('elb-ssl-proto2');
+    if (proto1) {
+      proto1.textContent = s.proto1;
+      proto1.className = 'elb-ssl-proto ' + s.proto1.toLowerCase();
+    }
+    if (proto2) {
+      proto2.textContent = s.proto2;
+      proto2.className = 'elb-ssl-proto ' + s.proto2.toLowerCase();
+    }
+
+    // Update locks
+    const lock1 = document.getElementById('elb-ssl-lock1');
+    const lock2 = document.getElementById('elb-ssl-lock2');
+    if (lock1) lock1.classList.toggle('hidden', !s.lock1);
+    if (lock2) lock2.classList.toggle('hidden', !s.lock2);
+
+    // Update ELB sub text
+    const elbSub = document.getElementById('elb-ssl-elb-sub');
+    if (elbSub) elbSub.textContent = s.elbSub;
+
+    // Update EC2 cert visibility
+    const ec2Cert = document.getElementById('elb-ssl-ec2-cert');
+    if (ec2Cert) ec2Cert.classList.toggle('hidden', !s.ec2Cert);
   }
-  (window as any).elbTab = elbTab;
+
+  (window as any).elbSslScenario = elbSslScenario;
+
+  // Initialize SSL scenario
+  elbSslScenario(1);
 </script>

@@ -615,3 +615,57 @@
 .dia-arrow-v.up {
   transform: rotate(180deg);
 }
+
+/* テーマ: ELB */
+.dia-elb {
+  background: #EEEDFE;
+  border: 1px solid #534AB7;
+}
+.dia-elb .dia-box-label { color: #3C3489; }
+.dia-elb .dia-box-sub { color: #534AB7; }
+.dark .dia-elb {
+  background: rgba(83, 74, 183, 0.2);
+  border-color: #7c73d6;
+}
+.dark .dia-elb .dia-box-label { color: #c4b5fd; }
+.dark .dia-elb .dia-box-sub { color: #a5b4fc; }
+
+/* テーマ: リスナー */
+.dia-listener {
+  background: #E6F1FB;
+  border: 1px solid #185FA5;
+}
+.dia-listener .dia-box-label { color: #0C447C; }
+.dia-listener .dia-box-sub { color: #185FA5; }
+.dark .dia-listener {
+  background: rgba(24, 95, 165, 0.2);
+  border-color: #60a5fa;
+}
+.dark .dia-listener .dia-box-label { color: #93c5fd; }
+.dark .dia-listener .dia-box-sub { color: #60a5fa; }
+
+/* テーマ: ルール */
+.dia-rule {
+  background: #FAECE7;
+  border: 1px solid #993C1D;
+}
+.dia-rule .dia-box-label { color: #712B13; }
+.dia-rule .dia-box-sub { color: #993C1D; }
+.dark .dia-rule {
+  background: rgba(153, 60, 29, 0.2);
+  border-color: #f97316;
+}
+.dark .dia-rule .dia-box-label { color: #fdba74; }
+.dark .dia-rule .dia-box-sub { color: #fb923c; }
+
+/* テーマ: Lambda */
+.dia-lambda {
+  background: #FEF3C7;
+  border: 1px solid #F59E0B;
+}
+.dia-lambda .dia-box-label { color: #92400E; }
+.dark .dia-lambda {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #FBBF24;
+}
+.dark .dia-lambda .dia-box-label { color: #FCD34D; }

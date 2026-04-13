@@ -1,14 +1,6 @@
 ---
 ---
 <div>
-  <style>
-    .ec2-btn{cursor:pointer;font-size:12px;padding:4px 12px;border-radius:6px;border:1px solid #e5e7eb;background:#f9fafb;color:#111827;font-family:inherit;}
-    .dark .ec2-btn{border-color:#374151;background:#1f2937;color:#f9fafb;}
-    .ec2-btn.active{background:#534AB7;color:#fff;border-color:#534AB7;}
-    .ec2-panel{display:none;}
-    .ec2-panel.active{display:block;}
-  </style>
-
   <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
     <button class="ec2-btn active" onclick="ec2Tab('option')">購入オプション</button>
     <button class="ec2-btn" onclick="ec2Tab('spot')">スポット詳細</button>
@@ -16,33 +8,47 @@
   </div>
 
   <div id="ec2-option" class="ec2-panel active">
-    <svg width="100%" viewBox="0 0 680 380">
-      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">EC2購入オプション：コストと柔軟性のトレードオフ</text>
-      <rect x="40"  y="50" width="270" height="80" rx="8" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
-      <text x="175" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#444441">オンデマンド</text>
-      <text x="175" y="102" text-anchor="middle" font-size="12" fill="#5F5E5A">使った分だけ秒単位で課金</text>
-      <text x="175" y="122" text-anchor="middle" font-size="12" fill="#5F5E5A">コスト高・柔軟性最大</text>
-      <rect x="370" y="50" width="270" height="80" rx="8" fill="#E6F1FB" stroke="#185FA5" stroke-width="0.5"/>
-      <text x="505" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#0C447C">リザーブドインスタンス（RI）</text>
-      <text x="505" y="102" text-anchor="middle" font-size="12" fill="#185FA5">1年 or 3年の予約で最大72%割引</text>
-      <text x="505" y="122" text-anchor="middle" font-size="12" fill="#185FA5">安定した継続利用向け</text>
-      <rect x="40"  y="150" width="270" height="80" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
-      <text x="175" y="178" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">スポットインスタンス</text>
-      <text x="175" y="202" text-anchor="middle" font-size="12" fill="#993C1D">最大90%割引・中断リスクあり</text>
-      <text x="175" y="222" text-anchor="middle" font-size="12" fill="#993C1D">バッチ・CI/CDなど耐障害性が必要</text>
-      <rect x="370" y="150" width="270" height="80" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/>
-      <text x="505" y="178" text-anchor="middle" font-size="13" font-weight="500" fill="#3C3489">Savings Plans</text>
-      <text x="505" y="202" text-anchor="middle" font-size="12" fill="#534AB7">$/時間の使用量をコミット</text>
-      <text x="505" y="222" text-anchor="middle" font-size="12" fill="#534AB7">EC2・Lambda・Fargateに適用</text>
-      <rect x="40"  y="250" width="270" height="80" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
-      <text x="175" y="278" text-anchor="middle" font-size="13" font-weight="500" fill="#633806">Dedicated Host</text>
-      <text x="175" y="302" text-anchor="middle" font-size="12" fill="#854F0B">物理サーバーを専有</text>
-      <text x="175" y="322" text-anchor="middle" font-size="12" fill="#854F0B">ライセンス持ち込み（BYOL）向け</text>
-      <rect x="370" y="250" width="270" height="80" rx="8" fill="#EAF3DE" stroke="#3B6D11" stroke-width="0.5"/>
-      <text x="505" y="278" text-anchor="middle" font-size="13" font-weight="500" fill="#27500A">Savings Plans vs RI</text>
-      <text x="505" y="302" text-anchor="middle" font-size="12" fill="#3B6D11">SP：インスタンスタイプ変更OK</text>
-      <text x="505" y="322" text-anchor="middle" font-size="12" fill="#3B6D11">RI：特定タイプを予約・割引率高い</text>
-    </svg>
+    <div style="max-width:720px;margin:0 auto;">
+      <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:12px;text-align:center;">EC2購入オプション：コストと柔軟性のトレードオフ</div>
+      <table class="ec2-table">
+        <tbody>
+          <tr class="ec2-table__row ec2-bg-on">
+            <td class="ec2-table__cell">
+              <div class="ec2-title ec2-title--on">オンデマンド</div>
+              <div class="ec2-desc ec2-desc--on">使った分だけ秒単位で課金</div>
+              <div class="ec2-desc ec2-desc--on">コスト高・柔軟性最大</div>
+            </td>
+            <td class="ec2-table__cell ec2-bg-ri">
+              <div class="ec2-title ec2-title--ri">リザーブドインスタンス（RI）</div>
+              <div class="ec2-desc ec2-desc--ri">1年 or 3年の予約で最大72%割引</div>
+              <div class="ec2-desc ec2-desc--ri">安定した継続利用向け</div>
+            </td>
+            <td class="ec2-table__cell ec2-bg-spot">
+              <div class="ec2-title ec2-title--spot">スポットインスタンス</div>
+              <div class="ec2-desc ec2-desc--spot">最大90%割引・中断リスクあり</div>
+              <div class="ec2-desc ec2-desc--spot">バッチ・CI/CDなど耐障害性が必要</div>
+            </td>
+          </tr>
+          <tr class="ec2-table__row ec2-bg-sp">
+            <td class="ec2-table__cell">
+              <div class="ec2-title ec2-title--sp">Savings Plans</div>
+              <div class="ec2-desc ec2-desc--sp">$/時間の使用量をコミット</div>
+              <div class="ec2-desc ec2-desc--sp">EC2・Lambda・Fargateに適用</div>
+            </td>
+            <td class="ec2-table__cell ec2-bg-dedicated">
+              <div class="ec2-title ec2-title--dedicated">Dedicated Host</div>
+              <div class="ec2-desc ec2-desc--dedicated">物理サーバーを専有</div>
+              <div class="ec2-desc ec2-desc--dedicated">ライセンス持ち込み（BYOL）向け</div>
+            </td>
+            <td class="ec2-table__cell ec2-bg-spvsri">
+              <div class="ec2-title ec2-title--spvsri">Savings Plans vs RI</div>
+              <div class="ec2-desc ec2-desc--spvsri">SP：インスタンスタイプ変更OK</div>
+              <div class="ec2-desc ec2-desc--spvsri">RI：特定タイプを予約・割引率高い</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <div id="ec2-spot" class="ec2-panel">

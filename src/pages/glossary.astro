@@ -1,0 +1,299 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+interface Term {
+  term: string;
+  en?: string;
+  desc: string;
+}
+
+interface Category {
+  title: string;
+  icon: string;
+  color: string;
+  border: string;
+  terms: Term[];
+}
+
+const categories: Category[] = [
+  {
+    title: '基本概念',
+    icon: '☁️',
+    color: '#2563eb',
+    border: 'rgba(37,99,235,0.18)',
+    terms: [
+      { term: 'リージョン', en: 'Region', desc: 'AWSのデータセンターが集まる地理的エリア。東京リージョン（ap-northeast-1）など。各リージョンは独立しており、データは自動的に他リージョンへ複製されない。' },
+      { term: 'アベイラビリティゾーン', en: 'Availability Zone (AZ)', desc: 'リージョン内の独立したデータセンター群。各AZは物理的に離れた場所にあり、障害の影響を局所化する。東京リージョンには複数のAZが存在。' },
+      { term: 'エッジロケーション', en: 'Edge Location', desc: 'CloudFrontなどが利用するキャッシュ配信拠点。ユーザーに近い場所にコンテンツをキャッシュし低レイテンシーで配信する。リージョンより多くの拠点がある。' },
+      { term: 'ARN', en: 'Amazon Resource Name', desc: 'AWSリソースを一意に識別する名前。arn:aws:service:region:account-id:resource の形式。IAMポリシーやAPI呼び出しでリソースを指定する際に使用。' },
+      { term: 'タグ', en: 'Tag', desc: 'リソースに付与するキーと値のペア。コスト管理・アクセス制御・リソース整理に使用。例: Environment=Production, Team=Backend' },
+      { term: 'マネージドサービス', en: 'Managed Service', desc: 'AWSがインフラの管理（パッチ適用・バックアップ・スケーリングなど）を代行するサービス。RDS・DynamoDB・Lambdaなどが該当。運用負荷を軽減できる。' },
+      { term: 'サーバーレス', en: 'Serverless', desc: 'サーバーのプロビジョニングや管理が不要なアーキテクチャ。Lambda・Fargate・DynamoDB・S3 などが代表例。使った分だけ課金される。' },
+      { term: 'プロビジョニング', en: 'Provisioning', desc: 'リソース（サーバー・ストレージ・ネットワークなど）を事前に確保・構築すること。CloudFormation や Terraform で自動化できる。' },
+      { term: 'スループット', en: 'Throughput', desc: '単位時間あたりに処理できるデータ量やリクエスト数。ネットワーク帯域やディスクI/Oの性能指標として使われる。' },
+      { term: 'レイテンシー', en: 'Latency', desc: 'リクエストを送信してからレスポンスを受信するまでの遅延時間。低レイテンシー＝高速応答。CloudFront・ElastiCache・Global Accelerator で改善可能。' },
+      { term: 'デプロイ', en: 'Deploy', desc: 'アプリケーションやインフラの変更を本番環境に適用すること。Blue/Green・ローリング・カナリアなどのデプロイ戦略がある。' },
+      { term: 'オンプレミス', en: 'On-Premises', desc: '自社のデータセンターで管理するインフラ。クラウドとの対比で使われる。Direct Connect や VPN でAWSと接続可能。' },
+      { term: 'IaC', en: 'Infrastructure as Code', desc: 'インフラ構成をコードで定義・管理する手法。CloudFormation（YAML/JSON）やTerraform（HCL）が代表的。バージョン管理・再現性・自動化が可能。' },
+    ],
+  },
+  {
+    title: 'ネットワーク',
+    icon: '🌐',
+    color: '#0369a1',
+    border: 'rgba(3,105,161,0.18)',
+    terms: [
+      { term: 'VPC', en: 'Virtual Private Cloud', desc: 'AWS上に作成する仮想ネットワーク。CIDR ブロックでIPアドレス範囲を定義し、サブネット・ルートテーブル・ゲートウェイを配置する。' },
+      { term: 'サブネット', en: 'Subnet', desc: 'VPC内のIPアドレス範囲を分割した区画。パブリックサブネット（IGW経由でインターネット接続可）とプライベートサブネット（直接のインターネット接続なし）がある。' },
+      { term: 'CIDR', en: 'Classless Inter-Domain Routing', desc: 'IPアドレスの範囲を表す記法。例: 10.0.0.0/16 は 65,536 個のIPアドレスを含む。VPCやサブネットの作成時に指定する。' },
+      { term: 'インターネットゲートウェイ', en: 'Internet Gateway (IGW)', desc: 'VPCとインターネットを接続するゲートウェイ。パブリックサブネットのリソースがインターネットと通信するために必要。VPCにアタッチして使用。' },
+      { term: 'NATゲートウェイ', en: 'NAT Gateway', desc: 'プライベートサブネットのリソースがインターネットへアウトバウンド通信するためのゲートウェイ。外部からの直接アクセスは不可。パブリックサブネットに配置する。' },
+      { term: 'ルートテーブル', en: 'Route Table', desc: 'サブネット内のトラフィックの宛先を決定するルール群。各サブネットに1つ関連付ける。IGW・NAT・VPN・ピアリング先などへのルートを定義。' },
+      { term: 'セキュリティグループ', en: 'Security Group (SG)', desc: 'インスタンスレベルの仮想ファイアウォール。ステートフル（戻りのトラフィックは自動許可）。許可ルールのみ設定可能。デフォルトで全インバウンド拒否。' },
+      { term: 'ネットワークACL', en: 'Network ACL (NACL)', desc: 'サブネットレベルのファイアウォール。ステートレス（インバウンド・アウトバウンドそれぞれルール必要）。許可・拒否ルールの両方を設定可能。ルール番号順に評価。' },
+      { term: 'VPCピアリング', en: 'VPC Peering', desc: '2つのVPC間をプライベートIPで直接通信させる接続。リージョン間・アカウント間も可能。推移的ピアリング（A↔B、B↔C で A↔C は不可）はサポートされない。' },
+      { term: 'VPCエンドポイント', en: 'VPC Endpoint', desc: 'VPC内からAWSサービス（S3・DynamoDBなど）へインターネットを経由せずプライベートに接続する仕組み。ゲートウェイ型とインターフェース型がある。' },
+      { term: 'PrivateLink', en: 'AWS PrivateLink', desc: 'VPCエンドポイント（インターフェース型）を使い、AWSサービスやサードパーティサービスへプライベート接続する仕組み。トラフィックはAWSネットワーク内に留まる。' },
+      { term: 'Direct Connect', en: 'AWS Direct Connect', desc: 'オンプレミスとAWS間を専用線で接続するサービス。インターネットを経由しないため安定した帯域・低レイテンシーを実現。1Gbps / 10Gbps / 100Gbps の接続が可能。' },
+      { term: 'ELB', en: 'Elastic Load Balancing', desc: '受信トラフィックを複数のターゲットに分散するロードバランサー。ALB（HTTP/HTTPS）・NLB（TCP/UDP）・GWLB（サードパーティアプライアンス）の3種類がある。' },
+      { term: 'ターゲットグループ', en: 'Target Group', desc: 'ELB がトラフィックをルーティングする先のリソース群。EC2・Lambda・IPアドレスなどを登録可能。ヘルスチェックで正常なターゲットのみにルーティング。' },
+      { term: 'Route 53', en: 'Amazon Route 53', desc: 'AWSのDNSサービス。ドメイン登録・DNSルーティング・ヘルスチェックを提供。ルーティングポリシー: シンプル・加重・レイテンシー・フェイルオーバー・地理的近接性。' },
+    ],
+  },
+  {
+    title: 'セキュリティ',
+    icon: '🔒',
+    color: '#dc2626',
+    border: 'rgba(220,38,38,0.18)',
+    terms: [
+      { term: 'IAM', en: 'Identity and Access Management', desc: 'AWSリソースへのアクセスを制御するサービス。ユーザー・グループ・ロール・ポリシーで権限を管理。最小権限の原則に従って設計する。' },
+      { term: 'IAMロール', en: 'IAM Role', desc: '一時的な認証情報を提供する仕組み。EC2・Lambda・ECSなどのサービスに権限を付与する際に使用。ユーザーにロールを引き受けさせる（AssumeRole）ことも可能。' },
+      { term: 'IAMポリシー', en: 'IAM Policy', desc: 'JSON形式で記述するアクセス許可のルール。Effect（Allow/Deny）・Action・Resource・Condition で構成。マネージド・インライン・SCPなどの種類がある。' },
+      { term: '最小権限の原則', en: 'Principle of Least Privilege', desc: '必要最小限の権限のみを付与するセキュリティ原則。IAMポリシーで具体的なAction・Resourceを指定し、ワイルドカード（*）の使用を避ける。' },
+      { term: 'MFA', en: 'Multi-Factor Authentication', desc: 'パスワードに加えて追加の認証要素を要求する仕組み。IAMユーザー・ルートアカウントのセキュリティ強化に必須。仮想MFA・ハードウェアキーなどに対応。' },
+      { term: 'KMS', en: 'Key Management Service', desc: '暗号化キーの作成・管理・ローテーションを行うサービス。S3・EBS・RDSなどの暗号化に使用。カスタマー管理キー（CMK）とAWS管理キーがある。' },
+      { term: '保管時の暗号化', en: 'Encryption at Rest', desc: 'ストレージに保存されているデータを暗号化すること。S3（SSE-S3/SSE-KMS/SSE-C）・EBS・RDSなどで利用可能。KMSまたはCloudHSMの鍵を使用。' },
+      { term: '転送時の暗号化', en: 'Encryption in Transit', desc: 'ネットワーク上を移動するデータを暗号化すること。TLS/SSL を使用。ELBのHTTPSリスナー・S3のhttpsエンドポイント・VPN接続などで実現。' },
+      { term: 'WAF', en: 'Web Application Firewall', desc: 'WebアプリケーションをSQLインジェクション・XSSなどの攻撃から保護するファイアウォール。CloudFront・ALB・API Gatewayに適用可能。ルールでIPフィルタリングやレート制限も可能。' },
+      { term: 'Shield', en: 'AWS Shield', desc: 'DDoS攻撃から保護するサービス。Standard（無料・自動適用）とAdvanced（高度な保護・24/7サポート・コスト保護）がある。' },
+      { term: 'GuardDuty', en: 'Amazon GuardDuty', desc: 'AWSアカウントの脅威検出サービス。VPCフローログ・CloudTrailログ・DNSクエリログを分析して異常を検知。機械学習ベースで有効化するだけで使える。' },
+      { term: 'Cognito', en: 'Amazon Cognito', desc: 'ウェブ・モバイルアプリの認証・認可を提供するサービス。ユーザープール（認証）とIDプール（AWS認証情報の一時付与）で構成。ソーシャルログイン・SAML対応。' },
+      { term: '責任共有モデル', en: 'Shared Responsibility Model', desc: 'AWSと顧客のセキュリティ責任を区分するモデル。AWS＝クラウドのセキュリティ（物理インフラ）、顧客＝クラウド内のセキュリティ（データ・設定・アクセス管理）。' },
+    ],
+  },
+  {
+    title: 'コンピューティング',
+    icon: '⚡',
+    color: '#d97706',
+    border: 'rgba(217,119,6,0.18)',
+    terms: [
+      { term: 'EC2', en: 'Elastic Compute Cloud', desc: '仮想サーバーを提供するサービス。インスタンスタイプ（汎用・コンピューティング最適化・メモリ最適化など）で性能を選択。オンデマンド・リザーブド・スポットなどの購入オプションがある。' },
+      { term: 'AMI', en: 'Amazon Machine Image', desc: 'EC2インスタンスの起動に必要なテンプレート。OS・ソフトウェア・設定を含む。カスタムAMIを作成してゴールデンイメージとして活用可能。リージョン間コピーも可能。' },
+      { term: 'インスタンスタイプ', en: 'Instance Type', desc: 'EC2の仮想マシンのスペック。ファミリー（M=汎用, C=コンピューティング, R=メモリ, P/G=GPU, I/D=ストレージ）＋世代＋サイズで構成。例: m5.xlarge' },
+      { term: 'オンデマンド', en: 'On-Demand', desc: '従量課金で利用するEC2の購入オプション。事前コミットメント不要。秒単位課金。短期・予測不能なワークロードに適する。最もコストが高い。' },
+      { term: 'リザーブドインスタンス', en: 'Reserved Instance (RI)', desc: '1年または3年の利用を予約して割引を受けるEC2の購入オプション。オンデマンドより最大72%割引。スタンダード（変更不可）とコンバーティブル（変更可）がある。' },
+      { term: 'スポットインスタンス', en: 'Spot Instance', desc: 'AWSの余剰キャパシティを最大90%割引で利用するEC2の購入オプション。中断される可能性がある。バッチ処理・データ分析・CI/CDなど中断可能なワークロードに適する。' },
+      { term: 'Auto Scaling', en: 'Auto Scaling', desc: '需要に応じてEC2インスタンス数を自動調整するサービス。最小・希望・最大容量を設定。ターゲット追跡・ステップ・スケジュールなどのスケーリングポリシーがある。' },
+      { term: '起動テンプレート', en: 'Launch Template', desc: 'EC2インスタンスの起動設定をテンプレート化したもの。AMI・インスタンスタイプ・SG・キーペアなどを定義。Auto Scalingグループで使用。バージョニング対応。' },
+      { term: 'Lambda', en: 'AWS Lambda', desc: 'サーバーレスでコードを実行するサービス。イベント駆動で自動スケーリング。最大15分のタイムアウト。メモリは128MB〜10GB。実行回数＋実行時間で課金。' },
+      { term: 'Fargate', en: 'AWS Fargate', desc: 'コンテナのサーバーレス実行環境。EC2インスタンスの管理不要。ECS・EKSと統合。vCPU＋メモリの使用量で課金。' },
+      { term: 'ECS', en: 'Elastic Container Service', desc: 'AWSネイティブのコンテナオーケストレーションサービス。EC2起動タイプとFargate起動タイプを選択可能。タスク定義でコンテナの設定を管理。' },
+      { term: 'EKS', en: 'Elastic Kubernetes Service', desc: 'マネージドKubernetesサービス。Kubernetesのコントロールプレーンをフルマネージドで提供。既存のKubernetesツール・プラグインがそのまま利用可能。' },
+    ],
+  },
+  {
+    title: 'ストレージ',
+    icon: '💾',
+    color: '#7c3aed',
+    border: 'rgba(124,58,237,0.18)',
+    terms: [
+      { term: 'S3', en: 'Simple Storage Service', desc: 'オブジェクトストレージサービス。バケットにオブジェクト（ファイル）を保存。99.999999999%（イレブンナイン）の耐久性。ストレージクラスで用途に応じたコスト最適化が可能。' },
+      { term: 'バケット', en: 'Bucket', desc: 'S3のオブジェクトを格納するコンテナ。グローバルに一意な名前が必要。バケットポリシー・バージョニング・ライフサイクルルールなどを設定可能。' },
+      { term: 'ストレージクラス', en: 'Storage Class', desc: 'S3のアクセス頻度に応じた保管クラス。Standard → IA → One Zone-IA → Glacier Instant → Glacier Flexible → Glacier Deep Archive の順でコストが下がる。' },
+      { term: 'ライフサイクルポリシー', en: 'Lifecycle Policy', desc: 'S3オブジェクトを一定期間後に自動でストレージクラス変更または削除するルール。例: 30日後にIAへ移行、365日後にGlacierへ移行、730日後に削除。' },
+      { term: 'バージョニング', en: 'Versioning', desc: 'S3バケットでオブジェクトの全バージョンを保持する機能。誤削除・上書きからの復元が可能。MFA Deleteと組み合わせてさらに保護を強化可能。' },
+      { term: 'EBS', en: 'Elastic Block Store', desc: 'EC2にアタッチするブロックストレージ。gp3（汎用SSD）・io2（高IOPS SSD）・st1（スループット最適化HDD）・sc1（コールドHDD）のボリュームタイプがある。単一AZ。' },
+      { term: 'EFS', en: 'Elastic File System', desc: 'マネージドNFSファイルシステム。複数のEC2インスタンスから同時マウント可能。自動スケーリング。マルチAZ対応。Linux対応。One Zone ストレージクラスもあり。' },
+      { term: 'FSx', en: 'Amazon FSx', desc: 'フルマネージドファイルシステム。FSx for Windows（SMB/NTFS）・FSx for Lustre（HPC向け高性能）・FSx for NetApp ONTAP・FSx for OpenZFS などがある。' },
+      { term: 'Snow Family', en: 'AWS Snow Family', desc: '大規模データの物理移行デバイス。Snowcone（8-14TB）・Snowball Edge（80TB）・Snowmobile（100PB）。ネットワーク転送が現実的でない場合に使用。' },
+      { term: 'Storage Gateway', en: 'AWS Storage Gateway', desc: 'オンプレミスとAWSストレージをシームレスに統合するハイブリッドサービス。File Gateway（NFS/SMB→S3）・Volume Gateway（iSCSI→EBS）・Tape Gateway（バックアップ→S3/Glacier）。' },
+    ],
+  },
+  {
+    title: 'データベース',
+    icon: '🗄️',
+    color: '#059669',
+    border: 'rgba(5,150,105,0.18)',
+    terms: [
+      { term: 'RDS', en: 'Relational Database Service', desc: 'マネージドRDBMS。MySQL・PostgreSQL・MariaDB・Oracle・SQL Server に対応。自動バックアップ・マルチAZ・リードレプリカを提供。パッチ適用もAWSが管理。' },
+      { term: 'Aurora', en: 'Amazon Aurora', desc: 'AWSが設計したクラウドネイティブRDB。MySQL/PostgreSQL互換で最大5倍/3倍の性能。ストレージは自動で最大128TBまで拡張。6つのレプリカを3つのAZに分散。' },
+      { term: 'マルチAZ', en: 'Multi-AZ', desc: 'RDS/Auroraの高可用性構成。プライマリDBとは別のAZにスタンバイレプリカを自動配置。障害時に自動フェイルオーバー。読み取りの負荷分散ではなく冗長化が目的。' },
+      { term: 'リードレプリカ', en: 'Read Replica', desc: 'RDS/Auroraの読み取り専用コピー。読み取り負荷の分散に使用。非同期レプリケーション。リージョン間作成も可能（DR用途）。最大15個（Aurora）/5個（RDS）。' },
+      { term: 'DynamoDB', en: 'Amazon DynamoDB', desc: 'フルマネージドNoSQLデータベース。キーバリュー・ドキュメントモデル。1桁ミリ秒のレスポンス。オンデマンドとプロビジョンドのキャパシティモードがある。グローバルテーブルで複数リージョンに対応。' },
+      { term: 'ElastiCache', en: 'Amazon ElastiCache', desc: 'インメモリキャッシュサービス。Redis（レプリケーション・永続化・ソート済みセット対応）とMemcached（シンプル・マルチスレッド）から選択。DBの読み取り負荷軽減に使用。' },
+      { term: 'Redshift', en: 'Amazon Redshift', desc: 'ペタバイト規模のデータウェアハウス。列指向ストレージで分析クエリに最適化。S3からのデータロード（COPY）やRedshift Spectrumで外部データへの直接クエリが可能。' },
+      { term: 'DAX', en: 'DynamoDB Accelerator', desc: 'DynamoDB用のインメモリキャッシュ。読み取りレスポンスをマイクロ秒レベルに高速化。アプリケーションコードの変更は最小限。DynamoDB APIと互換。' },
+    ],
+  },
+  {
+    title: 'アーキテクチャ設計',
+    icon: '🏗️',
+    color: '#0891b2',
+    border: 'rgba(8,145,178,0.18)',
+    terms: [
+      { term: '高可用性', en: 'High Availability (HA)', desc: 'システムが継続的に稼働し、ダウンタイムを最小化する設計。マルチAZ配置・ELBによる負荷分散・Auto Scalingによる自動復旧で実現。' },
+      { term: '耐障害性', en: 'Fault Tolerance', desc: '一部のコンポーネントが故障してもシステム全体が機能し続ける能力。冗長化・レプリケーション・フェイルオーバーで実現。HAより厳格な要件。' },
+      { term: '疎結合', en: 'Loose Coupling', desc: 'コンポーネント間の依存関係を最小化する設計パターン。SQS・SNS・EventBridgeなどのメッセージングサービスを介して非同期通信する。障害の波及を防ぐ。' },
+      { term: '密結合', en: 'Tight Coupling', desc: 'コンポーネント間が直接通信し強い依存関係がある状態。一方の障害が全体に波及するリスクがある。疎結合への移行が推奨される。' },
+      { term: '水平スケーリング', en: 'Horizontal Scaling (Scale Out)', desc: 'インスタンス数を増やして処理能力を向上させる方式。Auto Scalingで自動化可能。垂直スケーリングよりも高可用性・耐障害性に優れる。' },
+      { term: '垂直スケーリング', en: 'Vertical Scaling (Scale Up)', desc: 'インスタンスのスペック（CPU・メモリ）を上げて処理能力を向上させる方式。上限がありダウンタイムが発生する場合がある。RDSで使われることが多い。' },
+      { term: 'DR戦略', en: 'Disaster Recovery Strategy', desc: '災害発生時の復旧戦略。コスト順: バックアップ&リストア → パイロットライト → ウォームスタンバイ → アクティブ-アクティブ。RTO/RPOの要件に応じて選択。' },
+      { term: 'RTO', en: 'Recovery Time Objective', desc: '目標復旧時間。障害発生からシステムが復旧するまでの許容時間。短いRTOほどコストが高い。ウォームスタンバイで分単位、バックアップ&リストアで時間単位。' },
+      { term: 'RPO', en: 'Recovery Point Objective', desc: '目標復旧時点。障害発生時にどの時点のデータまで復旧できるか。短いRPOほどデータ損失が少ない。同期レプリケーションでRPO=0（データ損失なし）を実現。' },
+      { term: 'Well-Architected', en: 'AWS Well-Architected Framework', desc: 'AWSが提唱する設計のベストプラクティス集。6つの柱: 運用の優秀性・セキュリティ・信頼性・パフォーマンス効率・コスト最適化・サステナビリティ。' },
+    ],
+  },
+  {
+    title: '統合・メッセージング',
+    icon: '🔗',
+    color: '#9333ea',
+    border: 'rgba(147,51,234,0.18)',
+    terms: [
+      { term: 'SQS', en: 'Simple Queue Service', desc: 'フルマネージドメッセージキュー。コンポーネント間の非同期通信を実現。標準キュー（順序保証なし・高スループット）とFIFOキュー（順序保証・重複排除）がある。' },
+      { term: 'SNS', en: 'Simple Notification Service', desc: 'パブリッシュ/サブスクライブ型の通知サービス。1つのメッセージを複数のサブスクライバーに配信（ファンアウト）。Lambda・SQS・HTTP・メール・SMSなどに通知可能。' },
+      { term: 'EventBridge', en: 'Amazon EventBridge', desc: 'サーバーレスイベントバス。AWSサービスやSaaSアプリケーションからのイベントを検知し、ターゲット（Lambda・SQS・Step Functionsなど）にルーティング。' },
+      { term: 'Step Functions', en: 'AWS Step Functions', desc: 'サーバーレスワークフローオーケストレーション。Lambda関数やAWSサービスを組み合わせたワークフローを視覚的に定義。Standard（最大1年）とExpress（最大5分）。' },
+      { term: 'API Gateway', en: 'Amazon API Gateway', desc: 'RESTful / WebSocket APIを作成・管理するサービス。Lambda・EC2・他のAWSサービスのフロントエンド。認証・スロットリング・キャッシュ・CORS対応。' },
+      { term: 'Kinesis', en: 'Amazon Kinesis', desc: 'リアルタイムストリーミングデータ処理。Data Streams（カスタム処理）・Data Firehose（S3/Redshiftへの配信）・Data Analytics（SQL分析）で構成。' },
+      { term: 'ファンアウト', en: 'Fan-out', desc: '1つのメッセージを複数の宛先に同時配信するパターン。SNS→複数SQSキューの構成が典型的。各コンシューマーが独立して処理可能。' },
+      { term: 'WebSocket', en: 'WebSocket', desc: 'クライアントとサーバー間で双方向リアルタイム通信を実現するプロトコル。API Gateway WebSocket APIで利用可能。チャット・ダッシュボード・通知などリアルタイム更新が必要なアプリに使用。' },
+      { term: 'SNI（Server Name Indication）', en: 'SNI（Server Name Indication）', desc: 'TLS拡張機能の一つ。1つのIPアドレスで複数のSSL/TLS証明書を使用可能にする。ALBやNLBで複数ドメインのHTTPS通信を同時に処理する際に利用される。' },
+    ],
+  },
+  {
+    title: '監視・管理',
+    icon: '📊',
+    color: '#be185d',
+    border: 'rgba(190,24,93,0.18)',
+    terms: [
+      { term: 'CloudWatch', en: 'Amazon CloudWatch', desc: 'AWSリソースの監視サービス。メトリクス収集・ログ管理・アラーム設定が可能。カスタムメトリクスの送信も可能。ダッシュボードで可視化。' },
+      { term: 'CloudTrail', en: 'AWS CloudTrail', desc: 'AWS APIコールの記録・監査サービス。誰が・いつ・何をしたかを記録。全リージョンで有効化可能。S3にログを保存。セキュリティ監査やコンプライアンスに必須。' },
+      { term: 'CloudFormation', en: 'AWS CloudFormation', desc: 'IaCサービス。YAML/JSONテンプレートでAWSリソースを定義し、スタックとして一括作成・更新・削除。ドリフト検出でテンプレートと実環境の差異を検出。' },
+      { term: 'Systems Manager', en: 'AWS Systems Manager', desc: 'AWS/オンプレミスのインフラを一元管理するサービス。パッチ管理・パラメータストア・セッションマネージャー・オートメーションなどの機能群で構成。' },
+      { term: 'Config', en: 'AWS Config', desc: 'AWSリソースの設定変更を記録・評価するサービス。コンプライアンスルールに基づいて設定の適合性を継続的にチェック。非適合リソースの自動修復も可能。' },
+      { term: 'Trusted Advisor', en: 'AWS Trusted Advisor', desc: 'AWSのベストプラクティスに基づく推奨事項を提供。コスト最適化・パフォーマンス・セキュリティ・耐障害性・サービスクォータの5カテゴリをチェック。' },
+      { term: 'Organizations', en: 'AWS Organizations', desc: '複数AWSアカウントの一元管理サービス。組織単位（OU）でアカウントをグループ化。SCP（サービスコントロールポリシー）で権限の上限を制御。一括請求で割引を集約。' },
+    ],
+  },
+];
+---
+
+<Layout title="AWS 用語集">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <!-- ヘッダー -->
+    <p class="text-sm mb-2" style="color:var(--text-muted)">
+      <a href="/" class="hover:text-orange-500 transition-colors">ホーム</a> / 用語集
+    </p>
+    <h1 class="text-3xl font-bold mb-2" style="color:var(--text)">AWS 用語集</h1>
+    <p class="mb-8" style="color:var(--text-muted)">
+      AWS SAA 試験で頻出する用語をカテゴリ別にまとめました。英語略称・正式名称と日本語の解説を掲載しています。
+    </p>
+
+    <!-- 検索 -->
+    <div class="relative mb-10">
+      <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style="color:var(--text-faint)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+      </svg>
+      <input
+        type="text"
+        id="glossary-search"
+        placeholder="用語を検索…（例: VPC, レイテンシー, S3）"
+        class="w-full pl-10 pr-4 py-3 rounded-xl border text-sm outline-none transition-colors"
+        style="background:var(--surface);border-color:var(--border);color:var(--text)"
+      />
+      <span id="glossary-count" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs" style="color:var(--text-faint)"></span>
+    </div>
+
+    <!-- カテゴリジャンプ -->
+    <div class="flex flex-wrap gap-2 mb-10">
+      {categories.map((cat, i) => (
+        <a href={`#cat-${i}`}
+           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all hover:scale-105"
+           style={`background:var(--surface);border-color:${cat.border};color:${cat.color}`}>
+          <span>{cat.icon}</span>
+          {cat.title}
+          <span class="opacity-60">{cat.terms.length}</span>
+        </a>
+      ))}
+    </div>
+
+    <!-- 用語リスト -->
+    <div class="flex flex-col gap-10" id="glossary-list">
+      {categories.map((cat, i) => (
+        <section id={`cat-${i}`} class="glossary-category" data-category={cat.title}>
+          <div class="flex items-center gap-2 mb-4 pb-2 border-b" style={`border-color:${cat.border}`}>
+            <span class="text-xl">{cat.icon}</span>
+            <h2 class="text-lg font-bold" style={`color:${cat.color}`}>{cat.title}</h2>
+            <span class="text-xs px-2 py-0.5 rounded-full" style={`background:${cat.border};color:${cat.color}`}>
+              {cat.terms.length} 用語
+            </span>
+          </div>
+          <div class="flex flex-col gap-2">
+            {cat.terms.map(t => (
+              <div class="glossary-term rounded-xl border p-4 transition-all"
+                   style="background:var(--surface);border-color:var(--border)"
+                   data-term={`${t.term} ${t.en || ''} ${t.desc}`.toLowerCase()}>
+                <div class="flex items-baseline flex-wrap gap-x-3 gap-y-1 mb-1.5">
+                  <span class="font-bold text-sm" style="color:var(--text)">{t.term}</span>
+                  {t.en && (
+                    <span class="text-xs font-mono px-1.5 py-0.5 rounded" style="background:var(--surface-off);color:var(--text-muted)">{t.en}</span>
+                  )}
+                </div>
+                <p class="text-sm leading-relaxed" style="color:var(--text-muted)">{t.desc}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+
+    <!-- 検索結果なし -->
+    <div id="glossary-empty" class="hidden text-center py-16">
+      <p class="text-lg font-bold mb-2" style="color:var(--text)">一致する用語が見つかりません</p>
+      <p class="text-sm" style="color:var(--text-muted)">別のキーワードで検索してみてください。</p>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const input = document.getElementById('glossary-search') as HTMLInputElement;
+  const countEl = document.getElementById('glossary-count')!;
+  const emptyEl = document.getElementById('glossary-empty')!;
+  const terms = document.querySelectorAll<HTMLElement>('.glossary-term');
+  const cats = document.querySelectorAll<HTMLElement>('.glossary-category');
+  const total = terms.length;
+
+  function filter() {
+    const q = input.value.trim().toLowerCase();
+    let visible = 0;
+
+    terms.forEach(el => {
+      const match = !q || el.dataset.term!.includes(q);
+      el.style.display = match ? '' : 'none';
+      if (match) visible++;
+    });
+
+    // カテゴリ内に表示用語がなければカテゴリごと非表示
+    cats.forEach(cat => {
+      const hasVisible = cat.querySelectorAll<HTMLElement>('.glossary-term').length > 0 &&
+        Array.from(cat.querySelectorAll<HTMLElement>('.glossary-term')).some(t => t.style.display !== 'none');
+      cat.style.display = hasVisible ? '' : 'none';
+    });
+
+    countEl.textContent = q ? `${visible} / ${total}` : `${total} 用語`;
+    emptyEl.classList.toggle('hidden', visible > 0);
+  }
+
+  input.addEventListener('input', filter);
+  filter();
+</script>

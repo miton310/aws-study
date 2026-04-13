@@ -64,3 +64,27 @@
 ### 作成した図解
 - `src/components/diagrams/NatGatewayAnimation.astro`
 - 配置: `/network/vpc`
+
+---
+
+## 3. ELBのSSL/TLS暗号化（End-to-End暗号化）
+
+### テーマ
+- ELB配下に複数台のEC2インスタンスがWebサーバーとして稼働
+- クライアントからWebサーバーまで全ての通信を暗号化
+
+### 重要ポイント
+| パターン | クライアント→ELB | ELB→EC2 | EC2の証明書 | 用途 |
+|---------|-----------------|---------|------------|------|
+| SSL終端 | HTTPS | HTTP | 不要 | 一般的なWebアプリ |
+| **End-to-End暗号化** | **HTTPS** | **HTTPS** | **必要** | 金融・医療など規制要件 |
+
+### SAA頻出ポイント
+- 「クライアントからWebサーバーまで全ての通信を暗号化」→ **End-to-End暗号化**
+- ELB→EC2間もHTTPSにするには、EC2に証明書をインストールする必要がある
+- ACMの証明書はELBに直接アタッチできるが、EC2にはエクスポートできない
+- EC2用の証明書は**ACM Private CA**または自己署名証明書を使用
+
+### 作成した図解
+- `src/components/diagrams/ELBDiagram.astro` の「SSL/TLS暗号化」タブ
+- 配置: `/compute/ec2` または ELBページ

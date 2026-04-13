@@ -1,0 +1,85 @@
+// EC2Diagram（EC2購入オプション等）用のFlocssスタイル（SCSS化）
+// ボタン: .ec2-btn
+// パネル: .ec2-panel
+// テーブル: .ec2-table, .ec2-table__row, .ec2-table__cell
+
+.ec2-btn {
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  color: #111827;
+  font-family: inherit;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  &.active {
+    background: #534AB7;
+    color: #fff;
+    border-color: #534AB7;
+  }
+  .dark & {
+    border-color: #374151;
+    background: #1f2937;
+    color: #f9fafb;
+  }
+}
+
+.ec2-panel {
+  display: none;
+  &.active {
+    display: block;
+  }
+}
+
+.ec2-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+  &__row {
+    border-radius: 8px;
+  }
+  &__cell {
+    padding: 18px 12px 12px 12px;
+    width: 33%;
+    vertical-align: top;
+    border-radius: 8px;
+  }
+}
+
+// 色・背景・フォント用ユーティリティ
+$on-bg: #F1EFE8;
+$ri-bg: #E6F1FB;
+$spot-bg: #FAECE7;
+$sp-bg: #EEEDFE;
+$dedicated-bg: #FAEEDA;
+$spvsri-bg: #EAF3DE;
+
+.ec2-bg-on { background: $on-bg; }
+.ec2-bg-ri { background: $ri-bg; }
+.ec2-bg-spot { background: $spot-bg; }
+.ec2-bg-sp { background: $sp-bg; }
+.ec2-bg-dedicated { background: $dedicated-bg; }
+.ec2-bg-spvsri { background: $spvsri-bg; }
+
+.ec2-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  &--on { color: #444441; }
+  &--ri { color: #0C447C; }
+  &--spot { color: #712B13; }
+  &--sp { color: #3C3489; }
+  &--dedicated { color: #633806; }
+  &--spvsri { color: #27500A; }
+}
+
+.ec2-desc {
+  font-size: 13px;
+  &--on { color: #5F5E5A; }
+  &--ri { color: #185FA5; }
+  &--spot { color: #993C1D; }
+  &--sp { color: #534AB7; }
+  &--dedicated { color: #854F0B; }
+  &--spvsri { color: #3B6D11; }
+}
