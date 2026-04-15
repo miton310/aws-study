@@ -105,218 +105,47 @@ import PrivateLinkDiagram from "../../../components/diagrams/PrivateLinkDiagram.
           </div>
         </div>
       </div>
-
-      <div class="bg-orange-50 border border-orange-200 rounded-lg p-6">
-        <h3 class="text-lg font-bold text-orange-800 mb-4">
-          📝 SAA試験のポイント
-        </h3>
-        <div class="text-orange-700">
-          <p class="mb-2">
-            <strong>「プライベートサブネットからS3にセキュアにアクセス」</strong
-            >
-          </p>
-          <p class="text-sm">→ Gateway型VPC Endpointが正解</p>
-        </div>
-      </div>
     </section>
 
     <section class="mb-12">
-      <h2 class="heading-section">VPC Endpoint 詳細図解</h2>
-      <div class="bg-white border border-gray-200 rounded-lg p-6">
-        <svg width="100%" viewBox="0 0 680 360">
-          <text
-            x="340"
-            y="26"
-            text-anchor="middle"
-            font-size="14"
-            font-weight="500"
-            fill="currentColor"
-            >VPC Endpoint：インターネットを経由せずAWSサービスへ</text
-          >
-
-          <!-- Gateway type -->
-          <rect
-            x="40"
-            y="50"
-            width="270"
-            height="140"
-            rx="10"
-            fill="#E1F5EE"
-            stroke="#0F6E56"
-            stroke-width="1"></rect>
-          <text
-            x="175"
-            y="78"
-            text-anchor="middle"
-            font-size="14"
-            font-weight="500"
-            fill="#085041">Gateway型</text
-          >
-          <text
-            x="175"
-            y="102"
-            text-anchor="middle"
-            font-size="12"
-            fill="#085041">対象: S3・DynamoDB</text
-          >
-          <text
-            x="175"
-            y="124"
-            text-anchor="middle"
-            font-size="12"
-            fill="#085041">ルートテーブルに追加</text
-          >
-          <text
-            x="175"
-            y="146"
-            text-anchor="middle"
-            font-size="12"
-            fill="#085041">無料</text
-          >
-          <text
-            x="175"
-            y="168"
-            text-anchor="middle"
-            font-size="12"
-            fill="#085041">同一リージョンのみ</text
-          >
-
-          <!-- Interface type -->
-          <rect
-            x="370"
-            y="50"
-            width="270"
-            height="140"
-            rx="10"
-            fill="#EEEDFE"
-            stroke="#534AB7"
-            stroke-width="1"></rect>
-          <text
-            x="505"
-            y="78"
-            text-anchor="middle"
-            font-size="14"
-            font-weight="500"
-            fill="#3C3489">Interface型（PrivateLink）</text
-          >
-          <text
-            x="505"
-            y="102"
-            text-anchor="middle"
-            font-size="12"
-            fill="#3C3489">対象: ほぼ全AWSサービス</text
-          >
-          <text
-            x="505"
-            y="124"
-            text-anchor="middle"
-            font-size="12"
-            fill="#3C3489">ENI（プライベートIP）を作成</text
-          >
-          <text
-            x="505"
-            y="146"
-            text-anchor="middle"
-            font-size="12"
-            fill="#3C3489">有料（時間+データ転送）</text
-          >
-          <text
-            x="505"
-            y="168"
-            text-anchor="middle"
-            font-size="12"
-            fill="#3C3489">クロスリージョン対応</text
-          >
-
-          <rect
-            x="40"
-            y="210"
-            width="600"
-            height="56"
-            rx="8"
-            fill="#FAEEDA"
-            stroke="#854F0B"
-            stroke-width="0.5"></rect>
-          <text
-            x="340"
-            y="234"
-            text-anchor="middle"
-            font-size="13"
-            font-weight="500"
-            fill="#633806">メリット</text
-          >
-          <text
-            x="340"
-            y="254"
-            text-anchor="middle"
-            font-size="12"
-            fill="#633806">インターネットGW・NAT GW不要→セキュア・低コスト</text
-          >
-
-          <rect
-            x="40"
-            y="284"
-            width="600"
-            height="56"
-            rx="8"
-            fill="#E6F1FB"
-            stroke="#185FA5"
-            stroke-width="0.5"></rect>
-          <text
-            x="340"
-            y="308"
-            text-anchor="middle"
-            font-size="13"
-            font-weight="500"
-            fill="#0C447C">SAA頻出</text
-          >
-          <text
-            x="340"
-            y="328"
-            text-anchor="middle"
-            font-size="12"
-            fill="#0C447C"
-            >「プライベートサブネットからS3にセキュアにアクセス」→ Gateway型VPC
-            Endpoint</text
-          >
-        </svg>
-      </div>
-      <div>
-        <p class="font-medium mb-2">コスト削減</p>
-        <p class="text-sm">• NAT Gateway の時間課金を削減</p>
-        <p class="text-sm">• データ転送料を削減（Gateway型は無料）</p>
+      <h2 class="heading-section">SAA試験のポイント</h2>
+      <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+        <h3 class="text-lg font-bold text-red-800 mb-4">📋 頻出パターン</h3>
+        <div class="space-y-4 text-red-700">
+          <div class="border-l-4 border-red-400 pl-4">
+            <p class="font-medium">
+              「プライベートサブネットからS3にセキュアにアクセスしたい」
+            </p>
+            <p class="text-sm mt-1">
+              → <strong>Gateway型 VPC Endpoint</strong> を作成（無料）
+            </p>
+          </div>
+          <div class="border-l-4 border-red-400 pl-4">
+            <p class="font-medium">「NAT Gateway のコストを削減したい」</p>
+            <p class="text-sm mt-1">
+              → S3/DynamoDBは <strong>Gateway Endpoint（無料）</strong>、その他は <strong>Interface Endpoint</strong>
+            </p>
+          </div>
+          <div class="border-l-4 border-red-400 pl-4">
+            <p class="font-medium">「オンプレミスからDirect Connect経由でS3にアクセス」</p>
+            <p class="text-sm mt-1">
+              → <strong>Interface型 VPC Endpoint</strong>が必要（Gateway型はVPC内のみ）
+            </p>
+          </div>
+          <div class="border-l-4 border-red-400 pl-4">
+            <p class="font-medium">「クロスリージョンでVPC Endpointを使いたい」</p>
+            <p class="text-sm mt-1">
+              → <strong>Interface型のみ対応</strong>（Gateway型は同一リージョンのみ）
+            </p>
+          </div>
+          <div class="border-l-4 border-red-400 pl-4">
+            <p class="font-medium">「自社サービスを他アカウント/VPCに公開したい」</p>
+            <p class="text-sm mt-1">
+              → <strong>PrivateLink（エンドポイントサービス）</strong> + NLB/GWLB
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   </div>
 </Layout>
-
-<section class="mb-12">
-  <h2 class="heading-section">SAA試験のポイント</h2>
-  <div class="bg-red-50 border border-red-200 rounded-lg p-6">
-    <h3 class="text-lg font-bold text-red-800 mb-4">📋 頻出パターン</h3>
-    <div class="space-y-4 text-red-700">
-      <div class="border-l-4 border-red-400 pl-4">
-        <p class="font-medium">
-          「プライベートサブネットからS3にセキュアにアクセスしたい」
-        </p>
-        <p class="text-sm mt-1">
-          → <strong>Gateway型 VPC Endpoint</strong> を作成
-        </p>
-      </div>
-      <div class="border-l-4 border-red-400 pl-4">
-        <p class="font-medium">「NAT Gateway のコストを削減したい」</p>
-        <p class="text-sm mt-1">
-          → S3/DynamoDBアクセスは <strong>Gateway Endpoint</strong> 、その他は
-          <strong>Interface Endpoint</strong>
-        </p>
-      </div>
-      <div class="border-l-4 border-red-400 pl-4">
-        <p class="font-medium">「クロスリージョンでVPC Endpointを使いたい」</p>
-        <p class="text-sm mt-1">
-          → <strong>Interface型のみ対応</strong
-          >（Gateway型は同一リージョンのみ）
-        </p>
-      </div>
-    </div>
-  </div>
-</section>

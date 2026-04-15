@@ -3,11 +3,15 @@
 <div>
   <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
     <button class="ec2-btn active" onclick="ec2Tab('option')">購入オプション</button>
+    <button class="ec2-btn" onclick="ec2Tab('family')">インスタンスファミリー</button>
+    <button class="ec2-btn" onclick="ec2Tab('storage')">ストレージ</button>
     <button class="ec2-btn" onclick="ec2Tab('spot')">スポット詳細</button>
     <button class="ec2-btn" onclick="ec2Tab('placement')">プレイスメントグループ</button>
+    <button class="ec2-btn" onclick="ec2Tab('connect')">接続方法</button>
     <button class="ec2-btn" onclick="ec2Tab('pattern')">頻出パターン</button>
   </div>
 
+  <!-- EC2購入オプションパネル -->
   <div id="ec2-option" class="ec2-panel active">
     <div class="ec2-option-title">EC2購入オプション</div>
 
@@ -127,6 +131,300 @@
     </div>
   </div>
 
+  <!-- インスタンスファミリー -->
+  <div id="ec2-family" class="ec2-panel">
+    <div class="ec2-family-title">インスタンスファミリー</div>
+
+    <!-- 命名規則 -->
+    <div class="ec2-family-naming">
+      <div class="ec2-family-naming-title">インスタンスタイプの読み方</div>
+      <div class="ec2-family-naming-example">
+        <span class="ec2-family-naming-part ec2-family-naming-family">m</span>
+        <span class="ec2-family-naming-part ec2-family-naming-gen">5</span>
+        <span class="ec2-family-naming-dot">.</span>
+        <span class="ec2-family-naming-part ec2-family-naming-size">xlarge</span>
+      </div>
+      <div class="ec2-family-naming-labels">
+        <div class="ec2-family-naming-label">
+          <span class="ec2-family-naming-arrow ec2-family-naming-family">↑</span>
+          <span>ファミリー（用途）</span>
+        </div>
+        <div class="ec2-family-naming-label">
+          <span class="ec2-family-naming-arrow ec2-family-naming-gen">↑</span>
+          <span>世代（大きいほど新しい）</span>
+        </div>
+        <div class="ec2-family-naming-label">
+          <span class="ec2-family-naming-arrow ec2-family-naming-size">↑</span>
+          <span>サイズ</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ファミリー一覧 -->
+    <div class="ec2-family-grid">
+      <!-- 汎用 -->
+      <div class="ec2-family-card ec2-family-general">
+        <div class="ec2-family-card-header">
+          <div class="ec2-family-card-icon">⚖️</div>
+          <div class="ec2-family-card-name">汎用</div>
+          <div class="ec2-family-card-types">T / M</div>
+        </div>
+        <div class="ec2-family-card-desc">CPU・メモリ・ネットワークのバランス型</div>
+        <div class="ec2-family-card-use">
+          <span class="ec2-family-use-label">用途</span>
+          Webサーバー、小〜中規模DB、開発環境
+        </div>
+        <div class="ec2-family-card-note">
+          <strong>T系</strong>：バースト可能（CPUクレジット制）・低コスト
+        </div>
+      </div>
+
+      <!-- コンピューティング最適化 -->
+      <div class="ec2-family-card ec2-family-compute">
+        <div class="ec2-family-card-header">
+          <div class="ec2-family-card-icon">⚡</div>
+          <div class="ec2-family-card-name">コンピューティング最適化</div>
+          <div class="ec2-family-card-types">C</div>
+        </div>
+        <div class="ec2-family-card-desc">高性能プロセッサ搭載</div>
+        <div class="ec2-family-card-use">
+          <span class="ec2-family-use-label">用途</span>
+          バッチ処理、HPC、ゲームサーバー、科学計算
+        </div>
+        <div class="ec2-family-card-note">
+          CPU負荷の高いワークロードに最適
+        </div>
+      </div>
+
+      <!-- メモリ最適化 -->
+      <div class="ec2-family-card ec2-family-memory">
+        <div class="ec2-family-card-header">
+          <div class="ec2-family-card-icon">🧠</div>
+          <div class="ec2-family-card-name">メモリ最適化</div>
+          <div class="ec2-family-card-types">R / X / z</div>
+        </div>
+        <div class="ec2-family-card-desc">大容量メモリ搭載</div>
+        <div class="ec2-family-card-use">
+          <span class="ec2-family-use-label">用途</span>
+          インメモリDB、Redis、SAP HANA、ビッグデータ
+        </div>
+        <div class="ec2-family-card-note">
+          <strong>X系</strong>：超大容量メモリ（最大24TB）
+        </div>
+      </div>
+
+      <!-- ストレージ最適化 -->
+      <div class="ec2-family-card ec2-family-storage">
+        <div class="ec2-family-card-header">
+          <div class="ec2-family-card-icon">💾</div>
+          <div class="ec2-family-card-name">ストレージ最適化</div>
+          <div class="ec2-family-card-types">I / D / H</div>
+        </div>
+        <div class="ec2-family-card-desc">高速ローカルストレージ</div>
+        <div class="ec2-family-card-use">
+          <span class="ec2-family-use-label">用途</span>
+          NoSQL DB、データウェアハウス、分散ファイルシステム
+        </div>
+        <div class="ec2-family-card-note">
+          <strong>I系</strong>：NVMe SSD　<strong>D/H系</strong>：大容量HDD
+        </div>
+      </div>
+
+      <!-- 高速コンピューティング -->
+      <div class="ec2-family-card ec2-family-accelerated">
+        <div class="ec2-family-card-header">
+          <div class="ec2-family-card-icon">🎮</div>
+          <div class="ec2-family-card-name">高速コンピューティング</div>
+          <div class="ec2-family-card-types">P / G / Inf / Trn</div>
+        </div>
+        <div class="ec2-family-card-desc">GPU・専用チップ搭載</div>
+        <div class="ec2-family-card-use">
+          <span class="ec2-family-use-label">用途</span>
+          機械学習、グラフィックス処理、動画エンコード
+        </div>
+        <div class="ec2-family-card-note">
+          <strong>P系</strong>：ML学習　<strong>G系</strong>：グラフィックス　<strong>Inf/Trn</strong>：推論
+        </div>
+      </div>
+    </div>
+
+    <!-- SAA頻出 -->
+    <div class="ec2-family-note">
+      <strong>SAA頻出パターン</strong>
+      <div class="ec2-family-patterns">
+        <div class="ec2-family-pattern">
+          <span class="ec2-family-q">「CPU負荷が高いバッチ処理」</span>
+          <span class="ec2-family-a">→ C系（C5, C6i, C7g）</span>
+        </div>
+        <div class="ec2-family-pattern">
+          <span class="ec2-family-q">「大量データをメモリに載せたい」</span>
+          <span class="ec2-family-a">→ R系（R5, R6i）/ X系</span>
+        </div>
+        <div class="ec2-family-pattern">
+          <span class="ec2-family-q">「コスト重視・負荷が不定期」</span>
+          <span class="ec2-family-a">→ T系（T3, T4g）バースト可能</span>
+        </div>
+        <div class="ec2-family-pattern">
+          <span class="ec2-family-q">「機械学習のトレーニング」</span>
+          <span class="ec2-family-a">→ P系（P4d, P5）/ Trn系</span>
+        </div>
+        <div class="ec2-family-pattern">
+          <span class="ec2-family-q">「高速ローカルストレージが必要」</span>
+          <span class="ec2-family-a">→ I系（I3, I4i）NVMe SSD</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ストレージ -->
+  <div id="ec2-storage" class="ec2-panel">
+    <div class="ec2-storage-title">EC2で使えるブロックストレージ</div>
+
+    <!-- EBS vs インスタンスストア比較 -->
+    <div class="ec2-storage-compare">
+      <div class="ec2-storage-card ec2-storage-ebs">
+        <div class="ec2-storage-card-header">
+          <div class="ec2-storage-card-icon">💾</div>
+          <div class="ec2-storage-card-name">EBS（Elastic Block Store）</div>
+          <div class="ec2-storage-card-badge">永続的</div>
+        </div>
+        <div class="ec2-storage-card-body">
+          <div class="ec2-storage-point ec2-storage-good">ネットワーク接続型（別のAZ以外のEC2に付け替え可能）</div>
+          <div class="ec2-storage-point ec2-storage-good">インスタンス停止/終了後もデータ保持</div>
+          <div class="ec2-storage-point ec2-storage-good">スナップショット（S3に増分バックアップ）</div>
+          <div class="ec2-storage-point ec2-storage-good">暗号化対応（KMS統合）</div>
+          <div class="ec2-storage-point">同一AZ内のEC2にのみアタッチ可能</div>
+        </div>
+        <div class="ec2-storage-usecase">
+          <span class="ec2-storage-usecase-label">用途</span>
+          OS・DB・アプリケーションデータ
+        </div>
+      </div>
+
+      <div class="ec2-storage-card ec2-storage-instance">
+        <div class="ec2-storage-card-header">
+          <div class="ec2-storage-card-icon">⚡</div>
+          <div class="ec2-storage-card-name">インスタンスストア</div>
+          <div class="ec2-storage-card-badge ec2-storage-badge-warn">一時的</div>
+        </div>
+        <div class="ec2-storage-card-body">
+          <div class="ec2-storage-point ec2-storage-good">物理的に接続（超高速I/O）</div>
+          <div class="ec2-storage-point ec2-storage-good">追加コストなし（インスタンス料金に含む）</div>
+          <div class="ec2-storage-point ec2-storage-warn">インスタンス停止/終了でデータ消失</div>
+          <div class="ec2-storage-point ec2-storage-warn">スナップショット不可</div>
+          <div class="ec2-storage-point">一部のインスタンスタイプのみ利用可能</div>
+        </div>
+        <div class="ec2-storage-usecase">
+          <span class="ec2-storage-usecase-label">用途</span>
+          キャッシュ・一時ファイル・バッファ
+        </div>
+      </div>
+    </div>
+
+    <!-- EBSボリュームタイプ -->
+    <div class="ec2-storage-types">
+      <div class="ec2-storage-types-title">EBSボリュームタイプ</div>
+      <div class="ec2-storage-types-grid">
+        <!-- SSD -->
+        <div class="ec2-storage-type ec2-storage-type-ssd">
+          <div class="ec2-storage-type-category">SSD（IOPS重視）</div>
+          <div class="ec2-storage-type-items">
+            <div class="ec2-storage-type-item">
+              <div class="ec2-storage-type-name">gp3 / gp2</div>
+              <div class="ec2-storage-type-desc">汎用SSD</div>
+              <div class="ec2-storage-type-detail">gp3: IOPS・スループット個別設定可</div>
+              <div class="ec2-storage-type-use">一般的なワークロード</div>
+            </div>
+            <div class="ec2-storage-type-item">
+              <div class="ec2-storage-type-name">io2 / io1</div>
+              <div class="ec2-storage-type-desc">プロビジョンドIOPS SSD</div>
+              <div class="ec2-storage-type-detail">最大64,000 IOPS・マルチアタッチ対応</div>
+              <div class="ec2-storage-type-use">高性能DB（Oracle, SAP等）</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HDD -->
+        <div class="ec2-storage-type ec2-storage-type-hdd">
+          <div class="ec2-storage-type-category">HDD（スループット重視）</div>
+          <div class="ec2-storage-type-items">
+            <div class="ec2-storage-type-item">
+              <div class="ec2-storage-type-name">st1</div>
+              <div class="ec2-storage-type-desc">スループット最適化HDD</div>
+              <div class="ec2-storage-type-detail">最大500 MB/s</div>
+              <div class="ec2-storage-type-use">ビッグデータ・ログ処理</div>
+            </div>
+            <div class="ec2-storage-type-item">
+              <div class="ec2-storage-type-name">sc1</div>
+              <div class="ec2-storage-type-desc">コールドHDD</div>
+              <div class="ec2-storage-type-detail">最低コスト</div>
+              <div class="ec2-storage-type-use">アクセス頻度の低いデータ</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ec2-storage-boot-note">
+        ※ ブートボリュームはSSD（gp2/gp3/io1/io2）のみ対応。HDDはブート不可。
+      </div>
+    </div>
+
+    <!-- スナップショット -->
+    <div class="ec2-storage-snapshot">
+      <div class="ec2-storage-snapshot-title">EBSスナップショット</div>
+      <div class="ec2-storage-snapshot-flow">
+        <div class="ec2-storage-snapshot-item">
+          <div class="ec2-storage-snapshot-icon">💾</div>
+          <div class="ec2-storage-snapshot-label">EBSボリューム</div>
+        </div>
+        <div class="ec2-storage-snapshot-arrow">→</div>
+        <div class="ec2-storage-snapshot-item ec2-storage-snapshot-s3">
+          <div class="ec2-storage-snapshot-icon">📸</div>
+          <div class="ec2-storage-snapshot-label">スナップショット</div>
+          <div class="ec2-storage-snapshot-sub">S3に増分保存</div>
+        </div>
+        <div class="ec2-storage-snapshot-arrow">→</div>
+        <div class="ec2-storage-snapshot-item">
+          <div class="ec2-storage-snapshot-icon">🌍</div>
+          <div class="ec2-storage-snapshot-label">別リージョン/AZ</div>
+          <div class="ec2-storage-snapshot-sub">コピー・復元可能</div>
+        </div>
+      </div>
+      <div class="ec2-storage-snapshot-points">
+        <div class="ec2-storage-snapshot-point">• 増分バックアップ（変更分のみ保存でコスト効率◎）</div>
+        <div class="ec2-storage-snapshot-point">• クロスリージョンコピーでDR対策</div>
+        <div class="ec2-storage-snapshot-point">• AMI作成の基盤（EC2のテンプレート）</div>
+      </div>
+    </div>
+
+    <!-- SAA頻出 -->
+    <div class="ec2-storage-note">
+      <strong>SAA頻出パターン</strong>
+      <div class="ec2-storage-patterns">
+        <div class="ec2-storage-pattern">
+          <span class="ec2-storage-q">「高IOPS・低レイテンシーが必要なDB」</span>
+          <span class="ec2-storage-a">→ io2 / io1（プロビジョンドIOPS）</span>
+        </div>
+        <div class="ec2-storage-pattern">
+          <span class="ec2-storage-q">「コスト効率の良い汎用ストレージ」</span>
+          <span class="ec2-storage-a">→ gp3（IOPS/スループット調整可能）</span>
+        </div>
+        <div class="ec2-storage-pattern">
+          <span class="ec2-storage-q">「インスタンス停止後もデータを保持」</span>
+          <span class="ec2-storage-a">→ EBS（インスタンスストアは消失）</span>
+        </div>
+        <div class="ec2-storage-pattern">
+          <span class="ec2-storage-q">「一時的なキャッシュ・高速I/O」</span>
+          <span class="ec2-storage-a">→ インスタンスストア</span>
+        </div>
+        <div class="ec2-storage-pattern">
+          <span class="ec2-storage-q">「EBSを別リージョンに移動」</span>
+          <span class="ec2-storage-a">→ スナップショット→クロスリージョンコピー→復元</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- スポットインスタンス -->
   <div id="ec2-spot" class="ec2-panel">
     <svg width="100%" viewBox="0 0 680 340">
       <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">スポットインスタンス：最大90%割引・中断リスクあり</text>
@@ -148,6 +446,7 @@
     </svg>
   </div>
 
+  <!-- プレイスメントグループ -->
   <div id="ec2-placement" class="ec2-panel">
     <div class="ec2-placement-title">プレイスメントグループ：インスタンスの配置戦略</div>
 
@@ -295,6 +594,138 @@
     </div>
   </div>
 
+  <!-- 接続方法 -->
+  <div id="ec2-connect" class="ec2-panel">
+    <div class="ec2-connect-title">EC2への接続方法</div>
+
+    <!-- 接続方法比較 -->
+    <div class="ec2-connect-grid">
+      <!-- Session Manager -->
+      <div class="ec2-connect-card ec2-connect-ssm">
+        <div class="ec2-connect-card-header">
+          <div class="ec2-connect-card-title">Session Manager</div>
+          <div class="ec2-connect-card-badge">SSM</div>
+        </div>
+        <div class="ec2-connect-card-body">
+          <div class="ec2-connect-point">SSM Agentが必要</div>
+          <div class="ec2-connect-point">IAMで認証・認可</div>
+          <div class="ec2-connect-point">ポート開放不要（443のみ）</div>
+          <div class="ec2-connect-point">操作ログをCloudWatch/S3に保存</div>
+        </div>
+        <div class="ec2-connect-req">
+          <span class="ec2-connect-req-label">要件</span>
+          SSM Agent + IAMロール + VPCエンドポイント（またはNAT）
+        </div>
+      </div>
+
+      <!-- EC2 Instance Connect Endpoint -->
+      <div class="ec2-connect-card ec2-connect-eice">
+        <div class="ec2-connect-card-header">
+          <div class="ec2-connect-card-title">EC2 Instance Connect Endpoint</div>
+          <div class="ec2-connect-card-badge ec2-connect-badge-new">新機能</div>
+        </div>
+        <div class="ec2-connect-card-body">
+          <div class="ec2-connect-point">エージェント不要</div>
+          <div class="ec2-connect-point">IAMで認証（一時的SSH鍵）</div>
+          <div class="ec2-connect-point">SSHポート22のみ許可でOK</div>
+          <div class="ec2-connect-point ec2-connect-highlight">踏み台サーバー不要</div>
+        </div>
+        <div class="ec2-connect-req">
+          <span class="ec2-connect-req-label">要件</span>
+          EIC Endpoint作成 + IAM権限 + SG（22許可）
+        </div>
+      </div>
+
+      <!-- 従来方式 -->
+      <div class="ec2-connect-card ec2-connect-bastion">
+        <div class="ec2-connect-card-header">
+          <div class="ec2-connect-card-title">踏み台サーバー（Bastion）</div>
+          <div class="ec2-connect-card-badge ec2-connect-badge-old">従来</div>
+        </div>
+        <div class="ec2-connect-card-body">
+          <div class="ec2-connect-point ec2-connect-warn">踏み台EC2が必要（コスト発生）</div>
+          <div class="ec2-connect-point">SSH鍵管理が必要</div>
+          <div class="ec2-connect-point">パブリックサブネットに配置</div>
+          <div class="ec2-connect-point">多段SSH接続</div>
+        </div>
+        <div class="ec2-connect-req">
+          <span class="ec2-connect-req-label">要件</span>
+          踏み台EC2 + IGW + キーペア管理
+        </div>
+      </div>
+    </div>
+
+    <!-- EIC Endpoint 詳細 -->
+    <div class="ec2-connect-detail">
+      <div class="ec2-connect-detail-title">EC2 Instance Connect Endpoint とは</div>
+      <div class="ec2-connect-detail-diagram">
+        <div class="ec2-connect-flow">
+          <div class="ec2-connect-flow-item ec2-connect-flow-user">
+            <div class="ec2-connect-flow-icon">👤</div>
+            <div class="ec2-connect-flow-label">ユーザー</div>
+            <div class="ec2-connect-flow-sub">ローカルPC</div>
+          </div>
+          <div class="ec2-connect-flow-arrow">→</div>
+          <div class="ec2-connect-flow-item ec2-connect-flow-aws">
+            <div class="ec2-connect-flow-icon">🔐</div>
+            <div class="ec2-connect-flow-label">IAM認証</div>
+            <div class="ec2-connect-flow-sub">AWS API</div>
+          </div>
+          <div class="ec2-connect-flow-arrow">→</div>
+          <div class="ec2-connect-flow-item ec2-connect-flow-eice">
+            <div class="ec2-connect-flow-icon">🔗</div>
+            <div class="ec2-connect-flow-label">EIC Endpoint</div>
+            <div class="ec2-connect-flow-sub">VPC内に作成</div>
+          </div>
+          <div class="ec2-connect-flow-arrow">→</div>
+          <div class="ec2-connect-flow-item ec2-connect-flow-ec2">
+            <div class="ec2-connect-flow-icon">🖥️</div>
+            <div class="ec2-connect-flow-label">EC2</div>
+            <div class="ec2-connect-flow-sub">プライベートサブネット</div>
+          </div>
+        </div>
+      </div>
+      <div class="ec2-connect-detail-points">
+        <div class="ec2-connect-detail-point">
+          <span class="ec2-connect-detail-check">✓</span>
+          パブリックIP不要 — EC2にElastic IPやパブリックIPを付与しなくてOK
+        </div>
+        <div class="ec2-connect-detail-point">
+          <span class="ec2-connect-detail-check">✓</span>
+          IGW/NAT不要 — プライベートサブネットから直接接続可能
+        </div>
+        <div class="ec2-connect-detail-point">
+          <span class="ec2-connect-detail-check">✓</span>
+          無料 — EIC Endpointの利用自体は無料（データ転送料のみ）
+        </div>
+        <div class="ec2-connect-detail-point">
+          <span class="ec2-connect-detail-check">✓</span>
+          CLI/コンソール対応 — `aws ec2-instance-connect ssh` または AWSコンソールから接続
+        </div>
+      </div>
+    </div>
+
+    <!-- SAA頻出 -->
+    <div class="ec2-connect-note">
+      <strong>SAA頻出パターン</strong>
+      <div class="ec2-connect-patterns">
+        <div class="ec2-connect-pattern">
+          <span class="ec2-connect-q">「プライベートサブネットのEC2に踏み台なしで接続」</span>
+          <span class="ec2-connect-a">→ EC2 Instance Connect Endpoint または Session Manager</span>
+        </div>
+        <div class="ec2-connect-pattern">
+          <span class="ec2-connect-q">「セッションログを監査証跡として残したい」</span>
+          <span class="ec2-connect-a">→ Session Manager（CloudWatch/S3連携）</span>
+        </div>
+        <div class="ec2-connect-pattern">
+          <span class="ec2-connect-q">「SSMエージェントなしでプライベートEC2に接続」</span>
+          <span class="ec2-connect-a">→ EC2 Instance Connect Endpoint</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAA note -->
   <div id="ec2-pattern" class="ec2-panel">
     <svg width="100%" viewBox="0 0 680 320">
       <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">SAA頻出パターン</text>
@@ -812,5 +1243,883 @@
   }
   .dark .ec2-placement-a {
     color: #fcd34d;
+  }
+
+  /* 接続方法 */
+  .ec2-connect-title {
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .ec2-connect-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 900px;
+    margin: 0 auto 16px;
+  }
+  @media (max-width: 800px) {
+    .ec2-connect-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ec2-connect-card {
+    padding: 14px;
+    border-radius: 10px;
+    border: 2px solid;
+    display: flex;
+    flex-direction: column;
+  }
+  .ec2-connect-ssm {
+    background: #ecfdf5;
+    border-color: #10b981;
+  }
+  .dark .ec2-connect-ssm {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: #34d399;
+  }
+  .ec2-connect-eice {
+    background: #dbeafe;
+    border-color: #3b82f6;
+  }
+  .dark .ec2-connect-eice {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #60a5fa;
+  }
+  .ec2-connect-bastion {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+  }
+  .dark .ec2-connect-bastion {
+    background: rgba(156, 163, 175, 0.1);
+    border-color: #6b7280;
+  }
+  .ec2-connect-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .ec2-connect-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .ec2-connect-card-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.1);
+    color: #374151;
+    white-space: nowrap;
+  }
+  .dark .ec2-connect-card-badge {
+    background: rgba(255,255,255,0.1);
+    color: #d1d5db;
+  }
+  .ec2-connect-badge-new {
+    background: #3b82f6;
+    color: #fff;
+  }
+  .ec2-connect-badge-old {
+    background: #9ca3af;
+    color: #fff;
+  }
+  .ec2-connect-card-body {
+    flex: 1;
+    margin-bottom: 10px;
+  }
+  .ec2-connect-point {
+    font-size: 12px;
+    color: #374151;
+    margin-bottom: 4px;
+    padding-left: 12px;
+    position: relative;
+  }
+  .dark .ec2-connect-point {
+    color: #d1d5db;
+  }
+  .ec2-connect-point::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #6b7280;
+  }
+  .ec2-connect-highlight {
+    color: #059669;
+    font-weight: 600;
+  }
+  .dark .ec2-connect-highlight {
+    color: #34d399;
+  }
+  .ec2-connect-warn {
+    color: #dc2626;
+  }
+  .dark .ec2-connect-warn {
+    color: #f87171;
+  }
+  .ec2-connect-req {
+    font-size: 11px;
+    padding: 8px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 6px;
+    color: #374151;
+  }
+  .dark .ec2-connect-req {
+    background: rgba(255,255,255,0.05);
+    color: #d1d5db;
+  }
+  .ec2-connect-req-label {
+    font-weight: 600;
+    color: #6b7280;
+    margin-right: 4px;
+  }
+  /* EIC Endpoint 詳細 */
+  .ec2-connect-detail {
+    max-width: 900px;
+    margin: 0 auto 16px;
+    padding: 16px;
+    background: #eff6ff;
+    border: 1px solid #3b82f6;
+    border-radius: 10px;
+  }
+  .dark .ec2-connect-detail {
+    background: rgba(59, 130, 246, 0.1);
+  }
+  .ec2-connect-detail-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 14px;
+    color: #1e40af;
+  }
+  .dark .ec2-connect-detail-title {
+    color: #93c5fd;
+  }
+  .ec2-connect-detail-diagram {
+    margin-bottom: 14px;
+  }
+  .ec2-connect-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .ec2-connect-flow-item {
+    text-align: center;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    min-width: 90px;
+  }
+  .dark .ec2-connect-flow-item {
+    background: #1f2937;
+    border-color: #4b5563;
+  }
+  .ec2-connect-flow-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  .ec2-connect-flow-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .ec2-connect-flow-sub {
+    font-size: 10px;
+    color: #6b7280;
+  }
+  .ec2-connect-flow-eice {
+    background: #dbeafe;
+    border-color: #3b82f6;
+  }
+  .dark .ec2-connect-flow-eice {
+    background: rgba(59, 130, 246, 0.2);
+  }
+  .ec2-connect-flow-arrow {
+    font-size: 18px;
+    color: #3b82f6;
+    font-weight: bold;
+  }
+  .ec2-connect-detail-points {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ec2-connect-detail-point {
+    font-size: 12px;
+    color: #1e40af;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .dark .ec2-connect-detail-point {
+    color: #bfdbfe;
+  }
+  .ec2-connect-detail-check {
+    color: #059669;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+  /* SAA頻出 */
+  .ec2-connect-note {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 14px 16px;
+    background: #faeeda;
+    border: 1px solid #854f0b;
+    border-radius: 8px;
+  }
+  .dark .ec2-connect-note {
+    background: rgba(133, 79, 11, 0.15);
+    border-color: #b45309;
+  }
+  .ec2-connect-note strong {
+    display: block;
+    font-size: 14px;
+    color: #633806;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .dark .ec2-connect-note strong {
+    color: #fcd34d;
+  }
+  .ec2-connect-patterns {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ec2-connect-pattern {
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(133, 79, 11, 0.2);
+  }
+  @media (min-width: 600px) {
+    .ec2-connect-pattern {
+      flex-direction: row;
+      justify-content: space-between;
+    }
+  }
+  .ec2-connect-pattern:last-child {
+    border-bottom: none;
+  }
+  .ec2-connect-q {
+    color: #633806;
+  }
+  .dark .ec2-connect-q {
+    color: #fef3c7;
+  }
+  .ec2-connect-a {
+    color: #412402;
+    font-weight: 500;
+  }
+  .dark .ec2-connect-a {
+    color: #fcd34d;
+  }
+
+  /* インスタンスファミリー */
+  .ec2-family-title {
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .ec2-family-naming {
+    max-width: 500px;
+    margin: 0 auto 20px;
+    padding: 16px;
+    background: #f3f4f6;
+    border-radius: 10px;
+    text-align: center;
+  }
+  .dark .ec2-family-naming {
+    background: rgba(156, 163, 175, 0.1);
+  }
+  .ec2-family-naming-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .ec2-family-naming-example {
+    font-size: 28px;
+    font-weight: 700;
+    font-family: monospace;
+    margin-bottom: 8px;
+  }
+  .ec2-family-naming-part {
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .ec2-family-naming-family {
+    background: #dbeafe;
+    color: #1d4ed8;
+  }
+  .ec2-family-naming-gen {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+  .ec2-family-naming-size {
+    background: #fef3c7;
+    color: #b45309;
+  }
+  .ec2-family-naming-dot {
+    color: #6b7280;
+  }
+  .ec2-family-naming-labels {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    font-size: 11px;
+    color: #6b7280;
+  }
+  .ec2-family-naming-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .ec2-family-naming-arrow {
+    font-weight: bold;
+  }
+  .ec2-family-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 900px;
+    margin: 0 auto 16px;
+  }
+  @media (max-width: 700px) {
+    .ec2-family-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 450px) {
+    .ec2-family-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ec2-family-card {
+    padding: 14px;
+    border-radius: 10px;
+    border: 2px solid;
+  }
+  .ec2-family-general {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+  }
+  .dark .ec2-family-general {
+    background: rgba(156, 163, 175, 0.1);
+    border-color: #6b7280;
+  }
+  .ec2-family-compute {
+    background: #fef3c7;
+    border-color: #f59e0b;
+  }
+  .dark .ec2-family-compute {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: #fbbf24;
+  }
+  .ec2-family-memory {
+    background: #dbeafe;
+    border-color: #3b82f6;
+  }
+  .dark .ec2-family-memory {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #60a5fa;
+  }
+  .ec2-family-storage {
+    background: #ecfdf5;
+    border-color: #10b981;
+  }
+  .dark .ec2-family-storage {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: #34d399;
+  }
+  .ec2-family-accelerated {
+    background: #fdf4ff;
+    border-color: #a855f7;
+  }
+  .dark .ec2-family-accelerated {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: #c084fc;
+  }
+  .ec2-family-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .ec2-family-card-icon {
+    font-size: 20px;
+  }
+  .ec2-family-card-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+  }
+  .ec2-family-card-types {
+    font-size: 12px;
+    font-weight: 700;
+    font-family: monospace;
+    padding: 2px 8px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 4px;
+    color: #374151;
+  }
+  .dark .ec2-family-card-types {
+    background: rgba(255,255,255,0.1);
+    color: #d1d5db;
+  }
+  .ec2-family-card-desc {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 8px;
+  }
+  .ec2-family-card-use {
+    font-size: 11px;
+    padding: 6px 8px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 6px;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+  .dark .ec2-family-card-use {
+    background: rgba(255,255,255,0.05);
+    color: #d1d5db;
+  }
+  .ec2-family-use-label {
+    font-weight: 600;
+    color: #059669;
+    margin-right: 4px;
+  }
+  .dark .ec2-family-use-label {
+    color: #34d399;
+  }
+  .ec2-family-card-note {
+    font-size: 10px;
+    color: #6b7280;
+  }
+  .ec2-family-card-note strong {
+    color: var(--text);
+  }
+  .ec2-family-note {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 14px 16px;
+    background: #faeeda;
+    border: 1px solid #854f0b;
+    border-radius: 8px;
+  }
+  .dark .ec2-family-note {
+    background: rgba(133, 79, 11, 0.15);
+    border-color: #b45309;
+  }
+  .ec2-family-note strong {
+    display: block;
+    font-size: 14px;
+    color: #633806;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .dark .ec2-family-note strong {
+    color: #fcd34d;
+  }
+  .ec2-family-patterns {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ec2-family-pattern {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(133, 79, 11, 0.2);
+  }
+  .ec2-family-pattern:last-child {
+    border-bottom: none;
+  }
+  .ec2-family-q {
+    color: #633806;
+  }
+  .dark .ec2-family-q {
+    color: #fef3c7;
+  }
+  .ec2-family-a {
+    color: #412402;
+    font-weight: 500;
+    font-family: monospace;
+  }
+  .dark .ec2-family-a {
+    color: #fcd34d;
+  }
+  @media (max-width: 600px) {
+    .ec2-family-pattern {
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+
+  /* ストレージ */
+  .ec2-storage-title {
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .ec2-storage-compare {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    max-width: 800px;
+    margin: 0 auto 16px;
+  }
+  @media (max-width: 600px) {
+    .ec2-storage-compare {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ec2-storage-card {
+    padding: 14px;
+    border-radius: 10px;
+    border: 2px solid;
+  }
+  .ec2-storage-ebs {
+    background: #dbeafe;
+    border-color: #3b82f6;
+  }
+  .dark .ec2-storage-ebs {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #60a5fa;
+  }
+  .ec2-storage-instance {
+    background: #fef3c7;
+    border-color: #f59e0b;
+  }
+  .dark .ec2-storage-instance {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: #fbbf24;
+  }
+  .ec2-storage-card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .ec2-storage-card-icon {
+    font-size: 20px;
+  }
+  .ec2-storage-card-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+  }
+  .ec2-storage-card-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #059669;
+    color: #fff;
+  }
+  .ec2-storage-badge-warn {
+    background: #dc2626;
+  }
+  .ec2-storage-card-body {
+    margin-bottom: 10px;
+  }
+  .ec2-storage-point {
+    font-size: 11px;
+    color: #374151;
+    margin-bottom: 3px;
+    padding-left: 12px;
+    position: relative;
+  }
+  .dark .ec2-storage-point {
+    color: #d1d5db;
+  }
+  .ec2-storage-point::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #6b7280;
+  }
+  .ec2-storage-good {
+    color: #059669;
+  }
+  .dark .ec2-storage-good {
+    color: #34d399;
+  }
+  .ec2-storage-warn {
+    color: #dc2626;
+  }
+  .dark .ec2-storage-warn {
+    color: #f87171;
+  }
+  .ec2-storage-usecase {
+    font-size: 11px;
+    padding: 6px 8px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 6px;
+    color: #374151;
+  }
+  .dark .ec2-storage-usecase {
+    background: rgba(255,255,255,0.05);
+    color: #d1d5db;
+  }
+  .ec2-storage-usecase-label {
+    font-weight: 600;
+    color: #059669;
+    margin-right: 4px;
+  }
+  .dark .ec2-storage-usecase-label {
+    color: #34d399;
+  }
+  /* EBSボリュームタイプ */
+  .ec2-storage-types {
+    max-width: 800px;
+    margin: 0 auto 16px;
+    padding: 14px;
+    background: #f3f4f6;
+    border-radius: 10px;
+  }
+  .dark .ec2-storage-types {
+    background: rgba(156, 163, 175, 0.1);
+  }
+  .ec2-storage-types-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  .ec2-storage-types-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 550px) {
+    .ec2-storage-types-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ec2-storage-type {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid;
+  }
+  .ec2-storage-type-ssd {
+    background: #ecfdf5;
+    border-color: #10b981;
+  }
+  .dark .ec2-storage-type-ssd {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: #34d399;
+  }
+  .ec2-storage-type-hdd {
+    background: #fef3c7;
+    border-color: #f59e0b;
+  }
+  .dark .ec2-storage-type-hdd {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: #fbbf24;
+  }
+  .ec2-storage-type-category {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .ec2-storage-type-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ec2-storage-type-item {
+    padding: 8px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 6px;
+  }
+  .dark .ec2-storage-type-item {
+    background: rgba(0,0,0,0.2);
+  }
+  .ec2-storage-type-name {
+    font-size: 12px;
+    font-weight: 600;
+    font-family: monospace;
+    color: var(--text);
+  }
+  .ec2-storage-type-desc {
+    font-size: 11px;
+    color: #6b7280;
+  }
+  .ec2-storage-type-detail {
+    font-size: 10px;
+    color: #059669;
+  }
+  .dark .ec2-storage-type-detail {
+    color: #34d399;
+  }
+  .ec2-storage-type-use {
+    font-size: 10px;
+    color: #374151;
+    margin-top: 2px;
+  }
+  .dark .ec2-storage-type-use {
+    color: #9ca3af;
+  }
+  .ec2-storage-boot-note {
+    font-size: 11px;
+    color: #dc2626;
+    text-align: center;
+    margin-top: 10px;
+  }
+  .dark .ec2-storage-boot-note {
+    color: #f87171;
+  }
+  /* スナップショット */
+  .ec2-storage-snapshot {
+    max-width: 800px;
+    margin: 0 auto 16px;
+    padding: 14px;
+    background: #eff6ff;
+    border: 1px solid #3b82f6;
+    border-radius: 10px;
+  }
+  .dark .ec2-storage-snapshot {
+    background: rgba(59, 130, 246, 0.1);
+  }
+  .ec2-storage-snapshot-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 12px;
+    color: #1e40af;
+  }
+  .dark .ec2-storage-snapshot-title {
+    color: #93c5fd;
+  }
+  .ec2-storage-snapshot-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .ec2-storage-snapshot-item {
+    text-align: center;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    min-width: 100px;
+  }
+  .dark .ec2-storage-snapshot-item {
+    background: #1f2937;
+    border-color: #4b5563;
+  }
+  .ec2-storage-snapshot-s3 {
+    background: #dbeafe;
+    border-color: #3b82f6;
+  }
+  .dark .ec2-storage-snapshot-s3 {
+    background: rgba(59, 130, 246, 0.2);
+  }
+  .ec2-storage-snapshot-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  .ec2-storage-snapshot-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .ec2-storage-snapshot-sub {
+    font-size: 10px;
+    color: #6b7280;
+  }
+  .ec2-storage-snapshot-arrow {
+    font-size: 18px;
+    color: #3b82f6;
+    font-weight: bold;
+  }
+  .ec2-storage-snapshot-points {
+    font-size: 11px;
+    color: #1e40af;
+  }
+  .dark .ec2-storage-snapshot-points {
+    color: #bfdbfe;
+  }
+  .ec2-storage-snapshot-point {
+    margin-bottom: 2px;
+  }
+  /* SAA頻出 */
+  .ec2-storage-note {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 14px 16px;
+    background: #faeeda;
+    border: 1px solid #854f0b;
+    border-radius: 8px;
+  }
+  .dark .ec2-storage-note {
+    background: rgba(133, 79, 11, 0.15);
+    border-color: #b45309;
+  }
+  .ec2-storage-note strong {
+    display: block;
+    font-size: 14px;
+    color: #633806;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .dark .ec2-storage-note strong {
+    color: #fcd34d;
+  }
+  .ec2-storage-patterns {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ec2-storage-pattern {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(133, 79, 11, 0.2);
+  }
+  .ec2-storage-pattern:last-child {
+    border-bottom: none;
+  }
+  .ec2-storage-q {
+    color: #633806;
+  }
+  .dark .ec2-storage-q {
+    color: #fef3c7;
+  }
+  .ec2-storage-a {
+    color: #412402;
+    font-weight: 500;
+  }
+  .dark .ec2-storage-a {
+    color: #fcd34d;
+  }
+  @media (max-width: 600px) {
+    .ec2-storage-pattern {
+      flex-direction: column;
+      gap: 2px;
+    }
   }
 </style>
