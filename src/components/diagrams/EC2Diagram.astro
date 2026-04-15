@@ -4,50 +4,126 @@
   <div style="display:flex;gap:6px;margin:0 0 10px;flex-wrap:wrap">
     <button class="ec2-btn active" onclick="ec2Tab('option')">購入オプション</button>
     <button class="ec2-btn" onclick="ec2Tab('spot')">スポット詳細</button>
+    <button class="ec2-btn" onclick="ec2Tab('placement')">プレイスメントグループ</button>
     <button class="ec2-btn" onclick="ec2Tab('pattern')">頻出パターン</button>
   </div>
 
   <div id="ec2-option" class="ec2-panel active">
-    <div style="max-width:720px;margin:0 auto;">
-      <div style="font-size:16px;font-weight:600;color:var(--text);margin-bottom:12px;text-align:center;">EC2購入オプション：コストと柔軟性のトレードオフ</div>
-      <table class="ec2-table">
-        <tbody>
-          <tr class="ec2-table__row ec2-bg-on">
-            <td class="ec2-table__cell">
-              <div class="ec2-title ec2-title--on">オンデマンド</div>
-              <div class="ec2-desc ec2-desc--on">使った分だけ秒単位で課金</div>
-              <div class="ec2-desc ec2-desc--on">コスト高・柔軟性最大</div>
-            </td>
-            <td class="ec2-table__cell ec2-bg-ri">
-              <div class="ec2-title ec2-title--ri">リザーブドインスタンス（RI）</div>
-              <div class="ec2-desc ec2-desc--ri">1年 or 3年の予約で最大72%割引</div>
-              <div class="ec2-desc ec2-desc--ri">安定した継続利用向け</div>
-            </td>
-            <td class="ec2-table__cell ec2-bg-spot">
-              <div class="ec2-title ec2-title--spot">スポットインスタンス</div>
-              <div class="ec2-desc ec2-desc--spot">最大90%割引・中断リスクあり</div>
-              <div class="ec2-desc ec2-desc--spot">バッチ・CI/CDなど耐障害性が必要</div>
-            </td>
-          </tr>
-          <tr class="ec2-table__row ec2-bg-sp">
-            <td class="ec2-table__cell">
-              <div class="ec2-title ec2-title--sp">Savings Plans</div>
-              <div class="ec2-desc ec2-desc--sp">$/時間の使用量をコミット</div>
-              <div class="ec2-desc ec2-desc--sp">EC2・Lambda・Fargateに適用</div>
-            </td>
-            <td class="ec2-table__cell ec2-bg-dedicated">
-              <div class="ec2-title ec2-title--dedicated">Dedicated Host</div>
-              <div class="ec2-desc ec2-desc--dedicated">物理サーバーを専有</div>
-              <div class="ec2-desc ec2-desc--dedicated">ライセンス持ち込み（BYOL）向け</div>
-            </td>
-            <td class="ec2-table__cell ec2-bg-spvsri">
-              <div class="ec2-title ec2-title--spvsri">Savings Plans vs RI</div>
-              <div class="ec2-desc ec2-desc--spvsri">SP：インスタンスタイプ変更OK</div>
-              <div class="ec2-desc ec2-desc--spvsri">RI：特定タイプを予約・割引率高い</div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="ec2-option-title">EC2購入オプション</div>
+
+    <!-- メイン3オプション -->
+    <div class="ec2-option-grid">
+      <!-- オンデマンド -->
+      <div class="ec2-option-card ec2-option-ondemand">
+        <div class="ec2-option-header">
+          <div class="ec2-option-name">オンデマンド</div>
+          <div class="ec2-option-badge">基準価格</div>
+        </div>
+        <div class="ec2-option-body">
+          <div class="ec2-option-point">使った分だけ秒単位で課金</div>
+          <div class="ec2-option-point">予約不要・いつでも起動/停止</div>
+          <div class="ec2-option-point">柔軟性最大・コスト高</div>
+        </div>
+        <div class="ec2-option-usecase">
+          <span class="ec2-option-usecase-label">向いている</span>
+          短期・テスト・開発・不定期な負荷
+        </div>
+      </div>
+
+      <!-- リザーブドインスタンス -->
+      <div class="ec2-option-card ec2-option-ri">
+        <div class="ec2-option-header">
+          <div class="ec2-option-name">リザーブドインスタンス（RI）</div>
+          <div class="ec2-option-badge ec2-option-badge-save">最大72%割引</div>
+        </div>
+        <div class="ec2-option-body">
+          <div class="ec2-option-point">1年 or 3年の予約でコスト削減</div>
+          <div class="ec2-option-point">特定のインスタンスタイプを予約</div>
+          <div class="ec2-option-point">前払いオプションで割引率UP</div>
+        </div>
+        <div class="ec2-option-usecase">
+          <span class="ec2-option-usecase-label">向いている</span>
+          24時間365日稼働・本番DB・基幹システム
+        </div>
+      </div>
+
+      <!-- スポットインスタンス -->
+      <div class="ec2-option-card ec2-option-spot">
+        <div class="ec2-option-header">
+          <div class="ec2-option-name">スポットインスタンス</div>
+          <div class="ec2-option-badge ec2-option-badge-save">最大90%割引</div>
+        </div>
+        <div class="ec2-option-body">
+          <div class="ec2-option-point">AWSの余剰キャパシティを利用</div>
+          <div class="ec2-option-point ec2-option-warn">2分前通知で強制終了リスク</div>
+          <div class="ec2-option-point">中断されても問題ない処理向け</div>
+        </div>
+        <div class="ec2-option-usecase">
+          <span class="ec2-option-usecase-label">向いている</span>
+          バッチ処理・CI/CD・機械学習
+        </div>
+      </div>
+    </div>
+
+    <!-- サブオプション -->
+    <div class="ec2-option-sub-grid">
+      <!-- Savings Plans -->
+      <div class="ec2-option-card-sub ec2-option-sp">
+        <div class="ec2-option-sub-header">
+          <div class="ec2-option-sub-name">Savings Plans</div>
+          <div class="ec2-option-badge ec2-option-badge-save">最大72%割引</div>
+        </div>
+        <div class="ec2-option-sub-body">
+          <div class="ec2-option-point">$/時間の使用量をコミット（1年 or 3年）</div>
+          <div class="ec2-option-point">インスタンスタイプ・サイズ変更OK</div>
+          <div class="ec2-option-point">EC2・Lambda・Fargateに適用可能</div>
+        </div>
+      </div>
+
+      <!-- Dedicated Host -->
+      <div class="ec2-option-card-sub ec2-option-dedicated">
+        <div class="ec2-option-sub-header">
+          <div class="ec2-option-sub-name">Dedicated Host</div>
+          <div class="ec2-option-badge">専用物理サーバー</div>
+        </div>
+        <div class="ec2-option-sub-body">
+          <div class="ec2-option-point">物理サーバーを丸ごと専有</div>
+          <div class="ec2-option-point">ソケット/コア単位のライセンス持ち込み（BYOL）</div>
+          <div class="ec2-option-point">コンプライアンス要件対応</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 比較表 -->
+    <div class="ec2-option-compare">
+      <div class="ec2-option-compare-title">Savings Plans vs リザーブドインスタンス</div>
+      <div class="ec2-option-compare-grid">
+        <div class="ec2-option-compare-row ec2-option-compare-header">
+          <div></div>
+          <div>Savings Plans</div>
+          <div>リザーブドインスタンス</div>
+        </div>
+        <div class="ec2-option-compare-row">
+          <div class="ec2-option-compare-label">柔軟性</div>
+          <div class="ec2-option-compare-good">タイプ・サイズ変更OK</div>
+          <div class="ec2-option-compare-bad">特定タイプに固定</div>
+        </div>
+        <div class="ec2-option-compare-row">
+          <div class="ec2-option-compare-label">割引率</div>
+          <div>最大72%</div>
+          <div class="ec2-option-compare-good">最大72%（同等〜やや高い）</div>
+        </div>
+        <div class="ec2-option-compare-row">
+          <div class="ec2-option-compare-label">適用範囲</div>
+          <div class="ec2-option-compare-good">EC2・Lambda・Fargate</div>
+          <div>EC2のみ</div>
+        </div>
+        <div class="ec2-option-compare-row">
+          <div class="ec2-option-compare-label">コミット</div>
+          <div>$/時間の使用量</div>
+          <div>特定インスタンス</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -70,6 +146,153 @@
       <rect x="40" y="278" width="600" height="44" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
       <text x="340" y="304" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">SAA頻出：「コスト最小・中断許容できるバッチ」→ スポットインスタンス</text>
     </svg>
+  </div>
+
+  <div id="ec2-placement" class="ec2-panel">
+    <div class="ec2-placement-title">プレイスメントグループ：インスタンスの配置戦略</div>
+
+    <div class="ec2-placement-grid">
+      <!-- Cluster -->
+      <div class="ec2-placement-card ec2-placement-cluster">
+        <div class="ec2-placement-card-header">
+          <div class="ec2-placement-card-title">クラスター</div>
+          <div class="ec2-placement-card-subtitle">Cluster</div>
+        </div>
+        <div class="ec2-placement-diagram">
+          <div class="ec2-placement-rack">
+            <div class="ec2-placement-rack-label">同一ラック</div>
+            <div class="ec2-placement-instances">
+              <div class="ec2-placement-instance"></div>
+              <div class="ec2-placement-instance"></div>
+              <div class="ec2-placement-instance"></div>
+              <div class="ec2-placement-instance"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ec2-placement-info">
+          <div class="ec2-placement-info-row">
+            <span class="ec2-placement-info-label">配置</span>
+            <span class="ec2-placement-info-value">近接（同一ラック）</span>
+          </div>
+          <div class="ec2-placement-info-row">
+            <span class="ec2-placement-info-label">目的</span>
+            <span class="ec2-placement-info-value ec2-placement-highlight">⚡ 低レイテンシー</span>
+          </div>
+          <div class="ec2-placement-info-row">
+            <span class="ec2-placement-info-label">制限</span>
+            <span class="ec2-placement-info-value ec2-placement-warn">単一AZ・障害時全滅リスク</span>
+          </div>
+          <div class="ec2-placement-info-row">
+            <span class="ec2-placement-info-label">用途</span>
+            <span class="ec2-placement-info-value">HPC・機械学習・ビッグデータ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spread -->
+      <div class="ec2-placement-card ec2-placement-spread">
+        <div class="ec2-placement-card-header">
+          <div class="ec2-placement-card-title">スプレッド</div>
+          <div class="ec2-placement-card-subtitle">Spread</div>
+        </div>
+        <div class="ec2-placement-diagram">
+          <div class="ec2-placement-racks">
+            <div class="ec2-placement-rack-small">
+              <div class="ec2-placement-instance"></div>
+            </div>
+            <div class="ec2-placement-rack-small">
+              <div class="ec2-placement-instance"></div>
+            </div>
+            <div class="ec2-placement-rack-small">
+              <div class="ec2-placement-instance"></div>
+            </div>
+          </div>
+          <div class="ec2-placement-rack-label">異なるラック</div>
+        </div>
+        <div class="ec2-placement-info">
+          <div class="ec2-placement-info-row">
+            <span class="ec2-placement-info-label">配置</span>
+            <span class="ec2-placement-info-value">分散（異なるラック）</span>
+          </div>
+          <div class="ec2-placement-info-row">
+            <span class="ec2-placement-info-label">目的</span>
+            <span class="ec2-placement-info-value ec2-placement-highlight">🛡️ 障害分離</span>
+          </div>
+          <div class="ec2-placement-info-row">
+            <span class="ec2-placement-info-label">制限</span>
+            <span class="ec2-placement-info-value ec2-placement-warn">AZあたり最大7インスタンス</span>
+          </div>
+          <div class="ec2-placement-info-row">
+            <span class="ec2-placement-info-label">用途</span>
+            <span class="ec2-placement-info-value">クリティカルな小規模アプリ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Partition -->
+      <div class="ec2-placement-card ec2-placement-partition">
+        <div class="ec2-placement-card-header">
+          <div class="ec2-placement-card-title">パーティション</div>
+          <div class="ec2-placement-card-subtitle">Partition</div>
+        </div>
+        <div class="ec2-placement-diagram">
+          <div class="ec2-placement-partitions">
+            <div class="ec2-placement-partition-box">
+              <div class="ec2-placement-partition-label">P1</div>
+              <div class="ec2-placement-instance"></div>
+              <div class="ec2-placement-instance"></div>
+            </div>
+            <div class="ec2-placement-partition-box">
+              <div class="ec2-placement-partition-label">P2</div>
+              <div class="ec2-placement-instance"></div>
+              <div class="ec2-placement-instance"></div>
+            </div>
+            <div class="ec2-placement-partition-box">
+              <div class="ec2-placement-partition-label">P3</div>
+              <div class="ec2-placement-instance"></div>
+              <div class="ec2-placement-instance"></div>
+            </div>
+          </div>
+        </div>
+        <div class="ec2-placement-info">
+          <div class="ec2-placement-info-row">
+            <span class="ec2-placement-info-label">配置</span>
+            <span class="ec2-placement-info-value">パーティション単位（異なるラック）</span>
+          </div>
+          <div class="ec2-placement-info-row">
+            <span class="ec2-placement-info-label">目的</span>
+            <span class="ec2-placement-info-value ec2-placement-highlight">📊 大規模分散</span>
+          </div>
+          <div class="ec2-placement-info-row">
+            <span class="ec2-placement-info-label">制限</span>
+            <span class="ec2-placement-info-value ec2-placement-warn">AZあたり最大7パーティション</span>
+          </div>
+          <div class="ec2-placement-info-row">
+            <span class="ec2-placement-info-label">用途</span>
+            <span class="ec2-placement-info-value">Hadoop・Cassandra・Kafka</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAA note -->
+    <div class="ec2-placement-note">
+      <strong>SAA頻出パターン</strong>
+      <div class="ec2-placement-patterns">
+        <div class="ec2-placement-pattern">
+          <span class="ec2-placement-q">「HPC・低レイテンシーが必要」</span>
+          <span class="ec2-placement-a">→ クラスター</span>
+        </div>
+        <div class="ec2-placement-pattern">
+          <span class="ec2-placement-q">「障害時に全滅を避けたい小規模」</span>
+          <span class="ec2-placement-a">→ スプレッド</span>
+        </div>
+        <div class="ec2-placement-pattern">
+          <span class="ec2-placement-q">「Hadoop・Cassandraなど大規模分散」</span>
+          <span class="ec2-placement-a">→ パーティション</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="ec2-pattern" class="ec2-panel">
@@ -102,3 +325,492 @@
   }
   (window as any).ec2Tab = ec2Tab;
 </script>
+
+<style>
+  /* 購入オプション */
+  .ec2-option-title {
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .ec2-option-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 800px;
+    margin: 0 auto 16px;
+  }
+  @media (max-width: 700px) {
+    .ec2-option-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ec2-option-card {
+    padding: 14px;
+    border-radius: 10px;
+    border: 2px solid;
+    display: flex;
+    flex-direction: column;
+  }
+  .ec2-option-ondemand {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+  }
+  .dark .ec2-option-ondemand {
+    background: rgba(156, 163, 175, 0.1);
+    border-color: #6b7280;
+  }
+  .ec2-option-ri {
+    background: #dbeafe;
+    border-color: #3b82f6;
+  }
+  .dark .ec2-option-ri {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #60a5fa;
+  }
+  .ec2-option-spot {
+    background: #fef3c7;
+    border-color: #f59e0b;
+  }
+  .dark .ec2-option-spot {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: #fbbf24;
+  }
+  .ec2-option-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .ec2-option-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .ec2-option-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.1);
+    color: #374151;
+    white-space: nowrap;
+  }
+  .dark .ec2-option-badge {
+    background: rgba(255,255,255,0.1);
+    color: #d1d5db;
+  }
+  .ec2-option-badge-save {
+    background: #059669;
+    color: #fff;
+  }
+  .dark .ec2-option-badge-save {
+    background: #10b981;
+  }
+  .ec2-option-body {
+    flex: 1;
+    margin-bottom: 10px;
+  }
+  .ec2-option-point {
+    font-size: 12px;
+    color: #374151;
+    margin-bottom: 4px;
+    padding-left: 12px;
+    position: relative;
+  }
+  .dark .ec2-option-point {
+    color: #d1d5db;
+  }
+  .ec2-option-point::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #6b7280;
+  }
+  .ec2-option-warn {
+    color: #dc2626;
+  }
+  .dark .ec2-option-warn {
+    color: #f87171;
+  }
+  .ec2-option-usecase {
+    font-size: 11px;
+    padding: 8px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 6px;
+    color: #374151;
+  }
+  .dark .ec2-option-usecase {
+    background: rgba(255,255,255,0.05);
+    color: #d1d5db;
+  }
+  .ec2-option-usecase-label {
+    font-weight: 600;
+    color: #059669;
+    margin-right: 4px;
+  }
+  .dark .ec2-option-usecase-label {
+    color: #34d399;
+  }
+  /* サブオプション */
+  .ec2-option-sub-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    max-width: 800px;
+    margin: 0 auto 16px;
+  }
+  @media (max-width: 600px) {
+    .ec2-option-sub-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ec2-option-card-sub {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid;
+  }
+  .ec2-option-sp {
+    background: #ecfdf5;
+    border-color: #10b981;
+  }
+  .dark .ec2-option-sp {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: #34d399;
+  }
+  .ec2-option-dedicated {
+    background: #fdf4ff;
+    border-color: #a855f7;
+  }
+  .dark .ec2-option-dedicated {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: #c084fc;
+  }
+  .ec2-option-sub-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .ec2-option-sub-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .ec2-option-sub-body {
+    font-size: 12px;
+  }
+  /* 比較表 */
+  .ec2-option-compare {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 14px;
+    background: #faeeda;
+    border: 1px solid #854f0b;
+    border-radius: 8px;
+  }
+  .dark .ec2-option-compare {
+    background: rgba(133, 79, 11, 0.15);
+    border-color: #b45309;
+  }
+  .ec2-option-compare-title {
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 12px;
+    color: #633806;
+  }
+  .dark .ec2-option-compare-title {
+    color: #fcd34d;
+  }
+  .ec2-option-compare-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ec2-option-compare-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 1fr;
+    gap: 8px;
+    font-size: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(133, 79, 11, 0.2);
+  }
+  .ec2-option-compare-row:last-child {
+    border-bottom: none;
+  }
+  .ec2-option-compare-header {
+    font-weight: 600;
+    color: #633806;
+    border-bottom: 2px solid rgba(133, 79, 11, 0.3);
+  }
+  .dark .ec2-option-compare-header {
+    color: #fcd34d;
+  }
+  .ec2-option-compare-label {
+    font-weight: 500;
+    color: #854f0b;
+  }
+  .dark .ec2-option-compare-label {
+    color: #fbbf24;
+  }
+  .ec2-option-compare-row > div:not(.ec2-option-compare-label) {
+    color: #374151;
+  }
+  .dark .ec2-option-compare-row > div:not(.ec2-option-compare-label) {
+    color: #d1d5db;
+  }
+  .ec2-option-compare-good {
+    color: #059669 !important;
+    font-weight: 500;
+  }
+  .dark .ec2-option-compare-good {
+    color: #34d399 !important;
+  }
+  .ec2-option-compare-bad {
+    color: #dc2626 !important;
+  }
+  .dark .ec2-option-compare-bad {
+    color: #f87171 !important;
+  }
+  @media (max-width: 500px) {
+    .ec2-option-compare-row {
+      grid-template-columns: 60px 1fr 1fr;
+      font-size: 11px;
+    }
+  }
+
+  /* プレイスメントグループ */
+  .ec2-placement-title {
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  .ec2-placement-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    max-width: 720px;
+    margin: 0 auto 16px;
+  }
+  @media (max-width: 700px) {
+    .ec2-placement-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ec2-placement-card {
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid;
+  }
+  .ec2-placement-cluster {
+    background: #fef3c7;
+    border-color: #f59e0b;
+  }
+  .dark .ec2-placement-cluster {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: #fbbf24;
+  }
+  .ec2-placement-spread {
+    background: #ecfdf5;
+    border-color: #10b981;
+  }
+  .dark .ec2-placement-spread {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: #34d399;
+  }
+  .ec2-placement-partition {
+    background: #eff6ff;
+    border-color: #3b82f6;
+  }
+  .dark .ec2-placement-partition {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #60a5fa;
+  }
+  .ec2-placement-card-header {
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .ec2-placement-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .ec2-placement-card-subtitle {
+    font-size: 11px;
+    color: #6b7280;
+  }
+  .ec2-placement-diagram {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 12px;
+    min-height: 70px;
+  }
+  .ec2-placement-rack {
+    padding: 8px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+  }
+  .dark .ec2-placement-rack {
+    background: #1f2937;
+    border-color: #4b5563;
+  }
+  .ec2-placement-rack-label {
+    font-size: 10px;
+    color: #6b7280;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+  .ec2-placement-instances {
+    display: flex;
+    gap: 4px;
+    justify-content: center;
+  }
+  .ec2-placement-instance {
+    width: 16px;
+    height: 16px;
+    background: #f59e0b;
+    border-radius: 3px;
+  }
+  .ec2-placement-spread .ec2-placement-instance {
+    background: #10b981;
+  }
+  .ec2-placement-partition .ec2-placement-instance {
+    background: #3b82f6;
+  }
+  .ec2-placement-racks {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .ec2-placement-rack-small {
+    padding: 6px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+  }
+  .dark .ec2-placement-rack-small {
+    background: #1f2937;
+    border-color: #4b5563;
+  }
+  .ec2-placement-partitions {
+    display: flex;
+    gap: 6px;
+  }
+  .ec2-placement-partition-box {
+    padding: 6px;
+    background: #fff;
+    border: 1px dashed #3b82f6;
+    border-radius: 4px;
+    text-align: center;
+  }
+  .dark .ec2-placement-partition-box {
+    background: #1f2937;
+  }
+  .ec2-placement-partition-label {
+    font-size: 9px;
+    color: #3b82f6;
+    margin-bottom: 4px;
+  }
+  .ec2-placement-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    margin-top: 8px;
+  }
+  .dark .ec2-placement-info {
+    border-color: rgba(255,255,255,0.1);
+  }
+  .ec2-placement-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    padding: 2px 0;
+  }
+  .ec2-placement-info-label {
+    color: #6b7280;
+    font-weight: 500;
+    flex-shrink: 0;
+    min-width: 36px;
+  }
+  .ec2-placement-info-value {
+    color: var(--text);
+    text-align: right;
+    font-size: 11px;
+  }
+  .ec2-placement-highlight {
+    font-weight: 600;
+  }
+  .ec2-placement-cluster .ec2-placement-highlight {
+    color: #b45309;
+  }
+  .ec2-placement-spread .ec2-placement-highlight {
+    color: #16a34a;
+  }
+  .ec2-placement-partition .ec2-placement-highlight {
+    color: #2563eb;
+  }
+  .ec2-placement-warn {
+    color: #dc2626;
+    font-size: 10px;
+  }
+  .ec2-placement-note {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 14px 16px;
+    background: #faeeda;
+    border: 1px solid #854f0b;
+    border-radius: 8px;
+  }
+  .dark .ec2-placement-note {
+    background: rgba(133, 79, 11, 0.15);
+    border-color: #b45309;
+  }
+  .ec2-placement-note strong {
+    display: block;
+    font-size: 14px;
+    color: #633806;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .dark .ec2-placement-note strong {
+    color: #fcd34d;
+  }
+  .ec2-placement-patterns {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ec2-placement-pattern {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(133, 79, 11, 0.2);
+  }
+  .ec2-placement-pattern:last-child {
+    border-bottom: none;
+  }
+  .ec2-placement-q {
+    color: #633806;
+  }
+  .dark .ec2-placement-q {
+    color: #fef3c7;
+  }
+  .ec2-placement-a {
+    color: #412402;
+    font-weight: 500;
+  }
+  .dark .ec2-placement-a {
+    color: #fcd34d;
+  }
+</style>
