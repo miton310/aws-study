@@ -669,3 +669,125 @@
   border-color: #FBBF24;
 }
 .dark .dia-lambda .dia-box-label { color: #FCD34D; }
+
+/* ============================================
+   電流エフェクト（Electric Flow Animation）
+   ============================================ */
+
+/* 電流フロー共通 */
+.dia-flow {
+  stroke-dasharray: 8 6;
+  animation: dia-electric 0.8s linear infinite;
+}
+.dia-flow-fast {
+  stroke-dasharray: 6 4;
+  animation: dia-electric 0.5s linear infinite;
+}
+.dia-flow-slow {
+  stroke-dasharray: 10 8;
+  animation: dia-electric 1.2s linear infinite;
+}
+.dia-flow-reverse {
+  stroke-dasharray: 8 6;
+  animation: dia-electric-reverse 0.8s linear infinite;
+}
+
+@keyframes dia-electric {
+  to { stroke-dashoffset: -14; }
+}
+@keyframes dia-electric-reverse {
+  to { stroke-dashoffset: 14; }
+}
+
+/* カラーバリエーション */
+.dia-flow-green { stroke: #10b981; }
+.dia-flow-blue { stroke: #3b82f6; }
+.dia-flow-orange { stroke: #f59e0b; }
+.dia-flow-purple { stroke: #8b5cf6; }
+.dia-flow-red { stroke: #ef4444; }
+.dia-flow-teal { stroke: #14b8a6; }
+
+/* グロー効果用filter（SVG内で定義して使用） */
+.dia-glow {
+  filter: url(#dia-glow-filter);
+}
+
+/* ベースライン（電流の下に引く暗い線） */
+.dia-flow-base {
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.dia-flow-base-green { stroke: #064e3b; }
+.dia-flow-base-blue { stroke: #1e3a5f; }
+.dia-flow-base-orange { stroke: #78350f; }
+.dia-flow-base-purple { stroke: #3b0764; }
+
+/* SVGオーバーレイ用コンテナ */
+.dia-svg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* 相対位置コンテナ（矢印を動的に描画する親要素） */
+.dia-relative {
+  position: relative;
+}
+
+/* ============================================
+   動的矢印用マーカー定義テンプレート
+   （各コンポーネントのSVG内で使用）
+   ============================================
+
+   使用例:
+   <svg class="dia-svg-overlay">
+     <defs>
+       <marker id="dia-arrow-green" viewBox="0 0 10 10" refX="9" refY="5"
+               markerWidth="5" markerHeight="5" orient="auto">
+         <path d="M 0 0 L 10 5 L 0 10 z" fill="#10b981"/>
+       </marker>
+       <filter id="dia-glow-filter">
+         <feGaussianBlur stdDeviation="2" result="blur"/>
+         <feMerge>
+           <feMergeNode in="blur"/>
+           <feMergeNode in="SourceGraphic"/>
+         </feMerge>
+       </filter>
+     </defs>
+
+     <!-- ベースライン -->
+     <path d="M 50,50 Q 100,20 150,50" class="dia-flow-base dia-flow-base-green" fill="none"/>
+     <!-- 電流ライン -->
+     <path d="M 50,50 Q 100,20 150,50" class="dia-flow dia-flow-green dia-glow"
+           stroke-width="2" fill="none" marker-end="url(#dia-arrow-green)"/>
+   </svg>
+   ============================================ */
+
+/* 凡例ボックス */
+.dia-legend-box-flow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 12px;
+}
+.dark .dia-legend-box-flow {
+  background: #1e293b;
+  border-color: #334155;
+}
+.dia-legend-line {
+  width: 30px;
+  height: 3px;
+  border-radius: 2px;
+}
+.dia-legend-line.green { background: #10b981; }
+.dia-legend-line.blue { background: #3b82f6; }
+.dia-legend-line.orange { background: #f59e0b; }
+.dia-legend-line.purple { background: #8b5cf6; }

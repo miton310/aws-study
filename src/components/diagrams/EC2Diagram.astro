@@ -5,6 +5,7 @@
     <button class="ec2-btn active" onclick="ec2Tab('option')">購入オプション</button>
     <button class="ec2-btn" onclick="ec2Tab('family')">インスタンスファミリー</button>
     <button class="ec2-btn" onclick="ec2Tab('storage')">ストレージ</button>
+    <button class="ec2-btn" onclick="ec2Tab('ami')">AMI</button>
     <button class="ec2-btn" onclick="ec2Tab('spot')">スポット詳細</button>
     <button class="ec2-btn" onclick="ec2Tab('placement')">プレイスメントグループ</button>
     <button class="ec2-btn" onclick="ec2Tab('connect')">接続方法</button>
@@ -126,6 +127,73 @@
           <div class="ec2-option-compare-label">コミット</div>
           <div>$/時間の使用量</div>
           <div>特定インスタンス</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Savings Plans 詳細比較 -->
+    <div class="ec2-sp-section">
+      <div class="ec2-sp-title">Savings Plans の2種類</div>
+      <div class="ec2-sp-grid">
+        <!-- EC2 Instance Savings Plans -->
+        <div class="ec2-sp-card ec2-sp-instance">
+          <div class="ec2-sp-card-header">
+            <div class="ec2-sp-card-name">EC2 Instance Savings Plans</div>
+            <div class="ec2-sp-card-badge">最大72%割引</div>
+          </div>
+          <div class="ec2-sp-card-desc">特定リージョン + 特定インスタンスファミリーにコミット</div>
+          <div class="ec2-sp-card-body">
+            <div class="ec2-sp-item ec2-sp-good">割引率が高い</div>
+            <div class="ec2-sp-item ec2-sp-good">OS・テナンシー変更OK</div>
+            <div class="ec2-sp-item ec2-sp-good">サイズ変更OK（M5.large→M5.xlarge）</div>
+            <div class="ec2-sp-item ec2-sp-bad">リージョン変更NG</div>
+            <div class="ec2-sp-item ec2-sp-bad">ファミリー変更NG（M5→C5）</div>
+          </div>
+          <div class="ec2-sp-card-example">
+            <strong>例:</strong> us-east-1のM5ファミリーを$10/時間コミット
+          </div>
+        </div>
+
+        <!-- Compute Savings Plans -->
+        <div class="ec2-sp-card ec2-sp-compute">
+          <div class="ec2-sp-card-header">
+            <div class="ec2-sp-card-name">Compute Savings Plans</div>
+            <div class="ec2-sp-card-badge">最大66%割引</div>
+          </div>
+          <div class="ec2-sp-card-desc">コンピュート全体の使用量（$/時間）にコミット</div>
+          <div class="ec2-sp-card-body">
+            <div class="ec2-sp-item ec2-sp-good">リージョン変更OK</div>
+            <div class="ec2-sp-item ec2-sp-good">ファミリー変更OK</div>
+            <div class="ec2-sp-item ec2-sp-good">EC2 + Fargate + Lambda に適用</div>
+            <div class="ec2-sp-item ec2-sp-good">将来のアーキテクチャ変更に柔軟</div>
+            <div class="ec2-sp-item ec2-sp-warn">割引率はやや低め</div>
+          </div>
+          <div class="ec2-sp-card-example">
+            <strong>例:</strong> コンピュート全体で$10/時間コミット（どこでも使える）
+          </div>
+        </div>
+      </div>
+
+      <!-- 選び方ガイド -->
+      <div class="ec2-sp-guide">
+        <div class="ec2-sp-guide-title">どちらを選ぶ？</div>
+        <div class="ec2-sp-guide-grid">
+          <div class="ec2-sp-guide-item">
+            <span class="ec2-sp-guide-q">ワークロードが安定・同じファミリーを長期利用</span>
+            <span class="ec2-sp-guide-a">→ EC2 Instance SP（割引率重視）</span>
+          </div>
+          <div class="ec2-sp-guide-item">
+            <span class="ec2-sp-guide-q">Fargate/Lambdaへの移行可能性あり</span>
+            <span class="ec2-sp-guide-a">→ Compute SP（柔軟性重視）</span>
+          </div>
+          <div class="ec2-sp-guide-item">
+            <span class="ec2-sp-guide-q">複数リージョンに分散したワークロード</span>
+            <span class="ec2-sp-guide-a">→ Compute SP</span>
+          </div>
+          <div class="ec2-sp-guide-item">
+            <span class="ec2-sp-guide-q">最大の割引率を得たい</span>
+            <span class="ec2-sp-guide-a">→ EC2 Instance SP</span>
+          </div>
         </div>
       </div>
     </div>
@@ -424,26 +492,352 @@
     </div>
   </div>
 
+  <!-- AMI -->
+  <div id="ec2-ami" class="ec2-panel">
+    <div class="ec2-ami-title">AMI（Amazon Machine Image）</div>
+
+    <!-- AMIとは -->
+    <div class="ec2-ami-overview">
+      <div class="ec2-ami-overview-desc">
+        EC2インスタンスを起動するための<strong>テンプレート</strong>。OS・ソフトウェア・設定を含む。
+      </div>
+      <div class="ec2-ami-components">
+        <div class="ec2-ami-component">
+          <div class="ec2-ami-component-icon">💾</div>
+          <div class="ec2-ami-component-name">ルートボリューム</div>
+          <div class="ec2-ami-component-desc">OS・アプリケーション</div>
+        </div>
+        <div class="ec2-ami-component-plus">+</div>
+        <div class="ec2-ami-component">
+          <div class="ec2-ami-component-icon">🔑</div>
+          <div class="ec2-ami-component-name">起動許可</div>
+          <div class="ec2-ami-component-desc">誰が使用できるか</div>
+        </div>
+        <div class="ec2-ami-component-plus">+</div>
+        <div class="ec2-ami-component">
+          <div class="ec2-ami-component-icon">📦</div>
+          <div class="ec2-ami-component-name">ブロックデバイスマッピング</div>
+          <div class="ec2-ami-component-desc">追加ボリュームの設定</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AMIの種類 -->
+    <div class="ec2-ami-types">
+      <div class="ec2-ami-types-title">AMIの種類</div>
+      <div class="ec2-ami-types-grid">
+        <div class="ec2-ami-type-card ec2-ami-type-aws">
+          <div class="ec2-ami-type-header">
+            <div class="ec2-ami-type-name">AWS提供AMI</div>
+            <div class="ec2-ami-type-badge">公式</div>
+          </div>
+          <div class="ec2-ami-type-list">
+            <div class="ec2-ami-type-item">Amazon Linux 2023</div>
+            <div class="ec2-ami-type-item">Ubuntu, RHEL, Windows Server</div>
+            <div class="ec2-ami-type-item">無料〜ライセンス料込み</div>
+          </div>
+        </div>
+        <div class="ec2-ami-type-card ec2-ami-type-marketplace">
+          <div class="ec2-ami-type-header">
+            <div class="ec2-ami-type-name">Marketplace AMI</div>
+            <div class="ec2-ami-type-badge">サードパーティ</div>
+          </div>
+          <div class="ec2-ami-type-list">
+            <div class="ec2-ami-type-item">ベンダー提供の構成済みAMI</div>
+            <div class="ec2-ami-type-item">WordPress, Jenkins等</div>
+            <div class="ec2-ami-type-item">追加料金が発生する場合あり</div>
+          </div>
+        </div>
+        <div class="ec2-ami-type-card ec2-ami-type-custom">
+          <div class="ec2-ami-type-header">
+            <div class="ec2-ami-type-name">カスタムAMI</div>
+            <div class="ec2-ami-type-badge ec2-ami-type-badge-important">重要</div>
+          </div>
+          <div class="ec2-ami-type-list">
+            <div class="ec2-ami-type-item">自分で作成したAMI</div>
+            <div class="ec2-ami-type-item">ゴールデンイメージとして活用</div>
+            <div class="ec2-ami-type-item">起動時間の短縮・一貫性確保</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AMIの作成フロー -->
+    <div class="ec2-ami-flow">
+      <div class="ec2-ami-flow-title">AMI作成フロー</div>
+      <div class="ec2-ami-flow-diagram">
+        <div class="ec2-ami-flow-step">
+          <div class="ec2-ami-flow-step-icon">🖥️</div>
+          <div class="ec2-ami-flow-step-label">EC2インスタンス</div>
+          <div class="ec2-ami-flow-step-sub">設定・ソフトインストール済み</div>
+        </div>
+        <div class="ec2-ami-flow-arrow">→</div>
+        <div class="ec2-ami-flow-step">
+          <div class="ec2-ami-flow-step-icon">📸</div>
+          <div class="ec2-ami-flow-step-label">スナップショット作成</div>
+          <div class="ec2-ami-flow-step-sub">EBSボリュームのコピー</div>
+        </div>
+        <div class="ec2-ami-flow-arrow">→</div>
+        <div class="ec2-ami-flow-step ec2-ami-flow-step-ami">
+          <div class="ec2-ami-flow-step-icon">🖼️</div>
+          <div class="ec2-ami-flow-step-label">AMI</div>
+          <div class="ec2-ami-flow-step-sub">起動テンプレート完成</div>
+        </div>
+        <div class="ec2-ami-flow-arrow">→</div>
+        <div class="ec2-ami-flow-step">
+          <div class="ec2-ami-flow-step-icon">🚀</div>
+          <div class="ec2-ami-flow-step-label">新EC2を起動</div>
+          <div class="ec2-ami-flow-step-sub">同じ構成で素早く起動</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AMIの操作 -->
+    <div class="ec2-ami-operations">
+      <div class="ec2-ami-operations-title">AMIの操作</div>
+      <div class="ec2-ami-operations-grid">
+        <div class="ec2-ami-operation">
+          <div class="ec2-ami-operation-icon">🌍</div>
+          <div class="ec2-ami-operation-name">リージョン間コピー</div>
+          <div class="ec2-ami-operation-desc">
+            別リージョンにAMIをコピー。DR対策やグローバル展開に使用。
+          </div>
+          <div class="ec2-ami-operation-note">
+            コピー先で新しいAMI IDが発行される
+          </div>
+        </div>
+        <div class="ec2-ami-operation">
+          <div class="ec2-ami-operation-icon">👥</div>
+          <div class="ec2-ami-operation-name">アカウント間共有</div>
+          <div class="ec2-ami-operation-desc">
+            他のAWSアカウントにAMIを共有。組織内での展開に便利。
+          </div>
+          <div class="ec2-ami-operation-note">
+            公開設定で全アカウントに公開も可能
+          </div>
+        </div>
+        <div class="ec2-ami-operation">
+          <div class="ec2-ami-operation-icon">🔒</div>
+          <div class="ec2-ami-operation-name">暗号化</div>
+          <div class="ec2-ami-operation-desc">
+            KMSでAMIのスナップショットを暗号化。セキュリティ要件に対応。
+          </div>
+          <div class="ec2-ami-operation-note">
+            非暗号化→暗号化はコピー時に変換可能
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ゴールデンイメージ -->
+    <div class="ec2-ami-golden">
+      <div class="ec2-ami-golden-header">
+        <div class="ec2-ami-golden-title">ゴールデンイメージ（Golden Image）</div>
+        <div class="ec2-ami-golden-badge">ベストプラクティス</div>
+      </div>
+      <div class="ec2-ami-golden-desc">
+        本番環境で使用する標準構成をAMIとして保存し、全インスタンスで統一した構成を維持する手法。
+      </div>
+      <div class="ec2-ami-golden-benefits">
+        <div class="ec2-ami-golden-benefit">
+          <span class="ec2-ami-golden-benefit-icon">⚡</span>
+          <span>起動時間の短縮（インストール不要）</span>
+        </div>
+        <div class="ec2-ami-golden-benefit">
+          <span class="ec2-ami-golden-benefit-icon">✓</span>
+          <span>環境の一貫性確保</span>
+        </div>
+        <div class="ec2-ami-golden-benefit">
+          <span class="ec2-ami-golden-benefit-icon">🔄</span>
+          <span>Auto Scalingでの迅速なスケールアウト</span>
+        </div>
+        <div class="ec2-ami-golden-benefit">
+          <span class="ec2-ami-golden-benefit-icon">🛡️</span>
+          <span>セキュリティパッチ適用済みの展開</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAA頻出 -->
+    <div class="ec2-ami-exam">
+      <div class="ec2-ami-exam-title">SAA頻出パターン</div>
+      <div class="ec2-ami-exam-grid">
+        <div class="ec2-ami-exam-item">
+          <span class="ec2-ami-exam-q">「同じ構成のEC2を素早く複数起動したい」</span>
+          <span class="ec2-ami-exam-a">→ カスタムAMI（ゴールデンイメージ）</span>
+        </div>
+        <div class="ec2-ami-exam-item">
+          <span class="ec2-ami-exam-q">「別リージョンでDR環境を構築したい」</span>
+          <span class="ec2-ami-exam-a">→ AMIをリージョン間コピー</span>
+        </div>
+        <div class="ec2-ami-exam-item">
+          <span class="ec2-ami-exam-q">「Auto Scalingの起動を高速化したい」</span>
+          <span class="ec2-ami-exam-a">→ 事前構成済みAMI + 起動テンプレート</span>
+        </div>
+        <div class="ec2-ami-exam-item">
+          <span class="ec2-ami-exam-q">「AMIを別アカウントと共有したい」</span>
+          <span class="ec2-ami-exam-a">→ AMIの起動許可でアカウントIDを追加</span>
+        </div>
+        <div class="ec2-ami-exam-item">
+          <span class="ec2-ami-exam-q">「非暗号化AMIを暗号化したい」</span>
+          <span class="ec2-ami-exam-a">→ AMIコピー時に暗号化を有効化</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- スポットインスタンス -->
   <div id="ec2-spot" class="ec2-panel">
-    <svg width="100%" viewBox="0 0 680 340">
-      <text x="340" y="26" text-anchor="middle" font-size="14" font-weight="500" fill="currentColor">スポットインスタンス：最大90%割引・中断リスクあり</text>
-      <rect x="40" y="50" width="600" height="68" rx="8" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/>
-      <text x="340" y="78" text-anchor="middle" font-size="13" font-weight="500" fill="#712B13">仕組み</text>
-      <text x="60" y="102" font-size="12" fill="#993C1D">AWSの余剰キャパシティを格安で使う → AWSが必要になったら2分前通知で強制終了</text>
-      <rect x="40"  y="140" width="270" height="120" rx="8" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/>
-      <text x="175" y="168" text-anchor="middle" font-size="13" font-weight="500" fill="#085041">向いている（中断OK）</text>
-      <text x="175" y="194" text-anchor="middle" font-size="12" fill="#085041">バッチ処理</text>
-      <text x="175" y="216" text-anchor="middle" font-size="12" fill="#085041">CI/CDパイプライン</text>
-      <text x="175" y="238" text-anchor="middle" font-size="12" fill="#085041">機械学習の学習・画像処理</text>
-      <rect x="370" y="140" width="270" height="120" rx="8" fill="#FCEBEB" stroke="#A32D2D" stroke-width="0.5"/>
-      <text x="505" y="168" text-anchor="middle" font-size="13" font-weight="500" fill="#791F1F">向いていない（中断NG）</text>
-      <text x="505" y="194" text-anchor="middle" font-size="12" fill="#A32D2D">Webサーバー・本番DB</text>
-      <text x="505" y="216" text-anchor="middle" font-size="12" fill="#A32D2D">継続的なAPI処理</text>
-      <text x="505" y="238" text-anchor="middle" font-size="12" fill="#A32D2D">クリティカルな業務</text>
-      <rect x="40" y="278" width="600" height="44" rx="8" fill="#FAEEDA" stroke="#854F0B" stroke-width="0.5"/>
-      <text x="340" y="304" text-anchor="middle" font-size="12" font-weight="500" fill="#633806">SAA頻出：「コスト最小・中断許容できるバッチ」→ スポットインスタンス</text>
-    </svg>
+    <div class="ec2-spot-title">スポットインスタンス：最大90%割引・中断リスクあり</div>
+
+    <!-- 仕組み -->
+    <div class="ec2-spot-mechanism">
+      <div class="ec2-spot-mechanism-title">仕組み</div>
+      <div class="ec2-spot-mechanism-flow">
+        <div class="ec2-spot-mechanism-step">
+          <div class="ec2-spot-mechanism-icon">🏢</div>
+          <div class="ec2-spot-mechanism-label">AWSの余剰キャパシティ</div>
+        </div>
+        <div class="ec2-spot-mechanism-arrow">→</div>
+        <div class="ec2-spot-mechanism-step">
+          <div class="ec2-spot-mechanism-icon">💰</div>
+          <div class="ec2-spot-mechanism-label">格安で利用可能</div>
+        </div>
+        <div class="ec2-spot-mechanism-arrow">→</div>
+        <div class="ec2-spot-mechanism-step ec2-spot-mechanism-warn">
+          <div class="ec2-spot-mechanism-icon">⚠️</div>
+          <div class="ec2-spot-mechanism-label">2分前通知で強制終了</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 向き・不向き -->
+    <div class="ec2-spot-fit-grid">
+      <div class="ec2-spot-fit-card ec2-spot-fit-good">
+        <div class="ec2-spot-fit-header">✓ 向いている（中断OK）</div>
+        <div class="ec2-spot-fit-list">
+          <div class="ec2-spot-fit-item">バッチ処理</div>
+          <div class="ec2-spot-fit-item">CI/CDパイプライン</div>
+          <div class="ec2-spot-fit-item">機械学習の学習</div>
+          <div class="ec2-spot-fit-item">画像・動画処理</div>
+          <div class="ec2-spot-fit-item">ビッグデータ分析</div>
+        </div>
+      </div>
+      <div class="ec2-spot-fit-card ec2-spot-fit-bad">
+        <div class="ec2-spot-fit-header">✗ 向いていない（中断NG）</div>
+        <div class="ec2-spot-fit-list">
+          <div class="ec2-spot-fit-item">Webサーバー・本番DB</div>
+          <div class="ec2-spot-fit-item">継続的なAPI処理</div>
+          <div class="ec2-spot-fit-item">クリティカルな業務</div>
+          <div class="ec2-spot-fit-item">ステートフルなアプリ</div>
+          <div class="ec2-spot-fit-item">長時間実行ジョブ（単体）</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 中断対策 -->
+    <div class="ec2-spot-interrupt">
+      <div class="ec2-spot-interrupt-title">中断対策</div>
+      <div class="ec2-spot-interrupt-grid">
+        <div class="ec2-spot-interrupt-item">
+          <div class="ec2-spot-interrupt-name">中断通知の活用</div>
+          <div class="ec2-spot-interrupt-desc">2分前にメタデータで通知 → 処理を安全に終了</div>
+        </div>
+        <div class="ec2-spot-interrupt-item">
+          <div class="ec2-spot-interrupt-name">チェックポイント保存</div>
+          <div class="ec2-spot-interrupt-desc">進捗をS3等に保存 → 別インスタンスで再開</div>
+        </div>
+        <div class="ec2-spot-interrupt-item">
+          <div class="ec2-spot-interrupt-name">スポットフリート</div>
+          <div class="ec2-spot-interrupt-desc">複数タイプ・AZで分散 → 中断リスク軽減</div>
+        </div>
+        <div class="ec2-spot-interrupt-item">
+          <div class="ec2-spot-interrupt-name">オンデマンドと混合</div>
+          <div class="ec2-spot-interrupt-desc">Auto Scaling混合 → 可用性を確保</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- スポットフリート -->
+    <div class="ec2-spot-fleet">
+      <div class="ec2-spot-fleet-header">
+        <div class="ec2-spot-fleet-title">Spot Fleet（スポットフリート）</div>
+        <div class="ec2-spot-fleet-badge">重要</div>
+      </div>
+      <div class="ec2-spot-fleet-desc">
+        複数のインスタンスタイプ・AZにまたがってスポットインスタンスを自動調達・管理する機能
+      </div>
+      <div class="ec2-spot-fleet-grid">
+        <div class="ec2-spot-fleet-card">
+          <div class="ec2-spot-fleet-card-title">特徴</div>
+          <div class="ec2-spot-fleet-card-list">
+            <div class="ec2-spot-fleet-card-item">複数インスタンスタイプを指定可能</div>
+            <div class="ec2-spot-fleet-card-item">複数AZに分散配置</div>
+            <div class="ec2-spot-fleet-card-item">ターゲット容量（vCPU/メモリ/台数）を維持</div>
+            <div class="ec2-spot-fleet-card-item">中断時は自動で代替を起動</div>
+          </div>
+        </div>
+        <div class="ec2-spot-fleet-card">
+          <div class="ec2-spot-fleet-card-title">配分戦略</div>
+          <div class="ec2-spot-fleet-card-list">
+            <div class="ec2-spot-fleet-card-item"><strong>lowestPrice</strong>：最安値のプールを優先</div>
+            <div class="ec2-spot-fleet-card-item"><strong>diversified</strong>：全プールに均等分散（中断耐性↑）</div>
+            <div class="ec2-spot-fleet-card-item"><strong>capacityOptimized</strong>：容量に余裕のあるプール優先</div>
+            <div class="ec2-spot-fleet-card-item"><strong>priceCapacityOptimized</strong>：価格と容量のバランス（推奨）</div>
+          </div>
+        </div>
+      </div>
+      <div class="ec2-spot-fleet-diagram">
+        <div class="ec2-spot-fleet-diagram-title">スポットフリートの動作イメージ</div>
+        <div class="ec2-spot-fleet-diagram-flow">
+          <div class="ec2-spot-fleet-diagram-box ec2-spot-fleet-diagram-request">
+            <div class="ec2-spot-fleet-diagram-label">Spot Fleet リクエスト</div>
+            <div class="ec2-spot-fleet-diagram-sub">ターゲット: 10 vCPU</div>
+          </div>
+          <div class="ec2-spot-fleet-diagram-arrow">→</div>
+          <div class="ec2-spot-fleet-diagram-pools">
+            <div class="ec2-spot-fleet-diagram-pool">
+              <div class="ec2-spot-fleet-diagram-pool-header">m5.large</div>
+              <div class="ec2-spot-fleet-diagram-pool-az">AZ-a: 2台</div>
+            </div>
+            <div class="ec2-spot-fleet-diagram-pool">
+              <div class="ec2-spot-fleet-diagram-pool-header">c5.large</div>
+              <div class="ec2-spot-fleet-diagram-pool-az">AZ-b: 2台</div>
+            </div>
+            <div class="ec2-spot-fleet-diagram-pool">
+              <div class="ec2-spot-fleet-diagram-pool-header">r5.large</div>
+              <div class="ec2-spot-fleet-diagram-pool-az">AZ-c: 1台</div>
+            </div>
+          </div>
+        </div>
+        <div class="ec2-spot-fleet-diagram-note">
+          diversified戦略: 複数プールに分散 → 1つのプールで中断が発生しても影響を最小化
+        </div>
+      </div>
+    </div>
+
+    <!-- SAA頻出 -->
+    <div class="ec2-spot-exam">
+      <div class="ec2-spot-exam-title">SAA頻出パターン</div>
+      <div class="ec2-spot-exam-grid">
+        <div class="ec2-spot-exam-item">
+          <span class="ec2-spot-exam-q">「コスト最小・中断許容できるバッチ」</span>
+          <span class="ec2-spot-exam-a">→ スポットインスタンス</span>
+        </div>
+        <div class="ec2-spot-exam-item">
+          <span class="ec2-spot-exam-q">「スポットの中断リスクを軽減したい」</span>
+          <span class="ec2-spot-exam-a">→ Spot Fleet + diversified/capacityOptimized</span>
+        </div>
+        <div class="ec2-spot-exam-item">
+          <span class="ec2-spot-exam-q">「スポット＋可用性も確保したい」</span>
+          <span class="ec2-spot-exam-a">→ Auto Scaling混合（スポット＋オンデマンド）</span>
+        </div>
+        <div class="ec2-spot-exam-item">
+          <span class="ec2-spot-exam-q">「複数タイプで最もコスト効率良く」</span>
+          <span class="ec2-spot-exam-a">→ Spot Fleet + lowestPrice</span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- プレイスメントグループ -->
@@ -2118,6 +2512,1059 @@
   }
   @media (max-width: 600px) {
     .ec2-storage-pattern {
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+
+  /* Savings Plans 詳細比較 */
+  .ec2-sp-section {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+  }
+  .dark .ec2-sp-section {
+    border-color: #374151;
+  }
+  .ec2-sp-title {
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 14px;
+    color: var(--text);
+  }
+  .ec2-sp-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 600px) {
+    .ec2-sp-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ec2-sp-card {
+    padding: 14px;
+    border-radius: 10px;
+    border: 2px solid;
+  }
+  .ec2-sp-instance {
+    background: #ecfdf5;
+    border-color: #10b981;
+  }
+  .dark .ec2-sp-instance {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: #34d399;
+  }
+  .ec2-sp-compute {
+    background: #eff6ff;
+    border-color: #3b82f6;
+  }
+  .dark .ec2-sp-compute {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #60a5fa;
+  }
+  .ec2-sp-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .ec2-sp-card-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .ec2-sp-card-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .ec2-sp-instance .ec2-sp-card-badge {
+    background: #059669;
+    color: #fff;
+  }
+  .ec2-sp-compute .ec2-sp-card-badge {
+    background: #2563eb;
+    color: #fff;
+  }
+  .ec2-sp-card-desc {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+  }
+  .dark .ec2-sp-card-desc {
+    border-color: rgba(255,255,255,0.1);
+  }
+  .ec2-sp-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+  .ec2-sp-item {
+    font-size: 12px;
+    padding-left: 16px;
+    position: relative;
+    color: #374151;
+  }
+  .dark .ec2-sp-item {
+    color: #d1d5db;
+  }
+  .ec2-sp-item::before {
+    position: absolute;
+    left: 0;
+    font-size: 11px;
+  }
+  .ec2-sp-good::before {
+    content: "✓";
+    color: #059669;
+  }
+  .ec2-sp-bad::before {
+    content: "✗";
+    color: #dc2626;
+  }
+  .ec2-sp-warn::before {
+    content: "△";
+    color: #d97706;
+  }
+  .ec2-sp-good {
+    color: #065f46;
+  }
+  .dark .ec2-sp-good {
+    color: #6ee7b7;
+  }
+  .ec2-sp-bad {
+    color: #991b1b;
+  }
+  .dark .ec2-sp-bad {
+    color: #fca5a5;
+  }
+  .ec2-sp-warn {
+    color: #92400e;
+  }
+  .dark .ec2-sp-warn {
+    color: #fcd34d;
+  }
+  .ec2-sp-card-example {
+    font-size: 11px;
+    padding: 8px 10px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 6px;
+    color: #374151;
+  }
+  .dark .ec2-sp-card-example {
+    background: rgba(255,255,255,0.05);
+    color: #d1d5db;
+  }
+  .ec2-sp-card-example strong {
+    color: var(--text);
+  }
+  /* 選び方ガイド */
+  .ec2-sp-guide {
+    padding: 14px 16px;
+    background: #faeeda;
+    border: 1px solid #854f0b;
+    border-radius: 8px;
+  }
+  .dark .ec2-sp-guide {
+    background: rgba(133, 79, 11, 0.15);
+    border-color: #b45309;
+  }
+  .ec2-sp-guide-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #633806;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .dark .ec2-sp-guide-title {
+    color: #fcd34d;
+  }
+  .ec2-sp-guide-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ec2-sp-guide-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(133, 79, 11, 0.2);
+  }
+  .ec2-sp-guide-item:last-child {
+    border-bottom: none;
+  }
+  .ec2-sp-guide-q {
+    color: #633806;
+  }
+  .dark .ec2-sp-guide-q {
+    color: #fef3c7;
+  }
+  .ec2-sp-guide-a {
+    color: #412402;
+    font-weight: 500;
+  }
+  .dark .ec2-sp-guide-a {
+    color: #fcd34d;
+  }
+  @media (max-width: 600px) {
+    .ec2-sp-guide-item {
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+
+  /* スポットインスタンス詳細 */
+  .ec2-spot-title {
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  /* 仕組み */
+  .ec2-spot-mechanism {
+    padding: 14px;
+    background: #faece7;
+    border: 1px solid #993c1d;
+    border-radius: 10px;
+    margin-bottom: 16px;
+  }
+  .dark .ec2-spot-mechanism {
+    background: rgba(153, 60, 29, 0.15);
+    border-color: #f97316;
+  }
+  .ec2-spot-mechanism-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    color: #712b13;
+    margin-bottom: 12px;
+  }
+  .dark .ec2-spot-mechanism-title {
+    color: #fdba74;
+  }
+  .ec2-spot-mechanism-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .ec2-spot-mechanism-step {
+    text-align: center;
+    padding: 10px 14px;
+    background: #fff;
+    border-radius: 8px;
+    min-width: 120px;
+  }
+  .dark .ec2-spot-mechanism-step {
+    background: #292524;
+  }
+  .ec2-spot-mechanism-warn {
+    background: #fef2f2;
+    border: 1px solid #dc2626;
+  }
+  .dark .ec2-spot-mechanism-warn {
+    background: rgba(220, 38, 38, 0.15);
+    border-color: #f87171;
+  }
+  .ec2-spot-mechanism-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+  .ec2-spot-mechanism-label {
+    font-size: 12px;
+    color: #374151;
+  }
+  .dark .ec2-spot-mechanism-label {
+    color: #d1d5db;
+  }
+  .ec2-spot-mechanism-arrow {
+    font-size: 20px;
+    color: #993c1d;
+    font-weight: bold;
+  }
+  .dark .ec2-spot-mechanism-arrow {
+    color: #fb923c;
+  }
+  /* 向き・不向き */
+  .ec2-spot-fit-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 550px) {
+    .ec2-spot-fit-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ec2-spot-fit-card {
+    padding: 14px;
+    border-radius: 10px;
+    border: 2px solid;
+  }
+  .ec2-spot-fit-good {
+    background: #ecfdf5;
+    border-color: #10b981;
+  }
+  .dark .ec2-spot-fit-good {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: #34d399;
+  }
+  .ec2-spot-fit-bad {
+    background: #fef2f2;
+    border-color: #ef4444;
+  }
+  .dark .ec2-spot-fit-bad {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: #f87171;
+  }
+  .ec2-spot-fit-header {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .ec2-spot-fit-good .ec2-spot-fit-header {
+    color: #065f46;
+  }
+  .dark .ec2-spot-fit-good .ec2-spot-fit-header {
+    color: #6ee7b7;
+  }
+  .ec2-spot-fit-bad .ec2-spot-fit-header {
+    color: #991b1b;
+  }
+  .dark .ec2-spot-fit-bad .ec2-spot-fit-header {
+    color: #fca5a5;
+  }
+  .ec2-spot-fit-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ec2-spot-fit-item {
+    font-size: 13px;
+    padding-left: 16px;
+    position: relative;
+    color: #374151;
+  }
+  .dark .ec2-spot-fit-item {
+    color: #d1d5db;
+  }
+  .ec2-spot-fit-item::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+  }
+  .ec2-spot-fit-good .ec2-spot-fit-item::before {
+    color: #10b981;
+  }
+  .ec2-spot-fit-bad .ec2-spot-fit-item::before {
+    color: #ef4444;
+  }
+  /* 中断対策 */
+  .ec2-spot-interrupt {
+    padding: 14px;
+    background: #f3f4f6;
+    border-radius: 10px;
+    margin-bottom: 16px;
+  }
+  .dark .ec2-spot-interrupt {
+    background: rgba(156, 163, 175, 0.1);
+  }
+  .ec2-spot-interrupt-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .ec2-spot-interrupt-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  @media (max-width: 550px) {
+    .ec2-spot-interrupt-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ec2-spot-interrupt-item {
+    padding: 10px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+  }
+  .dark .ec2-spot-interrupt-item {
+    background: #1f2937;
+    border-color: #374151;
+  }
+  .ec2-spot-interrupt-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 4px;
+  }
+  .dark .ec2-spot-interrupt-name {
+    color: #93c5fd;
+  }
+  .ec2-spot-interrupt-desc {
+    font-size: 12px;
+    color: #6b7280;
+  }
+  /* スポットフリート */
+  .ec2-spot-fleet {
+    padding: 16px;
+    background: #eff6ff;
+    border: 2px solid #3b82f6;
+    border-radius: 10px;
+    margin-bottom: 16px;
+  }
+  .dark .ec2-spot-fleet {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #60a5fa;
+  }
+  .ec2-spot-fleet-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .ec2-spot-fleet-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e40af;
+  }
+  .dark .ec2-spot-fleet-title {
+    color: #93c5fd;
+  }
+  .ec2-spot-fleet-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    background: #dc2626;
+    color: #fff;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .ec2-spot-fleet-desc {
+    font-size: 13px;
+    color: #374151;
+    text-align: center;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+  }
+  .dark .ec2-spot-fleet-desc {
+    color: #d1d5db;
+  }
+  .ec2-spot-fleet-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 550px) {
+    .ec2-spot-fleet-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ec2-spot-fleet-card {
+    padding: 12px;
+    background: #fff;
+    border-radius: 8px;
+  }
+  .dark .ec2-spot-fleet-card {
+    background: #1e293b;
+  }
+  .ec2-spot-fleet-card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 8px;
+  }
+  .dark .ec2-spot-fleet-card-title {
+    color: #93c5fd;
+  }
+  .ec2-spot-fleet-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ec2-spot-fleet-card-item {
+    font-size: 12px;
+    color: #374151;
+    padding-left: 12px;
+    position: relative;
+  }
+  .dark .ec2-spot-fleet-card-item {
+    color: #d1d5db;
+  }
+  .ec2-spot-fleet-card-item::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #3b82f6;
+  }
+  .ec2-spot-fleet-card-item strong {
+    color: #1e40af;
+  }
+  .dark .ec2-spot-fleet-card-item strong {
+    color: #93c5fd;
+  }
+  /* スポットフリート図解 */
+  .ec2-spot-fleet-diagram {
+    padding: 12px;
+    background: #dbeafe;
+    border-radius: 8px;
+  }
+  .dark .ec2-spot-fleet-diagram {
+    background: rgba(59, 130, 246, 0.15);
+  }
+  .ec2-spot-fleet-diagram-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e40af;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .dark .ec2-spot-fleet-diagram-title {
+    color: #93c5fd;
+  }
+  .ec2-spot-fleet-diagram-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .ec2-spot-fleet-diagram-box {
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-align: center;
+  }
+  .ec2-spot-fleet-diagram-request {
+    background: #3b82f6;
+    color: #fff;
+  }
+  .ec2-spot-fleet-diagram-label {
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .ec2-spot-fleet-diagram-sub {
+    font-size: 11px;
+    opacity: 0.9;
+  }
+  .ec2-spot-fleet-diagram-arrow {
+    font-size: 20px;
+    color: #3b82f6;
+    font-weight: bold;
+  }
+  .ec2-spot-fleet-diagram-pools {
+    display: flex;
+    gap: 8px;
+  }
+  .ec2-spot-fleet-diagram-pool {
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid #3b82f6;
+    border-radius: 6px;
+    text-align: center;
+  }
+  .dark .ec2-spot-fleet-diagram-pool {
+    background: #1e293b;
+    border-color: #60a5fa;
+  }
+  .ec2-spot-fleet-diagram-pool-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: #1e40af;
+    font-family: monospace;
+  }
+  .dark .ec2-spot-fleet-diagram-pool-header {
+    color: #93c5fd;
+  }
+  .ec2-spot-fleet-diagram-pool-az {
+    font-size: 10px;
+    color: #6b7280;
+  }
+  .ec2-spot-fleet-diagram-note {
+    font-size: 11px;
+    color: #1e40af;
+    text-align: center;
+    margin-top: 10px;
+  }
+  .dark .ec2-spot-fleet-diagram-note {
+    color: #bfdbfe;
+  }
+  /* SAA頻出 */
+  .ec2-spot-exam {
+    padding: 14px 16px;
+    background: #faeeda;
+    border: 1px solid #854f0b;
+    border-radius: 8px;
+  }
+  .dark .ec2-spot-exam {
+    background: rgba(133, 79, 11, 0.15);
+    border-color: #b45309;
+  }
+  .ec2-spot-exam-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #633806;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .dark .ec2-spot-exam-title {
+    color: #fcd34d;
+  }
+  .ec2-spot-exam-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ec2-spot-exam-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(133, 79, 11, 0.2);
+  }
+  .ec2-spot-exam-item:last-child {
+    border-bottom: none;
+  }
+  .ec2-spot-exam-q {
+    color: #633806;
+  }
+  .dark .ec2-spot-exam-q {
+    color: #fef3c7;
+  }
+  .ec2-spot-exam-a {
+    color: #412402;
+    font-weight: 500;
+  }
+  .dark .ec2-spot-exam-a {
+    color: #fcd34d;
+  }
+  @media (max-width: 600px) {
+    .ec2-spot-exam-item {
+      flex-direction: column;
+      gap: 2px;
+    }
+  }
+
+  /* AMI */
+  .ec2-ami-title {
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+  /* 概要 */
+  .ec2-ami-overview {
+    padding: 16px;
+    background: #f3f4f6;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  .dark .ec2-ami-overview {
+    background: rgba(156, 163, 175, 0.1);
+  }
+  .ec2-ami-overview-desc {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+  .ec2-ami-overview-desc strong {
+    color: #2563eb;
+  }
+  .dark .ec2-ami-overview-desc strong {
+    color: #60a5fa;
+  }
+  .ec2-ami-components {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .ec2-ami-component {
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    min-width: 120px;
+  }
+  .dark .ec2-ami-component {
+    background: #1f2937;
+    border-color: #374151;
+  }
+  .ec2-ami-component-icon {
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+  .ec2-ami-component-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .ec2-ami-component-desc {
+    font-size: 11px;
+    color: #6b7280;
+  }
+  .ec2-ami-component-plus {
+    font-size: 20px;
+    color: #9ca3af;
+    font-weight: bold;
+  }
+  /* 種類 */
+  .ec2-ami-types {
+    margin-bottom: 16px;
+  }
+  .ec2-ami-types-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .ec2-ami-types-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 700px) {
+    .ec2-ami-types-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ec2-ami-type-card {
+    padding: 14px;
+    border-radius: 10px;
+    border: 2px solid;
+  }
+  .ec2-ami-type-aws {
+    background: #fff7ed;
+    border-color: #f97316;
+  }
+  .dark .ec2-ami-type-aws {
+    background: rgba(249, 115, 22, 0.1);
+    border-color: #fb923c;
+  }
+  .ec2-ami-type-marketplace {
+    background: #f5f3ff;
+    border-color: #8b5cf6;
+  }
+  .dark .ec2-ami-type-marketplace {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: #a78bfa;
+  }
+  .ec2-ami-type-custom {
+    background: #ecfdf5;
+    border-color: #10b981;
+  }
+  .dark .ec2-ami-type-custom {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: #34d399;
+  }
+  .ec2-ami-type-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .ec2-ami-type-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .ec2-ami-type-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: #6b7280;
+    color: #fff;
+  }
+  .ec2-ami-type-badge-important {
+    background: #dc2626;
+  }
+  .ec2-ami-type-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ec2-ami-type-item {
+    font-size: 12px;
+    color: #374151;
+    padding-left: 12px;
+    position: relative;
+  }
+  .dark .ec2-ami-type-item {
+    color: #d1d5db;
+  }
+  .ec2-ami-type-item::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #6b7280;
+  }
+  /* 作成フロー */
+  .ec2-ami-flow {
+    padding: 16px;
+    background: #eff6ff;
+    border: 1px solid #3b82f6;
+    border-radius: 10px;
+    margin-bottom: 16px;
+  }
+  .dark .ec2-ami-flow {
+    background: rgba(59, 130, 246, 0.1);
+    border-color: #60a5fa;
+  }
+  .ec2-ami-flow-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    color: #1e40af;
+    margin-bottom: 14px;
+  }
+  .dark .ec2-ami-flow-title {
+    color: #93c5fd;
+  }
+  .ec2-ami-flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .ec2-ami-flow-step {
+    text-align: center;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    min-width: 110px;
+  }
+  .dark .ec2-ami-flow-step {
+    background: #1e293b;
+    border-color: #475569;
+  }
+  .ec2-ami-flow-step-ami {
+    background: #dbeafe;
+    border-color: #3b82f6;
+  }
+  .dark .ec2-ami-flow-step-ami {
+    background: rgba(59, 130, 246, 0.2);
+  }
+  .ec2-ami-flow-step-icon {
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+  .ec2-ami-flow-step-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .ec2-ami-flow-step-sub {
+    font-size: 10px;
+    color: #6b7280;
+  }
+  .ec2-ami-flow-arrow {
+    font-size: 20px;
+    color: #3b82f6;
+    font-weight: bold;
+  }
+  /* 操作 */
+  .ec2-ami-operations {
+    margin-bottom: 16px;
+  }
+  .ec2-ami-operations-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .ec2-ami-operations-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 700px) {
+    .ec2-ami-operations-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ec2-ami-operation {
+    padding: 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+  }
+  .dark .ec2-ami-operation {
+    background: #1e293b;
+    border-color: #334155;
+  }
+  .ec2-ami-operation-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .ec2-ami-operation-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .ec2-ami-operation-desc {
+    font-size: 12px;
+    color: #374151;
+    margin-bottom: 6px;
+  }
+  .dark .ec2-ami-operation-desc {
+    color: #d1d5db;
+  }
+  .ec2-ami-operation-note {
+    font-size: 11px;
+    color: #6b7280;
+    padding-top: 6px;
+    border-top: 1px solid #e5e7eb;
+  }
+  .dark .ec2-ami-operation-note {
+    border-color: #374151;
+  }
+  /* ゴールデンイメージ */
+  .ec2-ami-golden {
+    padding: 16px;
+    background: #fef3c7;
+    border: 2px solid #f59e0b;
+    border-radius: 10px;
+    margin-bottom: 16px;
+  }
+  .dark .ec2-ami-golden {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: #fbbf24;
+  }
+  .ec2-ami-golden-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .ec2-ami-golden-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #92400e;
+  }
+  .dark .ec2-ami-golden-title {
+    color: #fcd34d;
+  }
+  .ec2-ami-golden-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    background: #f59e0b;
+    color: #fff;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .ec2-ami-golden-desc {
+    font-size: 13px;
+    color: #78350f;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .dark .ec2-ami-golden-desc {
+    color: #fef3c7;
+  }
+  .ec2-ami-golden-benefits {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  @media (max-width: 500px) {
+    .ec2-ami-golden-benefits {
+      grid-template-columns: 1fr;
+    }
+  }
+  .ec2-ami-golden-benefit {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #78350f;
+    padding: 8px 10px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 6px;
+  }
+  .dark .ec2-ami-golden-benefit {
+    color: #fef3c7;
+    background: rgba(0,0,0,0.2);
+  }
+  .ec2-ami-golden-benefit-icon {
+    font-size: 16px;
+  }
+  /* SAA頻出 */
+  .ec2-ami-exam {
+    padding: 14px 16px;
+    background: #faeeda;
+    border: 1px solid #854f0b;
+    border-radius: 8px;
+  }
+  .dark .ec2-ami-exam {
+    background: rgba(133, 79, 11, 0.15);
+    border-color: #b45309;
+  }
+  .ec2-ami-exam-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #633806;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .dark .ec2-ami-exam-title {
+    color: #fcd34d;
+  }
+  .ec2-ami-exam-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ec2-ami-exam-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(133, 79, 11, 0.2);
+  }
+  .ec2-ami-exam-item:last-child {
+    border-bottom: none;
+  }
+  .ec2-ami-exam-q {
+    color: #633806;
+  }
+  .dark .ec2-ami-exam-q {
+    color: #fef3c7;
+  }
+  .ec2-ami-exam-a {
+    color: #412402;
+    font-weight: 500;
+  }
+  .dark .ec2-ami-exam-a {
+    color: #fcd34d;
+  }
+  @media (max-width: 600px) {
+    .ec2-ami-exam-item {
       flex-direction: column;
       gap: 2px;
     }

@@ -130,6 +130,23 @@
     border-color: #65a30d;
     color: #bef264;
   }
+  /* ヘルスチェックボックス（SVG準拠デザイン） */
+  .elb-healthcheck-box {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 16px;
+    border-radius: 6px;
+    background: #dcfce7;
+    border: 1px solid #16a34a;
+    color: #166534;
+    text-align: center;
+    margin-top: 8px;
+  }
+  .dark .elb-healthcheck-box {
+    background: rgba(22,163,74,.15);
+    border-color: #4ade80;
+    color: #bbf7d0;
+  }
 
   /* Terms: legend bar */
   .elb-terms-legend {
@@ -613,15 +630,15 @@
         <!-- ELB → Listener 2 -->
         <path id="elb-t-a2" fill="none" stroke="#534AB7" stroke-width="1.5" marker-end="url(#elb-t-ah)"/>
         <!-- Listener 1 → Rule 1 -->
-        <line id="elb-t-a3" stroke="#993C1D" stroke-width="1.5" marker-end="url(#elb-t-ah)"/>
+        <line id="elb-t-a3" stroke="#185FA5" stroke-width="1.5" marker-end="url(#elb-t-ah)"/>
         <!-- Listener 2 → Rule 2 -->
-        <line id="elb-t-a4" stroke="#993C1D" stroke-width="1.5" marker-end="url(#elb-t-ah)"/>
+        <line id="elb-t-a4" stroke="#185FA5" stroke-width="1.5" marker-end="url(#elb-t-ah)"/>
         <!-- Rule 1 → TG-A -->
         <path id="elb-t-a5" fill="none" stroke="#993C1D" stroke-width="1.5" marker-end="url(#elb-t-ah)"/>
         <!-- Rule 1 → TG-B -->
         <path id="elb-t-a6" fill="none" stroke="#993C1D" stroke-width="1.5" marker-end="url(#elb-t-ah)"/>
         <!-- Rule 2 → Redirect -->
-        <line id="elb-t-a7" stroke="#993C1D" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#elb-t-ah)"/>
+        <line id="elb-t-a7" stroke="#b45309" stroke-width="1.5" stroke-dasharray="4 2" marker-end="url(#elb-t-ah)"/>
       </svg>
 
       <!-- ELB -->
@@ -629,15 +646,16 @@
         <div id="elb-t-elb" class="dia-box dia-elb">
           <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Networking-Content-Delivery/48/Arch_Elastic-Load-Balancing_48.svg" alt="ELB"/>
           <div class="dia-box-label">ELB</div>
-          <div class="dia-box-sub">トラフィックの入口全体</div>
+          <div class="dia-box-sub">トラフィックの入口</div>
         </div>
       </div>
 
       <div class="dia-row" style="height:36px;"></div>
 
-      <!-- Listeners -->
+      <!-- 3カラム構成: TG-A | TG-B | Redirect -->
       <div class="elb-terms-cols">
-        <div class="elb-terms-branch">
+        <!-- 左カラム: リスナー1 + ルール + ターゲットグループ -->
+        <div class="elb-terms-branch" style="flex:2;">
           <div id="elb-t-l1" class="dia-box dia-listener">
             <div class="dia-box-label">リスナー 1</div>
             <div class="dia-box-sub">HTTPS:443 を待ち受け</div>
@@ -645,24 +663,26 @@
           <div class="dia-row" style="height:12px;"></div>
           <div id="elb-t-r1" class="dia-box dia-rule">
             <div class="dia-box-label">ルール</div>
-            <div class="dia-box-sub">/api/* → TG-A / default → TG-B</div>
+            <div class="dia-box-sub">/api/* → TG-A　/ default → TG-B</div>
           </div>
           <div class="dia-row" style="height:12px;"></div>
-          <!-- TG-A & TG-B -->
-          <div class="elb-terms-cols" style="width:100%;gap:10px;">
+          <!-- TG-A & TG-B 横並び -->
+          <div class="elb-terms-cols" style="width:100%;gap:12px;">
             <div id="elb-t-tga" class="elb-tg-group">
               <div class="elb-tg-group-title">ターゲットグループ A</div>
               <div class="elb-tg-icons">
                 <div class="dia-box dia-ec2" style="padding:6px 8px;min-width:auto;">
                   <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2" style="width:28px;height:28px;margin-bottom:2px;"/>
                   <div class="dia-box-label" style="font-size:11px;">EC2</div>
+                  <div class="dia-box-sub" style="font-size:10px;">APIサーバー</div>
                 </div>
                 <div class="dia-box dia-ec2" style="padding:6px 8px;min-width:auto;">
                   <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2" style="width:28px;height:28px;margin-bottom:2px;"/>
                   <div class="dia-box-label" style="font-size:11px;">EC2</div>
+                  <div class="dia-box-sub" style="font-size:10px;">APIサーバー</div>
                 </div>
               </div>
-              <div class="elb-healthcheck">ヘルスチェック</div>
+              <div class="elb-healthcheck-box">ヘルスチェック</div>
             </div>
             <div id="elb-t-tgb" class="elb-tg-group">
               <div class="elb-tg-group-title">ターゲットグループ B</div>
@@ -670,18 +690,21 @@
                 <div class="dia-box dia-lambda" style="padding:6px 8px;min-width:auto;">
                   <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_AWS-Lambda_48.svg" alt="Lambda" style="width:28px;height:28px;margin-bottom:2px;"/>
                   <div class="dia-box-label" style="font-size:11px;">Lambda</div>
+                  <div class="dia-box-sub" style="font-size:10px;">Web画面</div>
                 </div>
                 <div class="dia-box dia-lambda" style="padding:6px 8px;min-width:auto;">
                   <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_AWS-Lambda_48.svg" alt="Lambda" style="width:28px;height:28px;margin-bottom:2px;"/>
                   <div class="dia-box-label" style="font-size:11px;">Lambda</div>
+                  <div class="dia-box-sub" style="font-size:10px;">Web画面</div>
                 </div>
               </div>
-              <div class="elb-healthcheck">ヘルスチェック</div>
+              <div class="elb-healthcheck-box">ヘルスチェック</div>
             </div>
           </div>
         </div>
 
-        <div class="elb-terms-branch">
+        <!-- 右カラム: リスナー2 + ルール + リダイレクト -->
+        <div class="elb-terms-branch" style="flex:1;">
           <div id="elb-t-l2" class="dia-box dia-listener">
             <div class="dia-box-label">リスナー 2</div>
             <div class="dia-box-sub">HTTP:80 を待ち受け</div>
@@ -721,6 +744,11 @@
         <span class="elb-terms-legend-dot" style="background:#059669;"></span>
         <span class="elb-terms-legend-name" style="color:#059669;">ターゲットグループ</span>
         <span class="elb-terms-legend-desc">振り先のまとまり</span>
+      </div>
+      <div class="elb-terms-legend-item">
+        <span class="elb-terms-legend-dot" style="background:#16a34a;"></span>
+        <span class="elb-terms-legend-name" style="color:#16a34a;">ヘルスチェック</span>
+        <span class="elb-terms-legend-desc">正常性確認</span>
       </div>
     </div>
   </div>

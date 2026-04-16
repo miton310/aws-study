@@ -9,7 +9,8 @@ import vue from '@astrojs/vue';
 export default defineConfig({
   devToolbar: { enabled: false },
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    server: { port: 4322 }
   },
 
   integrations: [vue()]
