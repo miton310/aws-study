@@ -67,7 +67,7 @@ export const chapters: Chapter[] = [
       { name: 'RDS',               slug: 'database/rds',              priority: 'star2', hasDiagram: false, isNew: false },
       { name: 'Aurora',            slug: 'database/aurora',           priority: 'star2', hasDiagram: false, isNew: false },
       { name: 'DynamoDB',          slug: 'database/dynamodb',         priority: 'star2', hasDiagram: false, isNew: false },
-      { name: 'ElastiCache',       slug: 'database/elasticache',      priority: 'star1', hasDiagram: false, isNew: false },
+      { name: 'ElasticCache',       slug: 'database/elasticache',      priority: 'star1', hasDiagram: false, isNew: false },
     ],
     moreServices: [
       { name: 'Redshift',          slug: 'database/redshift',         priority: 'star1', hasDiagram: false, isNew: false },

@@ -1,0 +1,16 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import EBSDiagram from '../../components/diagrams/EBSDiagram.astro';
+---
+<Layout title="EBS">
+  <div class="max-w-5xl mx-auto px-4 py-12">
+    <p class="text-sm text-gray-500 mb-2"><a href="/" class="hover:text-orange-500">ホーム</a> / <a href="/storage" class="hover:text-orange-500">ストレージ</a> / EBS</p>
+    <h1 class="text-3xl font-bold mb-2">Amazon EBS</h1>
+    <p class="text-gray-500 mb-10">ブロックストレージ・ボリュームタイプ・スナップショット</p>
+
+    <section class="mb-12">
+      <h2 class="heading-section">EBS 図解</h2>
+      <EBSDiagram />
+    </section>
+  </div>
+</Layout>

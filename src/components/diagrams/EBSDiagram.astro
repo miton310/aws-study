@@ -1,0 +1,816 @@
+---
+/**
+ * EBSDiagram.astro
+ * Amazon EBS の図解コンポーネント
+ * - 概要: EC2との関係、スナップショット、主な特徴
+ * - ボリュームタイプ: gp3/gp2/io2/st1/sc1
+ * - ユースケース: 用途別の選択指針
+ */
+---
+
+<style>
+  .ebs-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .ebs-tab {
+    cursor: pointer;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    background: #f9fafb;
+    color: #374151;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .dark .ebs-tab {
+    border-color: #374151;
+    background: #1f2937;
+    color: #d1d5db;
+  }
+  .ebs-tab:hover { background: #f3f4f6; }
+  .dark .ebs-tab:hover { background: #374151; }
+  .ebs-tab.active {
+    background: #059669;
+    color: #fff;
+    border-color: #059669;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .ebs-section-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: #1f2937;
+  }
+  .dark .ebs-section-title { color: #f3f4f6; }
+
+  /* Overview wrap */
+  .ebs-overview-wrap {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px;
+    border-radius: 12px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+  }
+  .dark .ebs-overview-wrap {
+    background: #111827;
+    border-color: #374151;
+  }
+  .ebs-svg-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* Top section: EC2 - EBS - Snapshot */
+  .ebs-top-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .ebs-snapshot-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .ebs-snapshot-label {
+    font-size: 12px;
+    color: #6b7280;
+  }
+  .dark .ebs-snapshot-label { color: #9ca3af; }
+
+  /* Features row */
+  .ebs-features-title {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    padding: 8px 0;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 8px;
+  }
+  .dark .ebs-features-title {
+    color: #d1d5db;
+    border-color: #374151;
+  }
+  .ebs-features-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 640px) {
+    .ebs-features-row { grid-template-columns: 1fr; }
+  }
+
+  /* Volume types grid */
+  .ebs-volume-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .ebs-volume-card {
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+  }
+  .dark .ebs-volume-card {
+    background: #1f2937;
+    border-color: #374151;
+  }
+  .ebs-volume-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .ebs-volume-card-sub {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 10px;
+  }
+  .dark .ebs-volume-card-sub { color: #9ca3af; }
+  .ebs-volume-card-specs {
+    font-size: 12px;
+    line-height: 1.7;
+  }
+  .ebs-volume-card-specs dt {
+    color: #6b7280;
+    display: inline;
+  }
+  .dark .ebs-volume-card-specs dt { color: #9ca3af; }
+  .ebs-volume-card-specs dd {
+    display: inline;
+    margin-left: 4px;
+    font-weight: 500;
+  }
+
+  /* SSD card */
+  .ebs-volume-card.ssd {
+    border-color: #10b981;
+    background: linear-gradient(135deg, #ecfdf5 0%, #fff 100%);
+  }
+  .dark .ebs-volume-card.ssd {
+    background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, #1f2937 100%);
+    border-color: #059669;
+  }
+  .ebs-volume-card.ssd .ebs-volume-card-title { color: #059669; }
+  .dark .ebs-volume-card.ssd .ebs-volume-card-title { color: #34d399; }
+
+  /* HDD card */
+  .ebs-volume-card.hdd {
+    border-color: #6b7280;
+    background: linear-gradient(135deg, #f9fafb 0%, #fff 100%);
+  }
+  .dark .ebs-volume-card.hdd {
+    background: linear-gradient(135deg, rgba(107,114,128,0.1) 0%, #1f2937 100%);
+    border-color: #9ca3af;
+  }
+  .ebs-volume-card.hdd .ebs-volume-card-title { color: #4b5563; }
+  .dark .ebs-volume-card.hdd .ebs-volume-card-title { color: #d1d5db; }
+
+  /* Provisioned IOPS card */
+  .ebs-volume-card.provisioned {
+    border-color: #ea580c;
+    background: linear-gradient(135deg, #fff7ed 0%, #fff 100%);
+  }
+  .dark .ebs-volume-card.provisioned {
+    background: linear-gradient(135deg, rgba(234,88,12,0.1) 0%, #1f2937 100%);
+    border-color: #f97316;
+  }
+  .ebs-volume-card.provisioned .ebs-volume-card-title { color: #c2410c; }
+  .dark .ebs-volume-card.provisioned .ebs-volume-card-title { color: #fb923c; }
+
+  /* Type section header */
+  .ebs-type-section-header {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .ebs-type-section-header.ssd {
+    background: #ede9fe;
+    color: #5b21b6;
+    border: 1px solid #a78bfa;
+  }
+  .dark .ebs-type-section-header.ssd {
+    background: rgba(139,92,246,0.15);
+    color: #c4b5fd;
+    border-color: #7c3aed;
+  }
+  .ebs-type-section-header.hdd {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #9ca3af;
+  }
+  .dark .ebs-type-section-header.hdd {
+    background: rgba(107,114,128,0.15);
+    color: #d1d5db;
+    border-color: #6b7280;
+  }
+
+  /* SAA Tab styles */
+  .ebs-saa-section {
+    padding: 16px;
+    border-radius: 10px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+  }
+  .dark .ebs-saa-section {
+    background: #111827;
+    border-color: #374151;
+  }
+  .ebs-saa-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 16px;
+    color: #1f2937;
+  }
+  .dark .ebs-saa-section-title { color: #f3f4f6; }
+
+  .ebs-saa-flow {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .ebs-saa-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* Compare grid */
+  .ebs-compare-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 640px) {
+    .ebs-compare-grid { grid-template-columns: 1fr; }
+  }
+  .ebs-compare-card {
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid;
+  }
+  .ebs-compare-card.ebs {
+    background: #ecfdf5;
+    border-color: #10b981;
+  }
+  .dark .ebs-compare-card.ebs {
+    background: rgba(16,185,129,0.1);
+    border-color: #059669;
+  }
+  .ebs-compare-card.instance-store {
+    background: #fff7ed;
+    border-color: #f97316;
+  }
+  .dark .ebs-compare-card.instance-store {
+    background: rgba(249,115,22,0.1);
+    border-color: #ea580c;
+  }
+  .ebs-compare-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .ebs-compare-card.ebs .ebs-compare-card-title { color: #059669; }
+  .dark .ebs-compare-card.ebs .ebs-compare-card-title { color: #34d399; }
+  .ebs-compare-card.instance-store .ebs-compare-card-title { color: #ea580c; }
+  .dark .ebs-compare-card.instance-store .ebs-compare-card-title { color: #fb923c; }
+  .ebs-compare-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  .ebs-compare-card.ebs .ebs-compare-list { color: #065f46; }
+  .dark .ebs-compare-card.ebs .ebs-compare-list { color: #6ee7b7; }
+  .ebs-compare-card.instance-store .ebs-compare-list { color: #9a3412; }
+  .dark .ebs-compare-card.instance-store .ebs-compare-list { color: #fdba74; }
+  .ebs-compare-list li::before {
+    content: "• ";
+    margin-right: 4px;
+  }
+
+  /* Flow legend */
+  .ebs-flow-legend {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 12px;
+    font-size: 12px;
+    color: #6b7280;
+  }
+  .dark .ebs-flow-legend { color: #9ca3af; }
+  .ebs-flow-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Use case table */
+  .ebs-usecase-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .ebs-usecase-table th,
+  .ebs-usecase-table td {
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    text-align: left;
+  }
+  .dark .ebs-usecase-table th,
+  .dark .ebs-usecase-table td {
+    border-color: #374151;
+  }
+  .ebs-usecase-table th {
+    background: #f3f4f6;
+    font-weight: 600;
+  }
+  .dark .ebs-usecase-table th {
+    background: #374151;
+  }
+  .ebs-usecase-table td:first-child {
+    font-weight: 500;
+  }
+  .ebs-recommend {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .ebs-recommend.gp3 { background: #d1fae5; color: #065f46; }
+  .dark .ebs-recommend.gp3 { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+  .ebs-recommend.io2 { background: #dbeafe; color: #1e40af; }
+  .dark .ebs-recommend.io2 { background: rgba(59,130,246,0.2); color: #93c5fd; }
+  .ebs-recommend.st1 { background: #fef3c7; color: #92400e; }
+  .dark .ebs-recommend.st1 { background: rgba(245,158,11,0.2); color: #fcd34d; }
+  .ebs-recommend.sc1 { background: #fef9c3; color: #854d0e; }
+  .dark .ebs-recommend.sc1 { background: rgba(250,204,21,0.2); color: #fef08a; }
+</style>
+
+<div class="ebs-container">
+  <!-- Tabs -->
+  <div class="ebs-tabs" role="tablist">
+    <button class="ebs-tab active" data-tab="ebs-overview" role="tab" aria-selected="true">概要</button>
+    <button class="ebs-tab" data-tab="ebs-types" role="tab" aria-selected="false">ボリュームタイプ</button>
+    <button class="ebs-tab" data-tab="ebs-usecase" role="tab" aria-selected="false">ユースケース</button>
+    <button class="ebs-tab" data-tab="ebs-saa" role="tab" aria-selected="false">SAA頻出</button>
+  </div>
+
+  <!-- ========== Tab 1: Overview ========== -->
+  <div id="ebs-overview" class="tab-panel active">
+    <div class="ebs-section-title">EBS 概要：EC2 との関係と主な特徴</div>
+
+    <div class="ebs-overview-wrap" id="ebs-ov-wrap">
+      <!-- SVG overlay for arrows -->
+      <svg id="ebs-ov-svg" class="ebs-svg-overlay">
+        <defs>
+          <marker id="ebs-ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <!-- EC2 ↔ EBS -->
+        <line id="ebs-a1" stroke="#185FA5" stroke-width="1.5" marker-end="url(#ebs-ah)"/>
+        <line id="ebs-a2" stroke="#185FA5" stroke-width="1.5" marker-end="url(#ebs-ah)"/>
+        <!-- EBS → Snapshot -->
+        <line id="ebs-a3" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ebs-ah)"/>
+      </svg>
+
+      <!-- Top row: EC2 - EBS - Snapshot -->
+      <div class="ebs-top-row">
+        <div id="ebs-ec2" class="dia-box dia-ec2">
+          <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2"/>
+          <div class="dia-box-label">EC2 インスタンス</div>
+          <div class="dia-box-sub">アプリケーション実行</div>
+        </div>
+
+        <div id="ebs-vol" class="dia-box dia-igw">
+          <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Storage/48/Arch_Amazon-Elastic-Block-Store_48.svg" alt="EBS"/>
+          <div class="dia-box-label">EBS ボリューム</div>
+          <div class="dia-box-sub">ブロックストレージ・永続化</div>
+        </div>
+
+        <div class="ebs-snapshot-area">
+          <div class="ebs-snapshot-label">バックアップ</div>
+          <div id="ebs-snap" class="dia-box" style="background:#4b5563;border-color:#9ca3af;">
+            <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Storage/Res_Amazon-Elastic-Block-Store_Snapshot_48.svg" alt="Snapshot"/>
+            <div class="dia-box-label" style="color:#e5e7eb;">S3 スナップショット</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <div class="ebs-features-title">EBS の主な特徴</div>
+      <div class="ebs-features-row">
+        <div class="dia-box dia-igw">
+          <div class="dia-box-label" style="color:#065f46;">同一 AZ 内で冗長化</div>
+          <div class="dia-box-sub" style="color:#059669;">自動レプリケーション</div>
+        </div>
+        <div class="dia-box dia-igw">
+          <div class="dia-box-label" style="color:#065f46;">EC2 から着脱可能</div>
+          <div class="dia-box-sub" style="color:#059669;">付け替え・移動できる</div>
+        </div>
+        <div class="dia-box dia-igw">
+          <div class="dia-box-label" style="color:#065f46;">暗号化対応</div>
+          <div class="dia-box-sub" style="color:#059669;">KMS 統合・保存時暗号化</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-note warn" style="margin-top:12px;">
+      <strong>SAA 頻出：</strong>EBS は同一 AZ 内のみ接続可。別 AZ に移すにはスナップショット経由。
+    </div>
+  </div>
+
+  <!-- ========== Tab 2: Volume Types ========== -->
+  <div id="ebs-types" class="tab-panel">
+    <div class="ebs-section-title">EBS ボリュームタイプ比較</div>
+
+    <!-- SSD Section -->
+    <div class="ebs-type-section-header ssd">
+      SSD 系 — ランダムアクセス向け（ブートボリューム・DB）
+    </div>
+
+    <div class="ebs-volume-grid" style="margin-bottom:20px;">
+      <!-- gp3 -->
+      <div class="ebs-volume-card ssd">
+        <div class="ebs-volume-card-title">gp3（汎用 SSD・推奨）</div>
+        <div class="ebs-volume-card-sub">コスト効率 best・スループット独立設定</div>
+        <dl class="ebs-volume-card-specs">
+          <div><dt>IOPS:</dt><dd>3,000 基本 / 最大 16,000</dd></div>
+          <div><dt>スループット:</dt><dd>125〜1,000 MB/s（独立設定可）</dd></div>
+          <div><dt>容量:</dt><dd>1 GiB〜16 TiB</dd></div>
+        </dl>
+      </div>
+
+      <!-- gp2 -->
+      <div class="ebs-volume-card ssd">
+        <div class="ebs-volume-card-title">gp2（汎用 SSD・旧世代）</div>
+        <div class="ebs-volume-card-sub">容量に連動・新規は gp3 推奨</div>
+        <dl class="ebs-volume-card-specs">
+          <div><dt>IOPS:</dt><dd>3 IOPS/GB・バースト 3,000 IOPS</dd></div>
+          <div><dt>スループット:</dt><dd>最大 250 MB/s</dd></div>
+          <div><dt>容量:</dt><dd>1 GiB〜16 TiB</dd></div>
+        </dl>
+      </div>
+
+      <!-- io2 / io2 Block Express -->
+      <div class="ebs-volume-card provisioned">
+        <div class="ebs-volume-card-title">io2 / io2 Block Express</div>
+        <div class="ebs-volume-card-sub">最大 256,000 IOPS・高耐久性</div>
+        <dl class="ebs-volume-card-specs">
+          <div><dt>IOPS:</dt><dd>最大 256,000（Block Express）</dd></div>
+          <div><dt>スループット:</dt><dd>最大 4,000 MB/s</dd></div>
+          <div><dt>耐久性:</dt><dd>99.999%</dd></div>
+          <div><dt>用途:</dt><dd>ミッションクリティカル DB</dd></div>
+        </dl>
+      </div>
+
+      <!-- io1 -->
+      <div class="ebs-volume-card provisioned">
+        <div class="ebs-volume-card-title">io1（プロビジョンド IOPS・旧）</div>
+        <div class="ebs-volume-card-sub">高 IOPS が必要な DB・io2 に移行推奨</div>
+        <dl class="ebs-volume-card-specs">
+          <div><dt>IOPS:</dt><dd>最大 64,000</dd></div>
+          <div><dt>スループット:</dt><dd>最大 1,000 MB/s</dd></div>
+          <div><dt>容量:</dt><dd>4 GiB〜16 TiB</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <!-- HDD Section -->
+    <div class="ebs-type-section-header hdd">
+      HDD 系 — シーケンシャルアクセス向け（大容量・低頻度）
+    </div>
+
+    <div class="ebs-volume-grid">
+      <!-- st1 -->
+      <div class="ebs-volume-card hdd">
+        <div class="ebs-volume-card-title">st1（スループット最適化 HDD）</div>
+        <div class="ebs-volume-card-sub">ビッグデータ・ログ・ETL 処理</div>
+        <dl class="ebs-volume-card-specs">
+          <div><dt>スループット:</dt><dd>最大 500 MB/s</dd></div>
+          <div><dt>IOPS:</dt><dd>最大 500</dd></div>
+          <div><dt>容量:</dt><dd>125 GiB〜16 TiB</dd></div>
+        </dl>
+      </div>
+
+      <!-- sc1 -->
+      <div class="ebs-volume-card hdd">
+        <div class="ebs-volume-card-title">sc1（コールド HDD）</div>
+        <div class="ebs-volume-card-sub">アクセス頻度が低い・最安値</div>
+        <dl class="ebs-volume-card-specs">
+          <div><dt>スループット:</dt><dd>最大 250 MB/s</dd></div>
+          <div><dt>IOPS:</dt><dd>最大 250</dd></div>
+          <div><dt>容量:</dt><dd>125 GiB〜16 TiB</dd></div>
+        </dl>
+      </div>
+    </div>
+
+    <div class="dia-note warn" style="margin-top:16px;">
+      <strong>ブートボリューム可：</strong>gp2 / gp3 / io1 / io2 のみ（HDD 系はブート不可）
+    </div>
+  </div>
+
+  <!-- ========== Tab 3: Use Cases ========== -->
+  <div id="ebs-usecase" class="tab-panel">
+    <div class="ebs-section-title">ユースケース別ボリューム選択</div>
+
+    <div style="overflow-x:auto;">
+      <table class="ebs-usecase-table">
+        <thead>
+          <tr>
+            <th>ユースケース</th>
+            <th>推奨タイプ</th>
+            <th>理由</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>汎用ワークロード・開発環境</td>
+            <td><span class="ebs-recommend gp3">gp3</span></td>
+            <td>コスト効率が良く、ほとんどの用途に対応</td>
+          </tr>
+          <tr>
+            <td>ブートボリューム</td>
+            <td><span class="ebs-recommend gp3">gp3</span></td>
+            <td>起動に十分な性能、低コスト</td>
+          </tr>
+          <tr>
+            <td>本番 DB（MySQL, PostgreSQL）</td>
+            <td><span class="ebs-recommend gp3">gp3</span> / <span class="ebs-recommend io2">io2</span></td>
+            <td>中規模なら gp3、高 IOPS 要件なら io2</td>
+          </tr>
+          <tr>
+            <td>大規模 DB（Oracle, SAP HANA）</td>
+            <td><span class="ebs-recommend io2">io2 Block Express</span></td>
+            <td>最高 IOPS・レイテンシ・耐久性が必要</td>
+          </tr>
+          <tr>
+            <td>ログ処理・ETL・DWH</td>
+            <td><span class="ebs-recommend st1">st1</span></td>
+            <td>シーケンシャル読み書き、大容量、低コスト</td>
+          </tr>
+          <tr>
+            <td>アーカイブ・バックアップ</td>
+            <td><span class="ebs-recommend sc1">sc1</span></td>
+            <td>最低コスト、アクセス頻度が低い</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="dia-note warn" style="margin-top:16px;">
+      <strong>SAA 頻出：</strong>「高 IOPS が必要」→ io2　「シーケンシャル・ログ処理」→ st1　「最低コスト」→ sc1
+    </div>
+  </div>
+
+  <!-- ========== Tab 4: SAA Frequent ========== -->
+  <div id="ebs-saa" class="tab-panel">
+    <div class="ebs-section-title">SAA 頻出シナリオ</div>
+
+    <!-- AZ/Region migration flow -->
+    <div class="ebs-saa-section">
+      <div class="ebs-saa-section-title">EBS を別 AZ・別リージョンに移す流れ</div>
+
+      <div class="ebs-saa-flow" id="ebs-saa-flow">
+        <svg id="ebs-saa-svg" class="ebs-svg-overlay">
+          <defs>
+            <marker id="ebs-saa-ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </marker>
+          </defs>
+          <!-- Row 1 arrows -->
+          <line id="ebs-saa-a1" stroke="#185FA5" stroke-width="2" marker-end="url(#ebs-saa-ah)"/>
+          <line id="ebs-saa-a2" stroke="#6b7280" stroke-width="2" marker-end="url(#ebs-saa-ah)"/>
+          <line id="ebs-saa-a3" stroke="#059669" stroke-width="2" marker-end="url(#ebs-saa-ah)"/>
+          <!-- Row 2 arrows -->
+          <path id="ebs-saa-a4" fill="none" stroke="#6b7280" stroke-width="2" stroke-dasharray="5 3" marker-end="url(#ebs-saa-ah)"/>
+          <line id="ebs-saa-a5" stroke="#ea580c" stroke-width="2" marker-end="url(#ebs-saa-ah)"/>
+        </svg>
+
+        <!-- Row 1: EBS → Snapshot → 別AZ復元 → EC2 -->
+        <div class="ebs-saa-row">
+          <div id="ebs-saa-vol" class="dia-box dia-ec2">
+            <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Storage/48/Arch_Amazon-Elastic-Block-Store_48.svg" alt="EBS"/>
+            <div class="dia-box-label">EBS ボリューム</div>
+            <div class="dia-box-sub">AZ-a</div>
+          </div>
+          <div id="ebs-saa-snap" class="dia-box" style="background:#4b5563;border-color:#9ca3af;">
+            <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Storage/Res_Amazon-Elastic-Block-Store_Snapshot_48.svg" alt="Snapshot"/>
+            <div class="dia-box-label" style="color:#e5e7eb;">スナップショット</div>
+            <div class="dia-box-sub" style="color:#9ca3af;">S3 に保存</div>
+          </div>
+          <div id="ebs-saa-az" class="dia-box dia-igw">
+            <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Storage/48/Arch_Amazon-Elastic-Block-Store_48.svg" alt="EBS"/>
+            <div class="dia-box-label" style="color:#065f46;">新 EBS</div>
+            <div class="dia-box-sub" style="color:#059669;">AZ-b で復元</div>
+          </div>
+          <div id="ebs-saa-ec2" class="dia-box dia-ec2">
+            <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Compute/48/Arch_Amazon-EC2_48.svg" alt="EC2"/>
+            <div class="dia-box-label">EC2</div>
+            <div class="dia-box-sub">アタッチ</div>
+          </div>
+        </div>
+
+        <!-- Row 2: 別リージョンへコピー → 復元 -->
+        <div class="ebs-saa-row" style="margin-top:16px;">
+          <div style="width:120px;"></div>
+          <div id="ebs-saa-copy" class="dia-box" style="background:#7c2d12;border-color:#f97316;">
+            <img class="dia-box-icon" src="/AWS-icons/Resource-Icons_07312025/Res_Storage/Res_Amazon-Elastic-Block-Store_Snapshot_48.svg" alt="Copy" style="filter:hue-rotate(30deg);"/>
+            <div class="dia-box-label" style="color:#fed7aa;">別リージョンへコピー</div>
+          </div>
+          <div id="ebs-saa-region" class="dia-box" style="background:#7c2d12;border-color:#f97316;">
+            <img class="dia-box-icon" src="/AWS-icons/Architecture-Service-Icons_07312025/Arch_Storage/48/Arch_Amazon-Elastic-Block-Store_48.svg" alt="EBS" style="filter:hue-rotate(30deg);"/>
+            <div class="dia-box-label" style="color:#fed7aa;">別リージョンで復元</div>
+            <div class="dia-box-sub" style="color:#fb923c;">DR・移行に活用</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flow legend -->
+      <div class="ebs-flow-legend">
+        <div class="ebs-flow-legend-item">
+          <span style="display:inline-block;width:24px;height:2px;background:#185FA5;"></span>
+          <span>作成</span>
+        </div>
+        <div class="ebs-flow-legend-item">
+          <span style="display:inline-block;width:24px;height:2px;background:#059669;"></span>
+          <span>別AZ復元</span>
+        </div>
+        <div class="ebs-flow-legend-item">
+          <span style="display:inline-block;width:24px;height:2px;background:#6b7280;border-top:2px dashed #6b7280;height:0;"></span>
+          <span>別リージョンコピー</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EBS vs Instance Store -->
+    <div class="ebs-saa-section" style="margin-top:24px;">
+      <div class="ebs-saa-section-title">EBS vs インスタンスストア — SAA 最頻出の比較</div>
+
+      <div class="ebs-compare-grid">
+        <div class="ebs-compare-card ebs">
+          <div class="ebs-compare-card-title">EBS</div>
+          <ul class="ebs-compare-list">
+            <li>永続化・停止しても消えない</li>
+            <li>スナップショットでバックアップ可</li>
+            <li>ネットワーク経由でアタッチ</li>
+          </ul>
+        </div>
+        <div class="ebs-compare-card instance-store">
+          <div class="ebs-compare-card-title">インスタンスストア</div>
+          <ul class="ebs-compare-list">
+            <li>一時的・停止で消える</li>
+            <li>スナップショット不可</li>
+            <li>物理接続・超高速 I/O</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="dia-note warn" style="margin-top:16px;">
+      <strong>「データを永続化したい」→ EBS　「高速一時領域」→ インスタンスストア</strong><br/>
+      <span style="font-size:12px;">インスタンスストアはスナップショット不可なので「バックアップしたい」ならEBS一択</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Tab switching
+  document.querySelectorAll('.ebs-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.ebs-tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+      });
+      document.querySelectorAll('.ebs-container .tab-panel').forEach(p => p.classList.remove('active'));
+
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      const targetId = tab.getAttribute('data-tab');
+      document.getElementById(targetId)?.classList.add('active');
+
+      // Redraw arrows when switching tabs
+      if (targetId === 'ebs-overview') {
+        setTimeout(ebsDrawOverview, 50);
+      } else if (targetId === 'ebs-saa') {
+        setTimeout(ebsDrawSaa, 50);
+      }
+    });
+  });
+
+  // Arrow drawing
+  function ebsRect(id, containerRect) {
+    const el = document.getElementById(id);
+    if (!el) return { left: 0, right: 0, top: 0, bottom: 0, cx: 0, cy: 0 };
+    const r = el.getBoundingClientRect();
+    return {
+      left: r.left - containerRect.left,
+      right: r.right - containerRect.left,
+      top: r.top - containerRect.top,
+      bottom: r.bottom - containerRect.top,
+      cx: r.left - containerRect.left + r.width / 2,
+      cy: r.top - containerRect.top + r.height / 2,
+    };
+  }
+
+  function ebsSetLine(id, x1, y1, x2, y2) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.setAttribute('x1', x1);
+    el.setAttribute('y1', y1);
+    el.setAttribute('x2', x2);
+    el.setAttribute('y2', y2);
+  }
+
+  function ebsDrawOverview() {
+    const wrap = document.getElementById('ebs-ov-wrap');
+    const svg = document.getElementById('ebs-ov-svg');
+    if (!wrap || !svg) return;
+    const cr = wrap.getBoundingClientRect();
+    svg.setAttribute('viewBox', `0 0 ${cr.width} ${cr.height}`);
+
+    const ec2 = ebsRect('ebs-ec2', cr);
+    const vol = ebsRect('ebs-vol', cr);
+    const snap = ebsRect('ebs-snap', cr);
+
+    // EC2 → EBS (top arrow)
+    ebsSetLine('ebs-a1', ec2.right, ec2.cy - 4, vol.left, vol.cy - 4);
+    // EBS → EC2 (bottom arrow)
+    ebsSetLine('ebs-a2', vol.left, vol.cy + 4, ec2.right, ec2.cy + 4);
+    // EBS → Snapshot
+    ebsSetLine('ebs-a3', vol.right, vol.cy, snap.left, snap.cy);
+  }
+
+  function ebsSetPath(id, d) {
+    const el = document.getElementById(id);
+    if (el) el.setAttribute('d', d);
+  }
+
+  function ebsDrawSaa() {
+    const wrap = document.getElementById('ebs-saa-flow');
+    const svg = document.getElementById('ebs-saa-svg');
+    if (!wrap || !svg) return;
+    const cr = wrap.getBoundingClientRect();
+    svg.setAttribute('viewBox', `0 0 ${cr.width} ${cr.height}`);
+
+    const vol = ebsRect('ebs-saa-vol', cr);
+    const snap = ebsRect('ebs-saa-snap', cr);
+    const az = ebsRect('ebs-saa-az', cr);
+    const ec2 = ebsRect('ebs-saa-ec2', cr);
+    const copy = ebsRect('ebs-saa-copy', cr);
+    const region = ebsRect('ebs-saa-region', cr);
+
+    // Row 1: vol → snap → az → ec2
+    ebsSetLine('ebs-saa-a1', vol.right, vol.cy, snap.left, snap.cy);
+    ebsSetLine('ebs-saa-a2', snap.right, snap.cy, az.left, az.cy);
+    ebsSetLine('ebs-saa-a3', az.right, az.cy, ec2.left, ec2.cy);
+
+    // Row 2: snap → copy (curved down)
+    const snapBottom = snap.bottom;
+    const copyTop = copy.top;
+    const midY = (snapBottom + copyTop) / 2;
+    ebsSetPath('ebs-saa-a4', `M${snap.cx} ${snapBottom} C${snap.cx} ${midY} ${copy.cx} ${midY} ${copy.cx} ${copyTop}`);
+
+    // copy → region
+    ebsSetLine('ebs-saa-a5', copy.right, copy.cy, region.left, region.cy);
+  }
+
+  function ebsInitAll() {
+    ebsDrawOverview();
+    ebsDrawSaa();
+  }
+
+  window.addEventListener('load', () => setTimeout(ebsInitAll, 120));
+  window.addEventListener('resize', ebsInitAll);
+
+  const ovWrap = document.getElementById('ebs-ov-wrap');
+  if (ovWrap) new ResizeObserver(ebsInitAll).observe(ovWrap);
+
+  const saaWrap = document.getElementById('ebs-saa-flow');
+  if (saaWrap) new ResizeObserver(ebsDrawSaa).observe(saaWrap);
+</script>

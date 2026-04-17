@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { chapters } from '../data/chapters.ts';
 import SaaOverviewDiagram from '../components/diagrams/SaaOverviewDiagram.astro';
+import { serviceIcons } from '../data/serviceIcons.ts';
 
 const domains = [
   {
@@ -112,6 +113,7 @@ const categories = [
     badge: '分野2',
   },
 ];
+
 ---
 
 <Layout title="トップ">
@@ -295,15 +297,20 @@ const categories = [
 
             <!-- サービスリスト（主要） -->
             <div class="p-3 flex flex-col gap-1">
-              {ch.primaryServices.map(svc => (
+              {ch.primaryServices.concat(ch.moreServices).map(svc => (
                 <a href={`/${svc.slug}`}
                     class="flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-all duration-150 group"
                     style="color:var(--text-muted)"
                     onmouseover="this.style.background='var(--surface-off)'"
                     onmouseout="this.style.background='transparent'">
-                  <span class="font-medium group-hover:text-[var(--brand)] transition-colors" style="color:var(--text)">
+                  <div class="flex items-center gap-2 font-medium group-hover:text-[var(--brand)] transition-colors" style="color:var(--text)">
+                    {serviceIcons[svc.name] ? (
+                      <img src={serviceIcons[svc.name]} alt={svc.name} class="w-6 h-6" />
+                    ) : (
+                      <span class="text-red-500 text-sm">[]</span>
+                    )}
                     {svc.name}
-                  </span>
+                  </div>
                   <div class="flex items-center gap-1">
                     {svc.priority === 'star2' && (
                       <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 border border-amber-200">★★</span>
@@ -320,38 +327,6 @@ const categories = [
                   </div>
                 </a>
               ))}
-
-              <!-- もっと見るトグル -->
-              {ch.moreServices.length > 0 && (
-                <details class="group/more">
-                  <summary class="flex items-center gap-1.5 px-3 py-2 rounded-lg cursor-pointer text-xs font-semibold list-none transition-all duration-150"
-                            style="color:var(--text-faint)"
-                            onmouseover="this.style.background='var(--surface-off)'"
-                            onmouseout="this.style.background='transparent'">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                          class="transition-transform duration-200 group-open/more:rotate-90">
-                      <polyline points="9 18 15 12 9 6"/>
-                    </svg>
-                    さらに {ch.moreServices.length} サービス
-                  </summary>
-                  <div class="mt-1 flex flex-col gap-1">
-                    {ch.moreServices.map(svc => (
-                      <a href={`/${svc.slug}`}
-                          class="flex items-center justify-between px-3 py-1.5 rounded-lg text-sm transition-all duration-150"
-                          style="color:var(--text-muted)"
-                          onmouseover="this.style.background='var(--surface-off)'"
-                          onmouseout="this.style.background='transparent'">
-                        <span style="color:var(--text)">{svc.name}</span>
-                        <div class="flex items-center gap-1">
-                          {svc.isNew && (
-                            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200">新設</span>
-                          )}
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                </details>
-              )}
             </div>
           </div>
         ))}
